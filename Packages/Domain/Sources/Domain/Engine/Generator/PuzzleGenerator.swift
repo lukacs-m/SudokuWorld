@@ -1,0 +1,271 @@
+import Foundation
+public import Model
+
+/// The generation pipeline: fill a solution, apply variant extras (cages,
+/// parity marks), carve givens preserving uniqueness, tune to the target
+/// difficulty, and retry with deterministically evolved seeds on a miss.
+///
+/// Fully deterministic: the same (variant, difficulty, seed) always yields a
+/// byte-identical puzzle, which is what makes worldwide daily challenges work.
+public struct PuzzleGenerator: Sendable {
+    static let maxAttempts = 40
+
+    public init() {}
+
+    /// Generates on the global concurrent executor. `@concurrent` matters:
+    /// under NonisolatedNonsendingByDefault a plain async method would run on
+    /// the caller's actor — typically the MainActor of a view model.
+    @concurrent
+    public func generate(
+        variant: SudokuVariant,
+        difficulty: Difficulty,
+        seed: UInt64,
+    ) async -> PuzzleDefinition {
+        generateNow(variant: variant, difficulty: difficulty, seed: seed)
+    }
+
+    /// Synchronous core — exposed for tests and for callers already off-main.
+    public func generateNow(
+        variant: SudokuVariant,
+        difficulty: Difficulty,
+        seed: UInt64,
+    ) -> PuzzleDefinition {
+        let topology = TopologyFactory.topology(for: variant)
+        let fillContext = SolverContext(topology: topology)
+        let grader = Grader()
+
+        var attemptSeed = seed
+        var best: (puzzle: PuzzleDefinition, distance: Int)?
+
+        for _ in 0 ..< Self.maxAttempts {
+            if let candidate = attempt(
+                topology: topology,
+                fillContext: fillContext,
+                variant: variant,
+                difficulty: difficulty,
+                seed: seed,
+                attemptSeed: attemptSeed,
+                grader: grader,
+            ) {
+                let distance = abs(candidate.gradedDifficulty.rank - difficulty.rank)
+                if distance == 0 { return candidate }
+                if best == nil || distance < (best?.distance ?? .max) {
+                    best = (candidate, distance)
+                }
+            }
+            attemptSeed = SplitMix64.evolve(attemptSeed)
+        }
+        if let best { return best.puzzle }
+        return lastResortPuzzle(
+            topology: topology,
+            fillContext: fillContext,
+            variant: variant,
+            difficulty: difficulty,
+            seed: seed,
+        )
+    }
+
+    // MARK: - Single attempt
+
+    private func attempt(
+        topology: GridTopology,
+        fillContext: SolverContext,
+        variant: SudokuVariant,
+        difficulty: Difficulty,
+        seed: UInt64,
+        attemptSeed: UInt64,
+        grader: Grader,
+    ) -> PuzzleDefinition? {
+        var rng = Xoshiro256StarStar(seed: attemptSeed)
+        guard let solution = GridFiller.fill(context: fillContext, rng: &rng) else {
+            return nil
+        }
+
+        let outcome: DifficultyTargeter.Outcome?
+        var cages: [Cage] = []
+        var parities: [Int: CellParity] = [:]
+
+        switch variant {
+        case .killer:
+            cages = CagePartitioner.partition(
+                topology: topology,
+                solution: solution,
+                difficulty: difficulty,
+                rng: &rng,
+            )
+            outcome = killerGivens(
+                topology: topology,
+                cages: cages,
+                solution: solution,
+                target: difficulty,
+                grader: grader,
+                rng: &rng,
+            )
+
+        case .evenOdd:
+            parities = parityMarks(
+                topology: topology,
+                solution: solution,
+                difficulty: difficulty,
+                rng: &rng,
+            )
+            let context = SolverContext(topology: topology, parities: parities)
+            outcome = carveAndTune(
+                context: context,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+            )
+
+        default:
+            outcome = carveAndTune(
+                context: fillContext,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+            )
+        }
+
+        guard let outcome else { return nil }
+        return PuzzleDefinition(
+            id: Self.deterministicID(seed: seed, variant: variant, difficulty: difficulty),
+            variant: variant,
+            requestedDifficulty: difficulty,
+            gradedDifficulty: outcome.graded,
+            seed: seed,
+            givens: outcome.givens,
+            solution: solution,
+            cages: cages,
+            parities: parities,
+        )
+    }
+
+    private func carveAndTune(
+        context: SolverContext,
+        solution: [Int],
+        difficulty: Difficulty,
+        grader: Grader,
+        rng: inout Xoshiro256StarStar,
+    ) -> DifficultyTargeter.Outcome? {
+        let carved = GivensCarver.carve(
+            context: context,
+            solution: solution,
+            target: difficulty,
+            symmetric: true,
+            rng: &rng,
+            grader: grader,
+        )
+        guard let graded = carved.graded else { return nil }
+        return DifficultyTargeter.Outcome(givens: carved.givens, graded: graded)
+    }
+
+    /// Killer puzzles start with no givens at all; clues are added one at a
+    /// time until the technique ladder can finish the puzzle (which also
+    /// guarantees uniqueness), then difficulty-tuned the same way.
+    private func killerGivens(
+        topology: GridTopology,
+        cages: [Cage],
+        solution: [Int],
+        target: Difficulty,
+        grader: Grader,
+        rng: inout Xoshiro256StarStar,
+    ) -> DifficultyTargeter.Outcome? {
+        let context = SolverContext(topology: topology, cages: cages)
+        var givens = [Int?](repeating: nil, count: topology.cellCount)
+        var addQueue = Array(0 ..< topology.cellCount).shuffled(using: &rng)
+
+        while !grader.solves(context: context, givens: givens) {
+            guard let cell = addQueue.popLast() else { return nil }
+            givens[cell] = solution[cell]
+        }
+
+        // Remaining queue entries double as the easing pool for tuning.
+        let easingUnits = addQueue.reversed().map { [$0] }
+        return DifficultyTargeter.tune(
+            context: context,
+            givens: givens,
+            removedUnits: easingUnits,
+            solution: solution,
+            target: target,
+            grader: grader,
+        )
+    }
+
+    private func parityMarks(
+        topology: GridTopology,
+        solution: [Int],
+        difficulty: Difficulty,
+        rng: inout Xoshiro256StarStar,
+    ) -> [Int: CellParity] {
+        let fraction = switch difficulty {
+        case .beginner: 0.45
+        case .easy: 0.40
+        case .medium: 0.35
+        case .hard: 0.30
+        case .expert: 0.25
+        case .master: 0.20
+        }
+        let markCount = Int(Double(topology.cellCount) * fraction)
+        let marked = Array(0 ..< topology.cellCount).shuffled(using: &rng).prefix(markCount)
+
+        var parities: [Int: CellParity] = [:]
+        for cell in marked {
+            parities[cell] = solution[cell].isMultiple(of: 2) ? .even : .odd
+        }
+        return parities
+    }
+
+    /// Unreachable in practice (an attempt always yields some tunable puzzle);
+    /// keeps the API total without force-unwraps.
+    private func lastResortPuzzle(
+        topology: GridTopology,
+        fillContext: SolverContext,
+        variant: SudokuVariant,
+        difficulty: Difficulty,
+        seed: UInt64,
+    ) -> PuzzleDefinition {
+        var rng = Xoshiro256StarStar(seed: seed)
+        let solution = GridFiller.fill(context: fillContext, rng: &rng)
+            ?? Array(repeating: 1, count: topology.cellCount)
+        var givens: [Int?] = solution
+        // Leave a token challenge: blank one cell per house where possible.
+        for house in topology.houses {
+            if let cell = house.first(where: { givens[$0] != nil }) {
+                givens[cell] = nil
+            }
+        }
+        let graded = Grader().grade(topology: topology, givens: givens) ?? .beginner
+        return PuzzleDefinition(
+            id: Self.deterministicID(seed: seed, variant: variant, difficulty: difficulty),
+            variant: variant,
+            requestedDifficulty: difficulty,
+            gradedDifficulty: graded,
+            seed: seed,
+            givens: givens,
+            solution: solution,
+        )
+    }
+
+    /// A UUID derived from the generation inputs, so regenerating the same
+    /// puzzle (e.g. a daily challenge) yields a stable identity.
+    static func deterministicID(
+        seed: UInt64,
+        variant: SudokuVariant,
+        difficulty: Difficulty,
+    ) -> UUID {
+        var mix = SplitMix64(seed: seed ^ EventSeeds.fnv1a("\(variant.slug):\(difficulty.slug)"))
+        let high = mix.next()
+        let low = mix.next()
+        let hex = String(format: "%016llX%016llX", high, low)
+        let dashed = [
+            hex.prefix(8),
+            hex.dropFirst(8).prefix(4),
+            hex.dropFirst(12).prefix(4),
+            hex.dropFirst(16).prefix(4),
+            hex.dropFirst(20),
+        ].joined(separator: "-")
+        return UUID(uuidString: dashed) ?? UUID()
+    }
+}
