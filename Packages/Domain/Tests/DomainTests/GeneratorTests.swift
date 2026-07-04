@@ -138,4 +138,37 @@ struct GeneratorTests {
         #expect(first == second)
         #expect(first.id == second.id)
     }
+
+    /// Difficulty must be visible on the board, not just in the technique
+    /// cap: beginner boards stay dense, expert/master boards carve deep.
+    /// Guards against regressing to "every difficulty digs to its limit",
+    /// which made all boards feel equally (and maximally) hard.
+    @Test func difficultyControlsGivensDensity() {
+        func givensCount(_ difficulty: Difficulty, seed: UInt64) -> Int {
+            generator.generateNow(variant: .classic, difficulty: difficulty, seed: seed)
+                .givens.count { $0 != nil }
+        }
+
+        for seed in [UInt64(99), 4242, 987_654] {
+            let beginner = givensCount(.beginner, seed: seed)
+            let easy = givensCount(.easy, seed: seed)
+            let medium = givensCount(.medium, seed: seed)
+            let expert = givensCount(.expert, seed: seed)
+
+            // Floors: 55% / 47% / 40% / 31% of 81 cells.
+            #expect(beginner >= 44)
+            #expect(easy >= 38)
+            #expect(medium >= 32)
+            #expect(expert <= 33)
+            // The spread a player actually perceives.
+            #expect(beginner - expert >= 11)
+            #expect(beginner > easy)
+        }
+    }
+
+    @Test func consecutiveSeedsProduceDifferentPuzzles() {
+        let first = generator.generateNow(variant: .classic, difficulty: .easy, seed: 1_000)
+        let second = generator.generateNow(variant: .classic, difficulty: .easy, seed: 1_001)
+        #expect(first.solution != second.solution || first.givens != second.givens)
+    }
 }

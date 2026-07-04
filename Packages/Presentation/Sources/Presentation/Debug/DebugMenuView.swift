@@ -8,7 +8,6 @@
     /// setup), achievement reset, and a deterministic-seed playground.
     struct DebugMenuView: View {
         @State private var resetResult: String?
-        @State private var seedText = "12345"
 
         @Environment(Router.self) private var router
 
@@ -57,12 +56,9 @@
                     }
                 }
 
-                Section("Seed playground") {
-                    TextField("Seed", text: $seedText)
-                        .font(.body.monospaced())
+                Section("Quick play (medium)") {
                     ForEach(SudokuVariant.allCases, id: \.self) { variant in
-                        Button("Play \(variant.slug) medium with seed") {
-                            // Deterministic replay: same seed → same puzzle.
+                        Button("Play \(variant.slug)") {
                             router.push(.game(GameLaunch(kind: .new(
                                 variant: variant,
                                 difficulty: .medium,
@@ -71,8 +67,8 @@
                         }
                     }
                     Text(
-                        "Note: seeded replay drives the daily-challenge path; "
-                            + "regular games derive their seed from the start time.",
+                        "Regular games derive their seed from the start time; "
+                            + "only the daily challenge replays deterministically.",
                     )
                     .font(.caption2)
                     .foregroundStyle(.secondary)

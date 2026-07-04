@@ -2,8 +2,8 @@ import Foundation
 public import Model
 
 /// The generation pipeline: fill a solution, apply variant extras (cages,
-/// parity marks), carve givens preserving uniqueness, tune to the target
-/// difficulty, and retry with deterministically evolved seeds on a miss.
+/// parity marks), carve givens under the difficulty's technique cap and
+/// givens floor, and retry with deterministically evolved seeds on a miss.
 ///
 /// Fully deterministic: the same (variant, difficulty, seed) always yields a
 /// byte-identical puzzle, which is what makes worldwide daily challenges work.
@@ -63,6 +63,23 @@ public struct PuzzleGenerator: Sendable {
             difficulty: difficulty,
             seed: seed,
         )
+    }
+
+    /// The fewest clues a puzzle of this difficulty may keep, as a fraction of
+    /// the grid. This is what makes difficulties *feel* different to humans:
+    /// beginner boards stay dense (≈45 givens on a 9×9) even though deeper
+    /// digs would still be "solvable with singles", while master carves to
+    /// the technique-ladder minimum.
+    static func minimumGivens(for difficulty: Difficulty, cellCount: Int) -> Int {
+        let fraction = switch difficulty {
+        case .beginner: 0.55
+        case .easy: 0.47
+        case .medium: 0.40
+        case .hard: 0.35
+        case .expert: 0.31
+        case .master: 0.0
+        }
+        return Int(Double(cellCount) * fraction)
     }
 
     // MARK: - Single attempt
@@ -153,6 +170,10 @@ public struct PuzzleGenerator: Sendable {
             context: context,
             solution: solution,
             target: difficulty,
+            minimumGivens: Self.minimumGivens(
+                for: difficulty,
+                cellCount: context.cellCount,
+            ),
             symmetric: true,
             rng: &rng,
             grader: grader,
@@ -163,7 +184,8 @@ public struct PuzzleGenerator: Sendable {
 
     /// Killer puzzles start with no givens at all; clues are added one at a
     /// time until the technique ladder can finish the puzzle (which also
-    /// guarantees uniqueness), then difficulty-tuned the same way.
+    /// guarantees uniqueness), difficulty-tuned, then topped up to the
+    /// difficulty's givens floor so easier killers stay approachable.
     private func killerGivens(
         topology: GridTopology,
         cages: [Cage],
@@ -183,14 +205,32 @@ public struct PuzzleGenerator: Sendable {
 
         // Remaining queue entries double as the easing pool for tuning.
         let easingUnits = addQueue.reversed().map { [$0] }
-        return DifficultyTargeter.tune(
+        guard let tuned = DifficultyTargeter.tune(
             context: context,
             givens: givens,
             removedUnits: easingUnits,
             solution: solution,
             target: target,
             grader: grader,
-        )
+        ) else { return nil }
+
+        // Top up to the floor: extra givens only ever make the puzzle easier,
+        // so re-grade once at the end.
+        var topped = tuned.givens
+        var count = topped.count { $0 != nil }
+        let floor = Self.minimumGivens(for: target, cellCount: topology.cellCount)
+        if count < floor {
+            for cell in Array(0 ..< topology.cellCount).shuffled(using: &rng)
+                where topped[cell] == nil
+            {
+                topped[cell] = solution[cell]
+                count += 1
+                if count >= floor { break }
+            }
+            let regraded = grader.grade(context: context, givens: topped) ?? tuned.graded
+            return DifficultyTargeter.Outcome(givens: topped, graded: regraded)
+        }
+        return tuned
     }
 
     private func parityMarks(

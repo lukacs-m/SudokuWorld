@@ -94,7 +94,7 @@ constraints (cages, parity marks).
 |---|---|
 | Fill | MRV backtracking with seed-shuffled digits (own xoshiro256★★ RNG — never the system RNG) |
 | Variant extras | Killer: random-walk cage partition with distinct digits and exact sums; Even-Odd: parity marks derived from the solution |
-| Carve | Grade-guided digging: a removal is kept only while the technique ladder still solves the puzzle *and* grades ≤ target |
+| Carve | Grade-guided digging under two per-difficulty constraints: a removal is kept only while the technique ladder still solves the puzzle *and* grades ≤ target, and digging stops at the difficulty's givens floor (beginner ≈ 55% of cells stay given, easy 47%, medium 40%, hard 35%, expert 31%, master minimal) so difficulty is visible on the board, not just in the techniques |
 | Uniqueness | Ladder-solvable ⇒ unique (every deduction is forced); tests independently re-verify with `solutionCount(limit: 2)` |
 | Difficulty miss | Deterministic seed evolution, ≤ 40 attempts, nearest-grade fallback recorded in `gradedDifficulty` |
 | Hints | The same ladder yields the next step with cells, eliminations, and a localized explanation |
