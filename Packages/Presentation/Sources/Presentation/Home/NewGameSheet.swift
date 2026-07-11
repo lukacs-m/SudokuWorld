@@ -103,13 +103,14 @@ struct NewGameSheet: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
+            .background(
+                selected ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
+                in: RoundedRectangle(cornerRadius: 12),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .foregroundStyle(selected ? Color.white : theme.textPrimary)
-        .background(
-            selected ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
-            in: RoundedRectangle(cornerRadius: 12),
-        )
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 
@@ -129,13 +130,14 @@ struct NewGameSheet: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
+            .background(
+                selected ? theme.accent.opacity(0.12) : theme.cellBackgroundAlternate.opacity(0.4),
+                in: RoundedRectangle(cornerRadius: 10),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .foregroundStyle(selected ? theme.accent : theme.textPrimary)
-        .background(
-            selected ? theme.accent.opacity(0.12) : theme.cellBackgroundAlternate.opacity(0.4),
-            in: RoundedRectangle(cornerRadius: 10),
-        )
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
 

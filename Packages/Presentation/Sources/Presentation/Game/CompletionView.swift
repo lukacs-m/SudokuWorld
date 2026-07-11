@@ -83,6 +83,7 @@ struct CompletionView: View {
                     Text("game.finished.home", bundle: .module)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(theme.textPrimary)

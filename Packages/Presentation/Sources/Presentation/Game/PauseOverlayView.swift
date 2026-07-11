@@ -34,6 +34,7 @@ struct PauseOverlayView: View {
                     Text("game.paused.saveExit", bundle: .module)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(theme.textPrimary)
@@ -43,6 +44,7 @@ struct PauseOverlayView: View {
                     Text("game.paused.abandon", bundle: .module)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }

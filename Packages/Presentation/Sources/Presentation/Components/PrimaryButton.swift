@@ -1,6 +1,8 @@
 public import SwiftUI
 
-/// The filled accent button used for primary actions.
+/// The filled accent button used for primary actions. All chrome lives
+/// inside the label with an explicit content shape, so the entire filled
+/// area is tappable (with `.plain`, only the label's content shape hits).
 public struct PrimaryButton: View {
     private let titleKey: LocalizedStringKey
     private let systemImage: String?
@@ -31,9 +33,10 @@ public struct PrimaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
+            .background(theme.accent, in: RoundedRectangle(cornerRadius: 14))
+            .foregroundStyle(.white)
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
-        .background(theme.accent, in: RoundedRectangle(cornerRadius: 14))
-        .foregroundStyle(.white)
     }
 }

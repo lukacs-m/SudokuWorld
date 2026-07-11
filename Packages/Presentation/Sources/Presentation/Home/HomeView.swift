@@ -101,10 +101,11 @@ struct HomeView: View {
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
+                    .background(theme.accent.opacity(0.12), in: Capsule())
+                    .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(theme.accent)
-                .background(theme.accent.opacity(0.12), in: Capsule())
             }
         }
     }

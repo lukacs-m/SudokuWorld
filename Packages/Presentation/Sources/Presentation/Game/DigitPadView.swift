@@ -64,13 +64,14 @@ struct DigitPadView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
+            .background(
+                viewModel.isNoteMode ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
+                in: RoundedRectangle(cornerRadius: 10),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .foregroundStyle(viewModel.isNoteMode ? Color.white : theme.textSecondary)
-        .background(
-            viewModel.isNoteMode ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
-            in: RoundedRectangle(cornerRadius: 10),
-        )
         .accessibilityLabel(Text("game.tool.notes", bundle: .module))
         .accessibilityAddTraits(viewModel.isNoteMode ? [.isButton, .isSelected] : .isButton)
     }
@@ -91,13 +92,14 @@ struct DigitPadView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
+            .background(
+                theme.cellBackgroundAlternate.opacity(0.6),
+                in: RoundedRectangle(cornerRadius: 10),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .foregroundStyle(enabled ? theme.textPrimary : theme.textSecondary.opacity(0.4))
-        .background(
-            theme.cellBackgroundAlternate.opacity(0.6),
-            in: RoundedRectangle(cornerRadius: 10),
-        )
         .disabled(!enabled)
     }
 
@@ -124,13 +126,14 @@ struct DigitPadView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
+            .background(
+                isArmed ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
+                in: RoundedRectangle(cornerRadius: 10),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .foregroundStyle(isArmed ? Color.white : theme.playerText)
-        .background(
-            isArmed ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
-            in: RoundedRectangle(cornerRadius: 10),
-        )
         .opacity(remaining == 0 && !isArmed ? 0.35 : 1)
         .accessibilityLabel(String(
             format: String(localized: "a11y.digit.button", bundle: .module),

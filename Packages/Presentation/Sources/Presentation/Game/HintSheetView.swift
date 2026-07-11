@@ -47,6 +47,8 @@ struct HintSheetView: View {
                     Text("hint.revealInstead", bundle: .module)
                         .font(.subheadline)
                         .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(theme.textSecondary)

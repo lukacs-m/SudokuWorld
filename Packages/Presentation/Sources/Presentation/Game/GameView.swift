@@ -204,11 +204,12 @@ struct GameView: View {
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .background(theme.cellBackgroundAlternate.opacity(0.6), in: Capsule())
+                .contentShape(Capsule())
             }
             .buttonStyle(.plain)
             .foregroundStyle(viewModel.canRequestHint ? theme.accent : theme.textSecondary
                 .opacity(0.5))
-            .background(theme.cellBackgroundAlternate.opacity(0.6), in: Capsule())
             .disabled(!viewModel.canRequestHint)
         }
     }
