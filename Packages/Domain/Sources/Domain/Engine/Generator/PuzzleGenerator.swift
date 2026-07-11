@@ -18,7 +18,7 @@ public struct PuzzleGenerator: Sendable {
     /// Total attempts: generous for 9×9-class grids, tight for samurai-size
     /// boards where every attempt is ~5× more expensive.
     static func attemptBudget(cellCount: Int) -> Int {
-        cellCount > 200 ? 6 : 40
+        cellCount > 200 ? 3 : 40
     }
 
     /// Generates on the global concurrent executor. `@concurrent` matters:
@@ -44,13 +44,22 @@ public struct PuzzleGenerator: Sendable {
         let grader = Grader()
 
         let maxAttempts = Self.attemptBudget(cellCount: topology.cellCount)
-        // Early settling only where exact hits are expensive or unlikely:
-        // large grids (costly attempts) and master (X-wing-exactly is rare).
-        // Cheap grids with reachable targets hunt the exact grade through the
-        // whole budget — that's what keeps requested == graded almost always.
-        let settleEarly = topology.cellCount > 200 || difficulty == .master
-        let exactPhase = settleEarly ? max(1, maxAttempts / 3) : maxAttempts
-        let nearPhase = settleEarly ? max(2, (maxAttempts * 2) / 3) : maxAttempts
+        // Settle phases per tier. Beginner–medium hunt their exact grade
+        // through the whole budget (attempts are cheap and hits reliable,
+        // thanks to hardening). Hard hits often enough to warrant a real
+        // hunt; expert/master sit at the technique ladder's ceiling
+        // ("triples/X-wing required" boards are genuine finds), so they
+        // settle quickly on the deepest board found. Large grids settle
+        // fastest — their attempts are ~5× the cost.
+        let (exactPhase, nearPhase): (Int, Int) = if topology.cellCount > 200 {
+            (max(1, maxAttempts / 3), max(2, (maxAttempts * 2) / 3))
+        } else if difficulty == .hard {
+            (4, 8)
+        } else if difficulty >= .expert {
+            (2, 4)
+        } else {
+            (maxAttempts, maxAttempts)
+        }
 
         var attemptSeed = seed
         var best: (puzzle: PuzzleDefinition, distance: Int)?
@@ -66,7 +75,9 @@ public struct PuzzleGenerator: Sendable {
                 grader: grader,
             ) {
                 let distance = abs(candidate.gradedDifficulty.rank - difficulty.rank)
-                if distance == 0 { return candidate }
+                if distance == 0 {
+                    return candidate
+                }
                 if best == nil || distance < (best?.distance ?? .max) {
                     best = (candidate, distance)
                 }
@@ -85,7 +96,9 @@ public struct PuzzleGenerator: Sendable {
             }
             attemptSeed = SplitMix64.evolve(attemptSeed)
         }
-        if let best { return best.puzzle }
+        if let best {
+            return best.puzzle
+        }
         return lastResortPuzzle(
             topology: topology,
             fillContext: fillContext,
@@ -107,6 +120,20 @@ public struct PuzzleGenerator: Sendable {
         case .medium: 0.40
         case .hard: 0.35
         case .expert: 0.31
+        case .master: 0.0
+        }
+        return Int(Double(cellCount) * fraction)
+    }
+
+    /// How far hardening (stage 2 of the carve) may dig below the floor when
+    /// the floor state grades under the target. Each tier keeps a distinct
+    /// density so "hard" never carves down to master sparseness.
+    static func hardeningFloor(for difficulty: Difficulty, cellCount: Int) -> Int {
+        let fraction = switch difficulty {
+        case .beginner, .easy: 0.47
+        case .medium: 0.35
+        case .hard: 0.32
+        case .expert: 0.29
         case .master: 0.0
         }
         return Int(Double(cellCount) * fraction)
@@ -207,6 +234,10 @@ public struct PuzzleGenerator: Sendable {
                 for: difficulty,
                 cellCount: context.cellCount,
             ),
+            hardeningFloor: Self.hardeningFloor(
+                for: difficulty,
+                cellCount: context.cellCount,
+            ),
             symmetric: difficulty <= .hard,
             rng: &rng,
             grader: grader,
@@ -231,7 +262,10 @@ public struct PuzzleGenerator: Sendable {
         var givens = [Int?](repeating: nil, count: topology.cellCount)
         var addQueue = Array(0 ..< topology.cellCount).shuffled(using: &rng)
 
-        while !grader.solves(context: context, givens: givens) {
+        // Capped at the target: stops at the same clue set as "solvable, then
+        // eased to the target grade" would, but every failing check on the
+        // way stalls early instead of searching the full technique catalog.
+        while !grader.solvesWithin(target: target, context: context, givens: givens) {
             guard let cell = addQueue.popLast() else { return nil }
             givens[cell] = solution[cell]
         }
@@ -258,7 +292,9 @@ public struct PuzzleGenerator: Sendable {
             {
                 topped[cell] = solution[cell]
                 count += 1
-                if count >= floor { break }
+                if count >= floor {
+                    break
+                }
             }
             let regraded = grader.grade(context: context, givens: topped) ?? tuned.graded
             return DifficultyTargeter.Outcome(givens: topped, graded: regraded)

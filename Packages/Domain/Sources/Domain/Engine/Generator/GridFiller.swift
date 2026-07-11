@@ -16,7 +16,9 @@ enum GridFiller {
         rng: inout Xoshiro256StarStar,
     ) -> [Int]? {
         guard grid.propagate() else { return nil }
-        if grid.isSolved { return grid.values }
+        if grid.isSolved {
+            return grid.values
+        }
         guard let cell = grid.minimumRemainingCell() else { return nil }
 
         let digits = grid.context.digits(in: grid.candidates[cell]).shuffled(using: &rng)

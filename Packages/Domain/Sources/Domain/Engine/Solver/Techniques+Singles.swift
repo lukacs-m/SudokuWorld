@@ -34,7 +34,9 @@ extension Techniques {
                 {
                     home = cell
                     count += 1
-                    if count > 1 { break }
+                    if count > 1 {
+                        break
+                    }
                 }
                 guard count == 1, let cell = home else { continue }
                 return SolveStep(

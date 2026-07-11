@@ -21,33 +21,43 @@ enum DifficultyTargeter {
     ) -> Outcome? {
         var givens = initialGivens
         var pool = removedUnits
-        var graded = grader.grade(context: context, givens: givens)
+        var lastAdded: [Int]?
 
-        while graded == nil || graded.map({ $0 > target }) == true {
-            guard let unit = pool.popLast() else { break }
+        // Ease with cheap capped solvability checks; the expensive full grade
+        // runs once at the end (plus a bounded overshoot repair).
+        while !grader.solvesWithin(target: target, context: context, givens: givens) {
+            guard let unit = pool.popLast() else {
+                // Pool exhausted above the target — label honestly.
+                guard let final = grader.grade(context: context, givens: givens) else {
+                    return nil
+                }
+                return Outcome(givens: givens, graded: final)
+            }
             for cell in unit {
                 givens[cell] = solution[cell]
             }
-            graded = grader.grade(context: context, givens: givens)
-
-            // Overshot below the target: this unit lowered the grade too far.
-            // Try swapping it for another pool unit that lands exactly.
-            if let grade = graded, grade < target {
-                graded = repairOvershoot(
-                    context: context,
-                    givens: &givens,
-                    pool: &pool,
-                    overshotUnit: unit,
-                    overshotGrade: grade,
-                    solution: solution,
-                    target: target,
-                    grader: grader,
-                )
-            }
+            lastAdded = unit
         }
 
-        guard let final = graded else { return nil }
-        return Outcome(givens: givens, graded: final)
+        guard var graded = grader.grade(context: context, givens: givens) else { return nil }
+
+        // Overshot below the target: the last added unit lowered the grade
+        // too far. Try swapping it for another pool unit that lands exactly.
+        // A one-unit swap can only ever bridge one band — repairing a wider
+        // gap (e.g. hard-graded killer asked for master) is wasted grading.
+        if graded < target, target.rank - graded.rank == 1, let unit = lastAdded {
+            graded = repairOvershoot(
+                context: context,
+                givens: &givens,
+                pool: &pool,
+                overshotUnit: unit,
+                overshotGrade: graded,
+                solution: solution,
+                target: target,
+                grader: grader,
+            )
+        }
+        return Outcome(givens: givens, graded: graded)
     }
 
     /// Bounded search for an alternative re-add that hits the target exactly.

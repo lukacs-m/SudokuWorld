@@ -39,7 +39,11 @@ struct GameView: View {
         .sheet(
             isPresented: Binding(
                 get: { viewModel.presentedHint != nil },
-                set: { if !$0 { viewModel.dismissHint() } },
+                set: {
+                    if !$0 {
+                        viewModel.dismissHint()
+                    }
+                },
             ),
         ) {
             if let hint = viewModel.presentedHint {

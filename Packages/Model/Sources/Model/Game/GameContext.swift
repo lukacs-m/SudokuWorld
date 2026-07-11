@@ -15,12 +15,16 @@ public enum GameContext: Hashable, Sendable, Codable {
     }
 
     public var dailyDateKey: String? {
-        if case let .daily(dateKey) = self { return dateKey }
+        if case let .daily(dateKey) = self {
+            return dateKey
+        }
         return nil
     }
 
     public var weekKey: String? {
-        if case let .weekly(weekKey) = self { return weekKey }
+        if case let .weekly(weekKey) = self {
+            return weekKey
+        }
         return nil
     }
 }

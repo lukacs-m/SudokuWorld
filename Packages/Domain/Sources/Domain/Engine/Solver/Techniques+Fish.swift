@@ -6,7 +6,9 @@ extension Techniques {
     /// lines. Runs rows→columns then columns→rows. House-membership driven,
     /// so it stays correct on samurai's overlapping sub-grids.
     static func xWing(in grid: SolverGrid) -> SolveStep? {
-        if let step = xWing(in: grid, baseKind: .row, coverKind: .column) { return step }
+        if let step = xWing(in: grid, baseKind: .row, coverKind: .column) {
+            return step
+        }
         return xWing(in: grid, baseKind: .column, coverKind: .row)
     }
 

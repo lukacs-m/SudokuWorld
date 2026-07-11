@@ -63,7 +63,9 @@ public struct Solver: Sendable {
             var branch = grid
             guard branch.place(digit, at: cell) else { continue }
             search(&branch, limit: limit, count: &count, solution: &solution)
-            if count >= limit { return }
+            if count >= limit {
+                return
+            }
         }
     }
 }

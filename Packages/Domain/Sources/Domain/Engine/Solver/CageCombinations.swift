@@ -39,7 +39,9 @@ enum CageCombinations {
             guard startIndex < digits.count else { return }
             for index in startIndex ..< digits.count {
                 let digit = digits[index]
-                if digit > remainingSum { break }
+                if digit > remainingSum {
+                    break
+                }
                 chosen.append(digit)
                 search(
                     startIndex: index + 1,

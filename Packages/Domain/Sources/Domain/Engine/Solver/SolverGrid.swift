@@ -15,6 +15,10 @@ struct SolverGrid {
     /// naked single 0, hidden single 1, cage arithmetic 4. Lets the grader
     /// use bulk propagation without losing difficulty attribution.
     private(set) var propagationHardestRank: Int = -1
+    /// Digits already placed in each house, maintained incrementally by
+    /// `place` — the finders consult this constantly, and recomputing it by
+    /// scanning house cells dominated solve time.
+    private var housePlaced: [UInt16]
 
     private var cageRemainingSum: [Int]
     private var cageRemainingCount: [Int]
@@ -25,6 +29,7 @@ struct SolverGrid {
         values = [Int](repeating: 0, count: context.cellCount)
         unsolvedCount = context.cellCount
         isContradicted = false
+        housePlaced = [UInt16](repeating: 0, count: context.houses.count)
 
         var initial = [UInt16](repeating: context.fullMask, count: context.cellCount)
         for (cell, parity) in context.parities {
@@ -56,7 +61,9 @@ struct SolverGrid {
     mutating func place(_ digit: Int, at cell: Int) -> Bool {
         guard !isContradicted else { return false }
         if values[cell] != 0 {
-            if values[cell] == digit { return true }
+            if values[cell] == digit {
+                return true
+            }
             isContradicted = true
             return false
         }
@@ -69,6 +76,9 @@ struct SolverGrid {
         values[cell] = digit
         candidates[cell] = 0
         unsolvedCount -= 1
+        for house in context.housesForCell[cell] {
+            housePlaced[house] |= mask
+        }
 
         for peer in context.peers[cell] {
             guard eliminate(digit, at: peer) else { return false }
@@ -102,14 +112,22 @@ struct SolverGrid {
     /// logically forced, so solution counting stays exact while the search
     /// space collapses dramatically (killer grids with no givens would be
     /// near-brute-force otherwise). Returns false on contradiction.
+    ///
+    /// `maxRank` caps the techniques used (see `Technique.rank`): passes above
+    /// the cap are skipped entirely, which is what lets a beginner-capped
+    /// solvability check run as a pure naked-single fixpoint.
     @discardableResult
-    mutating func propagate() -> Bool {
+    mutating func propagate(maxRank: Int = .max) -> Bool {
         var changed = true
         while changed, !isContradicted {
             changed = false
             guard propagateNakedSingles(changed: &changed) else { return false }
-            guard propagateHiddenSingles(changed: &changed) else { return false }
-            guard propagateCageCombinations(changed: &changed) else { return false }
+            if maxRank >= Technique.hiddenSingle.rank {
+                guard propagateHiddenSingles(changed: &changed) else { return false }
+            }
+            if maxRank >= Technique.cageArithmetic.rank {
+                guard propagateCageCombinations(changed: &changed) else { return false }
+            }
         }
         return !isContradicted
     }
@@ -152,7 +170,9 @@ struct SolverGrid {
                 {
                     home = cell
                     count += 1
-                    if count > 1 { break }
+                    if count > 1 {
+                        break
+                    }
                 }
                 if count == 0 {
                     isContradicted = true
@@ -214,19 +234,17 @@ struct SolverGrid {
             if count < bestCount {
                 best = cell
                 bestCount = count
-                if count <= 2 { break }
+                if count <= 2 {
+                    break
+                }
             }
         }
         return best
     }
 
-    /// Whether a house still needs a digit (no cell in it holds the digit yet).
+    /// Digits already placed in a house (cached, updated on placement).
     func housePlacements(_ houseIndex: Int) -> UInt16 {
-        var placed: UInt16 = 0
-        for cell in context.houses[houseIndex] where values[cell] != 0 {
-            placed |= SolverContext.mask(for: values[cell])
-        }
-        return placed
+        housePlaced[houseIndex]
     }
 
     // MARK: - Killer cages

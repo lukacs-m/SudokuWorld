@@ -155,10 +155,11 @@ struct GeneratorTests {
             let medium = givensCount(.medium, seed: seed)
             let expert = givensCount(.expert, seed: seed)
 
-            // Floors: 55% / 47% / 40% / 31% of 81 cells.
+            // Floors: 55% / 47% of 81 cells; medium may harden a little past
+            // its 40% floor when the floor state grades too easy.
             #expect(beginner >= 44)
             #expect(easy >= 38)
-            #expect(medium >= 32)
+            #expect(medium >= 28)
             #expect(expert <= 33)
             // The spread a player actually perceives.
             #expect(beginner - expert >= 11)

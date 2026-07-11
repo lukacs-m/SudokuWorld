@@ -39,18 +39,36 @@ public struct Grader: Sendable {
         }
     }
 
-    /// Fast completeness check: can the ladder finish this puzzle at all?
-    /// Bulk propagation (singles + cage arithmetic) does the heavy lifting;
-    /// the ladder is only consulted at stalls, skipping per-step bookkeeping.
-    /// A fully ladder-solvable puzzle is necessarily unique — every deduction
-    /// is forced — which is what lets generation avoid exhaustive
-    /// solution counting entirely.
-    func solves(context: SolverContext, givens: [Int?]) -> Bool {
+    /// The hardest technique rank a puzzle of this grade may require —
+    /// the upper bound of each band in `difficulty(forHardestRank:)`.
+    static func maxRank(for difficulty: Difficulty) -> Int {
+        switch difficulty {
+        case .beginner: Technique.nakedSingle.rank
+        case .easy: Technique.hiddenSingle.rank
+        case .medium: Technique.cageArithmetic.rank
+        case .hard: Technique.boxLineReduction.rank
+        case .expert: Technique.hiddenTriple.rank
+        case .master: Technique.xWing.rank
+        }
+    }
+
+    /// Fast capped solvability: can the ladder finish this puzzle using only
+    /// techniques allowed at `target`? Equivalent to `grade(...) <= target`
+    /// (the ladder always prefers the easiest applicable step, so capping
+    /// never alters its choices — a needed-but-capped step just stalls), but
+    /// far cheaper: finders above the cap are never even searched, so a
+    /// beginner-capped check is little more than a naked-single fixpoint.
+    /// A capped-solvable puzzle is ladder-solvable, hence unique.
+    func solvesWithin(target: Difficulty, context: SolverContext, givens: [Int?]) -> Bool {
+        let cap = Self.maxRank(for: target)
         var grid = SolverGrid(context: context, givens: givens)
         while true {
-            guard grid.propagate() else { return false }
-            if grid.isSolved { return true }
-            guard let step = TechniqueLadder.nextStep(in: grid) else { return false }
+            guard grid.propagate(maxRank: cap) else { return false }
+            if grid.isSolved {
+                return true
+            }
+            guard grid.propagationHardestRank <= cap else { return false }
+            guard let step = TechniqueLadder.nextStep(in: grid, cap: cap) else { return false }
             guard step.apply(to: &grid) else { return false }
         }
     }
