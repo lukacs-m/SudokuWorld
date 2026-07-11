@@ -171,4 +171,26 @@ struct GeneratorTests {
         let second = generator.generateNow(variant: .classic, difficulty: .easy, seed: 1_001)
         #expect(first.solution != second.solution || first.givens != second.givens)
     }
+
+    /// The worst-case targets must complete within the deterministic work
+    /// budget. Master is the hardest grade to hit exactly (X-wing as the
+    /// hardest step) and samurai attempts are ~5× the cost of a 9×9 —
+    /// before the budget phases, master samurai effectively never finished.
+    @Test(.timeLimit(.minutes(2)), arguments: [
+        (SudokuVariant.samurai, Difficulty.master),
+        (SudokuVariant.killer, Difficulty.master),
+        (SudokuVariant.classic, Difficulty.master),
+    ])
+    func worstCaseTargetsFinishWithinBudget(variant: SudokuVariant, difficulty: Difficulty) {
+        let puzzle = generator.generateNow(
+            variant: variant,
+            difficulty: difficulty,
+            seed: 0xBEEF,
+        )
+        #expect(puzzle.requestedDifficulty == difficulty)
+        // The budget may settle on a neighboring grade; it must land close
+        // and the puzzle must still verify.
+        #expect(abs(puzzle.gradedDifficulty.rank - difficulty.rank) <= 2)
+        validate(puzzle)
+    }
 }

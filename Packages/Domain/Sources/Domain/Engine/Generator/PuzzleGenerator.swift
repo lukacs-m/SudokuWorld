@@ -7,10 +7,19 @@ public import Model
 ///
 /// Fully deterministic: the same (variant, difficulty, seed) always yields a
 /// byte-identical puzzle, which is what makes worldwide daily challenges work.
+/// Retries are bounded by a deterministic **work budget** (never wall-clock,
+/// which would break cross-device determinism) in three phases: hunt the
+/// exact grade first, then accept a neighboring grade, then take the best
+/// candidate seen — so generation always finishes promptly, even for
+/// hard-to-hit targets like Master on samurai's 369-cell grid.
 public struct PuzzleGenerator: Sendable {
-    static let maxAttempts = 40
-
     public init() {}
+
+    /// Total attempts: generous for 9×9-class grids, tight for samurai-size
+    /// boards where every attempt is ~5× more expensive.
+    static func attemptBudget(cellCount: Int) -> Int {
+        cellCount > 200 ? 6 : 40
+    }
 
     /// Generates on the global concurrent executor. `@concurrent` matters:
     /// under NonisolatedNonsendingByDefault a plain async method would run on
@@ -34,10 +43,19 @@ public struct PuzzleGenerator: Sendable {
         let fillContext = SolverContext(topology: topology)
         let grader = Grader()
 
+        let maxAttempts = Self.attemptBudget(cellCount: topology.cellCount)
+        // Early settling only where exact hits are expensive or unlikely:
+        // large grids (costly attempts) and master (X-wing-exactly is rare).
+        // Cheap grids with reachable targets hunt the exact grade through the
+        // whole budget — that's what keeps requested == graded almost always.
+        let settleEarly = topology.cellCount > 200 || difficulty == .master
+        let exactPhase = settleEarly ? max(1, maxAttempts / 3) : maxAttempts
+        let nearPhase = settleEarly ? max(2, (maxAttempts * 2) / 3) : maxAttempts
+
         var attemptSeed = seed
         var best: (puzzle: PuzzleDefinition, distance: Int)?
 
-        for _ in 0 ..< Self.maxAttempts {
+        for attemptIndex in 0 ..< maxAttempts {
             if let candidate = attempt(
                 topology: topology,
                 fillContext: fillContext,
@@ -52,6 +70,18 @@ public struct PuzzleGenerator: Sendable {
                 if best == nil || distance < (best?.distance ?? .max) {
                     best = (candidate, distance)
                 }
+            }
+            if attemptIndex + 1 >= exactPhase,
+               let settled = best, settled.distance <= 1
+            {
+                return settled.puzzle
+            }
+            // Settling on a farther grade needs the full budget — otherwise
+            // keep hunting; the post-loop fallback still returns the best.
+            if attemptIndex + 1 >= nearPhase,
+               let settled = best, settled.distance <= 2
+            {
+                return settled.puzzle
             }
             attemptSeed = SplitMix64.evolve(attemptSeed)
         }
@@ -166,6 +196,9 @@ public struct PuzzleGenerator: Sendable {
         grader: Grader,
         rng: inout Xoshiro256StarStar,
     ) -> DifficultyTargeter.Outcome? {
+        // Symmetry is an aesthetic for approachable boards; expert/master
+        // digs need the freedom of single-cell removals to reach the deep,
+        // technique-heavy configurations their grades require.
         let carved = GivensCarver.carve(
             context: context,
             solution: solution,
@@ -174,7 +207,7 @@ public struct PuzzleGenerator: Sendable {
                 for: difficulty,
                 cellCount: context.cellCount,
             ),
-            symmetric: true,
+            symmetric: difficulty <= .hard,
             rng: &rng,
             grader: grader,
         )
