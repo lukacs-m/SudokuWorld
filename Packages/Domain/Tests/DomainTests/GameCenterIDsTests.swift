@@ -12,6 +12,19 @@ struct GameCenterIDsTests {
         #expect(Set(ids).count == 84)
     }
 
+    /// The matrix must stay pinned to the curated seven that exist in
+    /// App Store Connect — new variants must NOT silently mint board IDs.
+    @Test func matrixCoversOnlyCuratedVariants() {
+        #expect(GameCenterIDs.leaderboardVariants.map(\.slug) == [
+            "classic", "mini6", "killer", "diagonal", "windoku", "evenodd", "samurai",
+        ])
+        for variant in SudokuVariant.allCases
+            where !GameCenterIDs.leaderboardVariants.contains(variant) {
+            let ids = GameCenterIDs.matrixLeaderboardIDs
+            #expect(!ids.contains { $0.contains(".\(variant.slug).") })
+        }
+    }
+
     @Test func allBoardsIncludeAggregates() {
         let ids = GameCenterIDs.allLeaderboardIDs
         #expect(ids.count == 88)

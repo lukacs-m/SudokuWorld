@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var showNewGame = false
     @State private var showPaywall = false
     @State private var hardcoreDefault = false
+    @State private var launchHooksHandled = false
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -58,6 +59,7 @@ struct HomeView: View {
         .onAppear {
             // Refresh when returning from a game (task only fires once).
             Task { await viewModel.refresh() }
+            handleLaunchHooks()
         }
         .sheet(isPresented: $showNewGame) {
             NewGameSheet(hardcoreDefault: hardcoreDefault) { variant, difficulty, mode in
@@ -69,6 +71,26 @@ struct HomeView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView()
         }
+    }
+
+    /// DEBUG-only automation entry points; no-ops in release builds.
+    private func handleLaunchHooks() {
+        #if DEBUG
+            guard !launchHooksHandled else {
+                return
+            }
+            launchHooksHandled = true
+            if LaunchHooks.openNewGameSheet {
+                showNewGame = true
+            }
+            if let start = LaunchHooks.autostart,
+               let variant = SudokuVariant(rawValue: start.variantSlug),
+               let difficulty = Difficulty(rawValue: start.difficultySlug) {
+                router.push(.game(GameLaunch(
+                    kind: .new(variant: variant, difficulty: difficulty, mode: .normal),
+                )))
+            }
+        #endif
     }
 
     private func header(theme: Theme) -> some View {

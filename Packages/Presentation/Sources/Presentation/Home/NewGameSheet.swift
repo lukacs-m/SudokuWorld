@@ -1,9 +1,8 @@
-import Common
 import Model
 import SwiftUI
 
-/// New game configuration: variant, difficulty, and hardcore mode. Samurai
-/// only appears when its feature flag is on.
+/// New game configuration: a sectioned catalog of variant cards, difficulty,
+/// and hardcore mode. Which variants appear is `VariantCatalog`'s call.
 struct NewGameSheet: View {
     let hardcoreDefault: Bool
     let onStart: (SudokuVariant, Difficulty, GameMode) -> Void
@@ -25,24 +24,18 @@ struct NewGameSheet: View {
         _hardcore = State(initialValue: hardcoreDefault)
     }
 
-    private var variants: [SudokuVariant] {
-        SudokuVariant.allCases.filter { $0 != .samurai || FeatureFlags.samuraiEnabled }
-    }
-
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("newGame.variant", bundle: .module)
-                        .font(.headline)
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 100), spacing: 10)],
-                        spacing: 10,
-                    ) {
-                        ForEach(variants, id: \.self) { candidate in
-                            variantCell(candidate, theme: theme)
-                        }
+                    ForEach(VariantCatalog.sections, id: \.group) { section in
+                        VariantSectionView(
+                            group: section.group,
+                            variants: section.variants,
+                            selection: $variant,
+                            theme: theme,
+                        )
                     }
 
                     Text("newGame.difficulty", bundle: .module)
@@ -88,32 +81,6 @@ struct NewGameSheet: View {
         }
     }
 
-    private func variantCell(_ candidate: SudokuVariant, theme: Theme) -> some View {
-        let selected = candidate == variant
-        return Button {
-            variant = candidate
-        } label: {
-            VStack(spacing: 6) {
-                Image(systemName: icon(for: candidate))
-                    .font(.title3)
-                Text(verbatim: moduleString("variant.\(candidate.slug)"))
-                    .font(.caption.weight(.medium))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(
-                selected ? theme.accent : theme.cellBackgroundAlternate.opacity(0.6),
-                in: RoundedRectangle(cornerRadius: 12),
-            )
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(selected ? Color.white : theme.textPrimary)
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-    }
-
     private func difficultyRow(_ candidate: Difficulty, theme: Theme) -> some View {
         let selected = candidate == difficulty
         return Button {
@@ -140,16 +107,38 @@ struct NewGameSheet: View {
         .foregroundStyle(selected ? theme.accent : theme.textPrimary)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
     }
+}
 
-    private func icon(for variant: SudokuVariant) -> String {
-        switch variant {
-        case .classic: "square.grid.3x3"
-        case .mini6: "square.grid.2x2"
-        case .killer: "sum"
-        case .diagonal: "line.diagonal"
-        case .windoku: "square.grid.3x3.middle.filled"
-        case .evenOdd: "circle.square"
-        case .samurai: "square.grid.3x3.fill.square"
+/// One catalog section: an uppercase header and a two-column grid of cards.
+struct VariantSectionView: View {
+    let group: SudokuVariantGroup
+    let variants: [SudokuVariant]
+    @Binding var selection: SudokuVariant
+    let theme: Theme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(verbatim: moduleString("section.\(group.slug)").localizedUppercase)
+                .font(.footnote.weight(.semibold))
+                .tracking(1.1)
+                .foregroundStyle(theme.textSecondary)
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 10),
+                    GridItem(.flexible(), spacing: 10),
+                ],
+                spacing: 10,
+            ) {
+                ForEach(variants, id: \.self) { candidate in
+                    VariantCard(
+                        variant: candidate,
+                        selected: candidate == selection,
+                        theme: theme,
+                    ) {
+                        selection = candidate
+                    }
+                }
+            }
         }
     }
 }

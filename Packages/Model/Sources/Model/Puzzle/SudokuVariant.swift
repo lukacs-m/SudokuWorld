@@ -1,6 +1,7 @@
-/// The seven playable rule sets. Raw values are the canonical slugs used in
+/// The playable rule sets. Raw values are the canonical slugs used in
 /// Game Center identifiers and persistence — renaming a case must never change
-/// its slug (a unit test pins the full identifier matrix).
+/// its slug (a unit test pins the full slug table). Every case is fully
+/// playable: a new case only lands together with its engine support.
 public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case classic
     case mini6
@@ -13,6 +14,16 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
         rawValue
+    }
+
+    /// The catalog section this variant is displayed under.
+    public var group: SudokuVariantGroup {
+        switch self {
+        case .classic, .mini6: .gridSizes
+        case .killer, .diagonal, .windoku: .extraRegions
+        case .samurai: .multiGrid
+        case .evenOdd: .twists
+        }
     }
 
     /// Killer puzzles replace most givens with cage-sum constraints.

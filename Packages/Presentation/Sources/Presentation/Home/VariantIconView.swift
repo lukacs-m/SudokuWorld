@@ -1,0 +1,214 @@
+import Model
+import SwiftUI
+
+/// The illustrated tile on a catalog card: a miniature grid sketch with a
+/// variant-specific decoration, drawn programmatically so every theme and
+/// color scheme renders it correctly.
+struct VariantIconView: View {
+    let variant: SudokuVariant
+    let theme: Theme
+
+    var body: some View {
+        Canvas { context, size in
+            let rect = CGRect(origin: .zero, size: size).insetBy(dx: 8, dy: 8)
+            VariantIconArtwork.draw(variant, in: rect, context: &context, theme: theme)
+        }
+        .background(theme.cellBackground, in: RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(theme.gridLineBold.opacity(0.45), lineWidth: 1),
+        )
+        .accessibilityHidden(true)
+    }
+}
+
+/// Pure drawing code for the catalog tiles. Exhaustive over `SudokuVariant`
+/// on purpose: adding a case without artwork must not compile.
+enum VariantIconArtwork {
+    static func draw(
+        _ variant: SudokuVariant,
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+    ) {
+        switch variant {
+        case .classic: classic(in: rect, context: &context, theme: theme)
+        case .mini6: mini(in: rect, context: &context, theme: theme, size: 6, label: "6×6")
+        case .killer: killer(in: rect, context: &context, theme: theme)
+        case .diagonal: diagonal(in: rect, context: &context, theme: theme)
+        case .windoku: windoku(in: rect, context: &context, theme: theme)
+        case .evenOdd: evenOdd(in: rect, context: &context, theme: theme)
+        case .samurai: samurai(in: rect, context: &context, theme: theme)
+        }
+    }
+
+    // MARK: - Variant artwork
+
+    private static func classic(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        fillCells(
+            [(1, 2), (4, 6), (6, 1)],
+            grid: 9,
+            in: rect,
+            context: &context,
+            color: theme.accent.opacity(0.85),
+        )
+    }
+
+    private static func mini(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+        size: Int,
+        label: String,
+    ) {
+        grid(size, boldEvery: nil, in: rect, context: &context, theme: theme)
+        let text = Text(label)
+            .font(.system(size: rect.height * 0.32, weight: .semibold, design: .serif))
+            .foregroundColor(theme.accent)
+        context.draw(
+            context.resolve(text),
+            at: CGPoint(x: rect.maxX - rect.width * 0.28, y: rect.maxY - rect.height * 0.18),
+        )
+    }
+
+    private static func killer(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        // A dashed cage across the top two boxes, sum clue inside it.
+        let cage = cellRect(row: 0, col: 1, rowSpan: 1, colSpan: 2, grid: 3, in: rect)
+            .insetBy(dx: 2, dy: 2)
+        let dash = StrokeStyle(lineWidth: 1, dash: [3, 2.2])
+        context.stroke(
+            Path(roundedRect: cage, cornerRadius: 2),
+            with: .color(theme.accent),
+            style: dash,
+        )
+        let sum = Text("15")
+            .font(.system(size: rect.height * 0.19, weight: .semibold))
+            .foregroundColor(theme.accent)
+        context.draw(
+            context.resolve(sum),
+            at: CGPoint(x: cage.minX + cage.width * 0.22, y: cage.midY),
+        )
+    }
+
+    private static func diagonal(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        var main = Path()
+        main.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        main.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        var anti = Path()
+        anti.move(to: CGPoint(x: rect.maxX, y: rect.minY))
+        anti.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        for path in [main, anti] {
+            context.stroke(path, with: .color(theme.accent), lineWidth: 1.6)
+        }
+    }
+
+    private static func windoku(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        // Windows first so grid lines stay visible above the tint.
+        for (row, col) in [(1, 1), (1, 5), (5, 1), (5, 5)] {
+            let window = cellRect(row: row, col: col, rowSpan: 3, colSpan: 3, grid: 9, in: rect)
+            context.fill(Path(window), with: .color(theme.accent.opacity(0.3)))
+        }
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+    }
+
+    private static func evenOdd(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        let circleCell = cellRect(row: 2, col: 2, grid: 9, in: rect).insetBy(dx: 0.5, dy: 0.5)
+        context.fill(Path(ellipseIn: circleCell), with: .color(theme.accent.opacity(0.85)))
+        let squareCell = cellRect(row: 5, col: 6, grid: 9, in: rect).insetBy(dx: 0.7, dy: 0.7)
+        context.fill(
+            Path(roundedRect: squareCell, cornerRadius: 1),
+            with: .color(theme.accent.opacity(0.45)),
+        )
+    }
+
+    private static func samurai(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        // Five overlapping grids: four corner squares plus a tinted center.
+        let side = rect.width * 0.42
+        let corners = [
+            CGPoint(x: rect.minX, y: rect.minY),
+            CGPoint(x: rect.maxX - side, y: rect.minY),
+            CGPoint(x: rect.minX, y: rect.maxY - side),
+            CGPoint(x: rect.maxX - side, y: rect.maxY - side),
+        ]
+        let center = CGRect(
+            x: rect.midX - side / 2,
+            y: rect.midY - side / 2,
+            width: side,
+            height: side,
+        )
+        context.fill(Path(center), with: .color(theme.accent.opacity(0.3)))
+        for origin in corners {
+            let square = CGRect(origin: origin, size: CGSize(width: side, height: side))
+            grid(3, boldEvery: nil, in: square, context: &context, theme: theme)
+            context.stroke(Path(square), with: .color(theme.gridLineBold), lineWidth: 1)
+        }
+        context.stroke(Path(center), with: .color(theme.gridLineBold), lineWidth: 1)
+    }
+
+    // MARK: - Shared sketch helpers
+
+    /// Interior grid lines for an `n`×`n` sketch; every `boldEvery`-th line
+    /// is drawn in the bold grid color.
+    static func grid(
+        _ n: Int,
+        boldEvery: Int?,
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+    ) {
+        let step = rect.width / CGFloat(n)
+        for line in 1 ..< n {
+            let bold = boldEvery.map { line % $0 == 0 } ?? false
+            let color = bold ? theme.gridLineBold : theme.gridLine
+            let x = rect.minX + CGFloat(line) * step
+            var vertical = Path()
+            vertical.move(to: CGPoint(x: x, y: rect.minY))
+            vertical.addLine(to: CGPoint(x: x, y: rect.maxY))
+            context.stroke(vertical, with: .color(color), lineWidth: bold ? 1 : 0.5)
+
+            let y = rect.minY + CGFloat(line) * (rect.height / CGFloat(n))
+            var horizontal = Path()
+            horizontal.move(to: CGPoint(x: rect.minX, y: y))
+            horizontal.addLine(to: CGPoint(x: rect.maxX, y: y))
+            context.stroke(horizontal, with: .color(color), lineWidth: bold ? 1 : 0.5)
+        }
+        context.stroke(Path(rect), with: .color(theme.gridLineBold), lineWidth: 1)
+    }
+
+    /// The rect covering a block of sketch cells.
+    static func cellRect(
+        row: Int,
+        col: Int,
+        rowSpan: Int = 1,
+        colSpan: Int = 1,
+        grid n: Int,
+        in rect: CGRect,
+    ) -> CGRect {
+        let cellWidth = rect.width / CGFloat(n)
+        let cellHeight = rect.height / CGFloat(n)
+        return CGRect(
+            x: rect.minX + CGFloat(col) * cellWidth,
+            y: rect.minY + CGFloat(row) * cellHeight,
+            width: cellWidth * CGFloat(colSpan),
+            height: cellHeight * CGFloat(rowSpan),
+        )
+    }
+
+    static func fillCells(
+        _ cells: [(row: Int, col: Int)],
+        grid n: Int,
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        color: Color,
+    ) {
+        for cell in cells {
+            let target = cellRect(row: cell.row, col: cell.col, grid: n, in: rect)
+                .insetBy(dx: 1, dy: 1)
+            context.fill(Path(roundedRect: target, cornerRadius: 1), with: .color(color))
+        }
+    }
+}
