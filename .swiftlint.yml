@@ -34,6 +34,7 @@ opt_in_rules:
 disabled_rules:
   - todo                    # TODO/FIXME comments are fine during development
   - trailing_comma          # SwiftFormat owns comma style
+  - opening_brace           # SwiftFormat owns brace placement (wrapped guards)
 
 line_length:
   warning: 100

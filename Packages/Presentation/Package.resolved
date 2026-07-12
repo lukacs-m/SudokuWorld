@@ -1,0 +1,24 @@
+{
+  "originHash" : "bf17f116e11edf3d2a8b5f0ade9c1c402d8f250711dfd4785a2f33cab16ac915",
+  "pins" : [
+    {
+      "identity" : "factory",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hmlongco/Factory.git",
+      "state" : {
+        "revision" : "cacafd638e8af1dac8abd6a4ab013d53983e2703",
+        "version" : "3.2.1"
+      }
+    },
+    {
+      "identity" : "purchases-ios-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios-spm.git",
+      "state" : {
+        "revision" : "6fcd89a5d6db067081148f0436a7c55d54f36d21",
+        "version" : "5.80.2"
+      }
+    }
+  ],
+  "version" : 3
+}

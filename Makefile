@@ -1,8 +1,8 @@
-# MyApp — developer tasks
+# SudokuWorld — developer tasks
 #
 # Common entry points:
 #   make setup      install tooling, generate the Xcode project, resolve packages
-#   make generate   regenerate MyApp.xcodeproj from project.yml
+#   make generate   regenerate SudokuWorld.xcodeproj from project.yml
 #   make open       open the project in Xcode (generates first if missing)
 #   make test       run every package's test suite
 #   make build      build the app for the simulator
@@ -10,11 +10,12 @@
 
 # ---- Config ---------------------------------------------------------------
 
-PROJECT      := MyApp.xcodeproj
-SCHEME       := MyApp
+PROJECT      := SudokuWorld.xcodeproj
+SCHEME       := SudokuWorld
 # Pick a simulator that exists on the machine; override on the CLI if needed:
-#   make test DESTINATION='platform=iOS Simulator,name=iPhone 16 Pro'
-DESTINATION  ?= platform=iOS Simulator,name=iPhone 16
+#   make test DESTINATION='platform=iOS Simulator,name=iPhone 17 Pro'
+# (Must run an OS matching the iOS 26 deployment target.)
+DESTINATION  ?= platform=iOS Simulator,name=iPhone 17
 
 # Layer packages, in dependency order (lowest first).
 PACKAGES     := Common Model Domain Data DI Presentation
@@ -75,7 +76,7 @@ tools: ## Ensure XcodeGen is installed (via Homebrew)
 # ---- Project generation ---------------------------------------------------
 
 .PHONY: generate
-generate: tools ## Generate MyApp.xcodeproj from project.yml
+generate: tools ## Generate SudokuWorld.xcodeproj from project.yml
 	@xcodegen generate
 	@echo "✅ Generated $(PROJECT)"
 

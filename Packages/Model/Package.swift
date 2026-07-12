@@ -30,6 +30,13 @@ let package = Package(
             ],
             swiftSettings: sharedSwiftSettings
         ),
+        .testTarget(
+            name: "ModelTests",
+            dependencies: [
+                "Model",
+            ],
+            swiftSettings: sharedSwiftSettings
+        ),
     ],
     swiftLanguageModes: [.v6]
 )

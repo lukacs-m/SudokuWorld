@@ -11,12 +11,16 @@ public enum ViewState<Value: Sendable>: Sendable {
 
 public extension ViewState {
     var value: Value? {
-        if case let .loaded(value) = self { return value }
+        if case let .loaded(value) = self {
+            return value
+        }
         return nil
     }
 
     var isLoading: Bool {
-        if case .loading = self { return true }
+        if case .loading = self {
+            return true
+        }
         return false
     }
 }

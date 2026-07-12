@@ -1,0 +1,285 @@
+import DI
+import Domain
+import FactoryTesting
+import Foundation
+import Model
+import Testing
+@testable import Presentation
+
+@Suite(.container)
+@MainActor
+struct GameViewModelTests {
+    private func registerBaseMocks(
+        startPuzzle: PuzzleDefinition = TestFixtures.puzzle(),
+        entitlements: Entitlements = .free,
+        interstitial: AdCreative? = nil,
+    ) -> (saves: SaveRecorder, completions: CompletionRecorder) {
+        let saves = SaveRecorder()
+        let completions = CompletionRecorder()
+        Container.shared.startGameUseCase.register { MockStartGame(puzzle: startPuzzle) }
+        Container.shared.resumeGameUseCase.register { MockResumeGame(saved: nil) }
+        Container.shared.saveGameUseCase.register { MockSaveGame(recorder: saves) }
+        Container.shared.abandonGameUseCase.register { MockAbandonGame() }
+        Container.shared.completeGameUseCase.register { MockCompleteGame(recorder: completions) }
+        Container.shared.getHintUseCase.register { MockGetHint() }
+        Container.shared.revealCellUseCase.register { MockRevealCell() }
+        Container.shared.interstitialGateUseCase.register {
+            MockInterstitialGate(creative: interstitial)
+        }
+        Container.shared.getEntitlementsUseCase.register {
+            MockGetEntitlements(entitlements: entitlements)
+        }
+        Container.shared.settingsRepository.register { MockSettingsRepository() }
+        return (saves, completions)
+    }
+
+    private func firstEmpty(_ session: GameSession) -> Int {
+        (0..<session.board.count).first { session.board[$0].value == nil } ?? 0
+    }
+
+    @Test func startCreatesAPlayingSession() async {
+        _ = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        #expect(viewModel.phase == .playing)
+        #expect(viewModel.session != nil)
+        #expect(viewModel.topology?.cellCount == 81)
+    }
+
+    @Test func correctPlacementUpdatesBoardAndSchedulesAutosave() async throws {
+        let (saves, _) = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        guard let session = viewModel.session else {
+            Issue.record("No session")
+            return
+        }
+        let index = firstEmpty(session)
+        viewModel.tapCell(index)
+        viewModel.tapDigit(session.puzzle.solution[index])
+
+        #expect(viewModel.session?.board[index].value == session.puzzle.solution[index])
+        #expect(viewModel.feedback?.result == .placed)
+
+        // The debounced autosave fires after ~500 ms.
+        try await Task.sleep(for: .milliseconds(900))
+        let count = await saves.snapshots.count
+        #expect(count >= 1)
+    }
+
+    @Test func noteModeTogglesNotes() async {
+        _ = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        guard let session = viewModel.session else {
+            Issue.record("No session")
+            return
+        }
+        let index = firstEmpty(session)
+        viewModel.isNoteMode = true
+        viewModel.tapCell(index)
+        viewModel.tapDigit(5)
+
+        #expect(viewModel.session?.board[index].value == nil)
+        #expect(viewModel.session?.board[index].notes.contains(5) == true)
+    }
+
+    @Test func hardcoreLossCompletesAsLost() async throws {
+        let (_, completions) = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .hardcore,
+        )))
+        await viewModel.start()
+
+        guard let session = viewModel.session else {
+            Issue.record("No session")
+            return
+        }
+        let index = firstEmpty(session)
+        let wrong = session.puzzle.solution[index] == 1 ? 2 : 1
+
+        // Select once — tapping the same cell again would toggle it off.
+        viewModel.tapCell(index)
+        for _ in 0..<4 {
+            viewModel.tapDigit(wrong)
+            viewModel.eraseTapped()
+        }
+        // The finish flow runs in a Task; give it a beat.
+        try await Task.sleep(for: .milliseconds(300))
+
+        let outcomes = await completions.outcomes
+        #expect(outcomes == [.lost])
+        if case let .finished(summary) = viewModel.phase {
+            #expect(summary.outcome == .lost)
+        } else {
+            Issue.record("Expected finished phase, got \(viewModel.phase)")
+        }
+    }
+
+    @Test func solvingRunsCompletionAndInterstitialGate() async throws {
+        let creative = AdCreative(
+            id: "test",
+            format: .interstitial,
+            headline: "h",
+            body: "b",
+            callToAction: "c",
+        )
+        let (_, completions) = registerBaseMocks(
+            startPuzzle: TestFixtures.almostSolvedPuzzle(),
+            interstitial: creative,
+        )
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        guard let session = viewModel.session else {
+            Issue.record("No session")
+            return
+        }
+        let index = firstEmpty(session)
+        viewModel.tapCell(index)
+        viewModel.tapDigit(session.puzzle.solution[index])
+        try await Task.sleep(for: .milliseconds(300))
+
+        let outcomes = await completions.outcomes
+        #expect(outcomes == [.won])
+        #expect(viewModel.interstitial == creative)
+        if case let .finished(summary) = viewModel.phase {
+            #expect(summary.outcome == .won)
+        } else {
+            Issue.record("Expected finished phase, got \(viewModel.phase)")
+        }
+    }
+
+    @Test func freeTierHintLimitIsEnforced() async {
+        _ = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        for _ in 0..<FreeTier.hintsPerGame {
+            #expect(viewModel.canRequestHint)
+            await viewModel.requestHint()
+            #expect(viewModel.presentedHint != nil)
+            viewModel.applyPresentedHint()
+        }
+        #expect(!viewModel.canRequestHint)
+        #expect(viewModel.hintsRemaining == 0)
+    }
+
+    @Test func premiumHasUnlimitedHints() async {
+        _ = registerBaseMocks(
+            entitlements: Entitlements(isPremium: true, source: .subscription),
+        )
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        for _ in 0..<5 {
+            await viewModel.requestHint()
+            viewModel.applyPresentedHint()
+        }
+        #expect(viewModel.canRequestHint)
+        #expect(viewModel.hintsRemaining == nil)
+    }
+
+    @Test func hardcoreModeDisallowsHints() async {
+        _ = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .hardcore,
+        )))
+        await viewModel.start()
+        #expect(!viewModel.canRequestHint)
+    }
+
+    @Test func pauseFreezesTheClock() async {
+        _ = registerBaseMocks()
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        viewModel.pauseTapped()
+        #expect(viewModel.phase == .paused)
+        #expect(viewModel.session?.lastResume == nil)
+
+        viewModel.resumeTapped()
+        #expect(viewModel.phase == .playing)
+        #expect(viewModel.session?.lastResume != nil)
+    }
+
+    @Test func digitFirstModeArmsDigits() async {
+        Container.shared.settingsRepository.register {
+            var settings = GameSettings.standard
+            settings.inputMode = .digitFirst
+            return MockSettingsRepository(settings: settings)
+        }
+        _ = registerBaseMocksKeepingSettings()
+
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .classic,
+            difficulty: .easy,
+            mode: .normal,
+        )))
+        await viewModel.start()
+
+        guard let session = viewModel.session else {
+            Issue.record("No session")
+            return
+        }
+        let index = firstEmpty(session)
+        let digit = session.puzzle.solution[index]
+
+        viewModel.tapDigit(digit)
+        #expect(viewModel.armedDigit == digit)
+        viewModel.tapCell(index)
+        #expect(viewModel.session?.board[index].value == digit)
+    }
+
+    /// Same as `registerBaseMocks` but leaves an existing settings
+    /// registration untouched.
+    private func registerBaseMocksKeepingSettings() -> (SaveRecorder, CompletionRecorder) {
+        let saves = SaveRecorder()
+        let completions = CompletionRecorder()
+        Container.shared.startGameUseCase.register { MockStartGame() }
+        Container.shared.resumeGameUseCase.register { MockResumeGame(saved: nil) }
+        Container.shared.saveGameUseCase.register { MockSaveGame(recorder: saves) }
+        Container.shared.abandonGameUseCase.register { MockAbandonGame() }
+        Container.shared.completeGameUseCase.register { MockCompleteGame(recorder: completions) }
+        Container.shared.getHintUseCase.register { MockGetHint() }
+        Container.shared.revealCellUseCase.register { MockRevealCell() }
+        Container.shared.interstitialGateUseCase.register { MockInterstitialGate(creative: nil) }
+        Container.shared.getEntitlementsUseCase.register { MockGetEntitlements() }
+        return (saves, completions)
+    }
+}
