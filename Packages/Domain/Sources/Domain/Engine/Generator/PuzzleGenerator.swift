@@ -46,16 +46,17 @@ public struct PuzzleGenerator: Sendable {
         let maxAttempts = Self.attemptBudget(cellCount: topology.cellCount)
         // Settle phases per tier. Beginner–medium hunt their exact grade
         // through the whole budget (attempts are cheap and hits reliable,
-        // thanks to hardening). Hard hits often enough to warrant a real
-        // hunt; expert/master sit at the technique ladder's ceiling
-        // ("triples/X-wing required" boards are genuine finds), so they
-        // settle quickly on the deepest board found. Large grids settle
-        // fastest — their attempts are ~5× the cost.
+        // thanks to hardening). Hard and expert are the thin bands — a dig
+        // often jumps from "pairs suffice" straight to "needs chains" — so
+        // they get a real hunt before settling on a neighbor. Master hits
+        // reliably (chain-requiring boards are common at minimal depth) and
+        // settles fast. Large grids settle fastest — their attempts are ~5×
+        // the cost.
         let (exactPhase, nearPhase): (Int, Int) = if topology.cellCount > 200 {
             (max(1, maxAttempts / 3), max(2, (maxAttempts * 2) / 3))
-        } else if difficulty == .hard {
+        } else if difficulty == .hard || difficulty == .expert {
             (4, 8)
-        } else if difficulty >= .expert {
+        } else if difficulty == .master {
             (2, 4)
         } else {
             (maxAttempts, maxAttempts)

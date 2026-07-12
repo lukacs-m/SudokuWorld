@@ -58,13 +58,14 @@ enum GivensCarver {
         let batchUnits = Self.batchUnits(cellCount: context.cellCount)
         var units = removalUnits(context: context, symmetric: symmetric, rng: &rng)
 
-        /// Attempts to remove `cells` as one step; restores them on failure.
-        func tryRemove(_ cells: [Int]) -> Bool {
+        /// Attempts to remove `cells` as one step at the given acceptance
+        /// cap; restores them on failure.
+        func tryRemove(_ cells: [Int], acceptance: Difficulty) -> Bool {
             let backup = cells.map { givens[$0] }
             for cell in cells {
                 givens[cell] = nil
             }
-            if grader.solvesWithin(target: target, context: context, givens: givens) {
+            if grader.solvesWithin(target: acceptance, context: context, givens: givens) {
                 givensCount -= cells.count
                 return true
             }
@@ -77,7 +78,7 @@ enum GivensCarver {
         /// Digs from the current cursor down to `floor`. With `probeGrade`,
         /// the full grade runs after every round that removed something, and
         /// digging stops as soon as the target grade is reached.
-        func dig(floor: Int, probeGrade: Bool) {
+        func dig(floor: Int, acceptance: Difficulty, probeGrade: Bool) {
             while index < units.count {
                 if givensCount <= floor {
                     break
@@ -94,7 +95,7 @@ enum GivensCarver {
                 // Speculative batch: one solvability check for several units.
                 if batch.count > 1,
                    givensCount - batchCells.count >= floor,
-                   tryRemove(batchCells)
+                   tryRemove(batchCells, acceptance: acceptance)
                 {
                     consecutiveRejections = 0
                     accepted = true
@@ -112,7 +113,7 @@ enum GivensCarver {
                             continue
                         }
 
-                        if tryRemove(unit) {
+                        if tryRemove(unit, acceptance: acceptance) {
                             consecutiveRejections = 0
                             accepted = true
                         } else {
@@ -131,7 +132,7 @@ enum GivensCarver {
         }
 
         // Stage 1: respect the density floor.
-        dig(floor: minimumGivens, probeGrade: false)
+        dig(floor: minimumGivens, acceptance: target, probeGrade: false)
         var graded = grader.grade(context: context, givens: givens)
 
         // Stage 2: harden past the floor when the grade came up short.
@@ -154,9 +155,14 @@ enum GivensCarver {
                 .map { [$0] }
             index = 0
             consecutiveRejections = 0
+
             // Master wants maximum depth regardless — skip the per-batch
             // probes and grade once at the end.
-            dig(floor: hardeningFloor, probeGrade: target != .master)
+            dig(
+                floor: hardeningFloor,
+                acceptance: target,
+                probeGrade: target != .master,
+            )
             graded = grader.grade(context: context, givens: givens)
         }
         return Result(givens: givens, graded: graded)

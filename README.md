@@ -16,10 +16,13 @@ events, RevenueCat monetization, and full English + French localization.
   Hyper/Windoku, Even-Odd, and Samurai (five overlapping grids, behind
   `FeatureFlags.samuraiEnabled`; on in Debug builds).
 - **Six difficulties** (Beginner → Master) graded by the *solving techniques a
-  puzzle actually requires* — naked/hidden singles, pairs, triples, pointing
-  pairs, box-line reduction, X-wing, killer cage arithmetic — never by clue
-  count. Every generated puzzle is fully solvable by logic (that's also what
-  guarantees a unique solution) and every hint names and explains its technique.
+  puzzle actually requires* — never by clue count. The ladder: naked/hidden
+  singles → pairs & killer cage arithmetic (medium) → pointing pairs,
+  box-line reduction, triples, X-wing (hard) → swordfish & XY-wing (expert)
+  → XY-chains (master). Expert and master boards genuinely *require* their
+  techniques (pinned by tests). Every generated puzzle is fully solvable by
+  logic (that's also what guarantees a unique solution) and every hint names
+  and explains its technique.
 - **Deterministic generation** — one seed produces a byte-identical puzzle on
   every device. The Daily Challenge derives its seed from the UTC date, so the
   whole world plays the same board.

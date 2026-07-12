@@ -52,6 +52,18 @@ enum TechniqueLadder {
         if let step = Techniques.xWing(in: grid) {
             return step
         }
+        guard cap >= Technique.swordfish.rank else { return nil }
+        if let step = Techniques.swordfish(in: grid) {
+            return step
+        }
+        guard cap >= Technique.xyWing.rank else { return nil }
+        if let step = Techniques.xyWing(in: grid) {
+            return step
+        }
+        guard cap >= Technique.xyChain.rank else { return nil }
+        if let step = Techniques.xyChain(in: grid) {
+            return step
+        }
         return nil
     }
 }

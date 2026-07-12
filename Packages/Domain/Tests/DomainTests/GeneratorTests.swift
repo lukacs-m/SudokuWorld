@@ -167,6 +167,26 @@ struct GeneratorTests {
         }
     }
 
+    /// "True master": with swordfish, XY-wing, and XY-chains in the ladder,
+    /// master boards must actually *require* a chain — not just be sparse.
+    /// Chain-requiring boards are common at minimal depth, so exact hits are
+    /// reliable; these seeds are pinned as proof.
+    @Test(arguments: [UInt64(7777), 11, 3333])
+    func masterRequiresDeepTechniques(seed: UInt64) {
+        let puzzle = generator.generateNow(variant: .classic, difficulty: .master, seed: seed)
+        #expect(puzzle.gradedDifficulty == .master)
+        validate(puzzle)
+    }
+
+    /// "True expert": wings/fish must be required — pinned on seeds verified
+    /// to hit the band exactly.
+    @Test(arguments: [UInt64(11), 222, 3333])
+    func expertRequiresWingsOrFish(seed: UInt64) {
+        let puzzle = generator.generateNow(variant: .classic, difficulty: .expert, seed: seed)
+        #expect(puzzle.gradedDifficulty == .expert)
+        validate(puzzle)
+    }
+
     @Test func consecutiveSeedsProduceDifferentPuzzles() {
         let first = generator.generateNow(variant: .classic, difficulty: .easy, seed: 1_000)
         let second = generator.generateNow(variant: .classic, difficulty: .easy, seed: 1_001)

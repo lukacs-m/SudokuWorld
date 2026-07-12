@@ -12,6 +12,9 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
     case nakedTriple
     case hiddenTriple
     case xWing
+    case swordfish
+    case xyWing
+    case xyChain
 
     /// Monotonic spotting-difficulty rank used by the grader.
     public var rank: Int {
@@ -26,6 +29,9 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
         case .nakedTriple: 7
         case .hiddenTriple: 8
         case .xWing: 9
+        case .swordfish: 10
+        case .xyWing: 11
+        case .xyChain: 12
         }
     }
 }

@@ -46,9 +46,9 @@ public struct Grader: Sendable {
         case .beginner: Technique.nakedSingle.rank
         case .easy: Technique.hiddenSingle.rank
         case .medium: Technique.cageArithmetic.rank
-        case .hard: Technique.boxLineReduction.rank
-        case .expert: Technique.hiddenTriple.rank
-        case .master: Technique.xWing.rank
+        case .hard: Technique.xWing.rank
+        case .expert: Technique.xyWing.rank
+        case .master: Technique.xyChain.rank
         }
     }
 
@@ -74,15 +74,18 @@ public struct Grader: Sendable {
     }
 
     /// The rank → difficulty table (see `Technique.rank`). Kept in one place
-    /// so tuning the scale never touches the finders.
+    /// so tuning the scale never touches the finders. Bands are drawn where
+    /// requirements actually cluster at depth: "needs triples/X-wing exactly"
+    /// is a razor-thin slice, so it shares the hard band; wings and fish
+    /// (common near minimal depth) are expert; chains are master.
     func difficulty(forHardestRank rank: Int) -> Difficulty {
         switch rank {
         case ..<1: .beginner // naked singles only
         case 1: .easy // hidden singles
         case 2 ... 4: .medium // pairs, cage arithmetic
-        case 5 ... 6: .hard // locked candidates
-        case 7 ... 8: .expert // triples
-        default: .master // x-wing
+        case 5 ... 9: .hard // locked candidates, triples, x-wing
+        case 10 ... 11: .expert // swordfish, xy-wing
+        default: .master // xy-chains
         }
     }
 }

@@ -1818,6 +1818,57 @@
         }
       }
     },
+    "hint.technique.swordfish" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digit %@ forms a swordfish across the highlighted lines — it can be removed from the other cells of the covering lines."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le chiffre %@ forme un espadon sur les lignes surlignées — il peut être retiré des autres cases des lignes couvrantes."
+          }
+        }
+      }
+    },
+    "hint.technique.xyWing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The highlighted pivot and its two pincers force %@ out of every cell that sees both pincers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pivot surligné et ses deux pinces excluent %@ de toute case voyant les deux pinces."
+          }
+        }
+      }
+    },
+    "hint.technique.xyChain" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A chain of paired cells proves one of its two ends must be %1$@ — cells seeing both ends can't be %1$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une chaîne de cases appariées prouve qu'une de ses extrémités vaut %1$@ — les cases voyant les deux extrémités ne peuvent pas valoir %1$@."
+          }
+        }
+      }
+    },
     "home.continue.title" : {
       "localizations" : {
         "en" : {
@@ -3294,6 +3345,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "X-Wing"
+          }
+        }
+      }
+    },
+    "technique.swordfish" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swordfish"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espadon"
+          }
+        }
+      }
+    },
+    "technique.xyWing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XY-Wing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XY-Wing"
+          }
+        }
+      }
+    },
+    "technique.xyChain" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XY-Chain"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaîne XY"
           }
         }
       }
