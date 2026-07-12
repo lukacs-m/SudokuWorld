@@ -18,7 +18,7 @@ struct DigitPadView: View {
 
         VStack(spacing: 12) {
             toolRow(theme: theme)
-            digitRow(size: size, theme: theme)
+            digitRows(size: size, theme: theme)
         }
     }
 
@@ -103,10 +103,21 @@ struct DigitPadView: View {
         .disabled(!enabled)
     }
 
-    private func digitRow(size: Int, theme: Theme) -> some View {
-        HStack(spacing: 6) {
-            ForEach(1 ... size, id: \.self) { digit in
-                digitButton(digit, theme: theme)
+    /// Digits chunk into rows so big variants stay tappable: one row up to 9,
+    /// two rows up to 16, three rows beyond.
+    private func digitRows(size: Int, theme: Theme) -> some View {
+        let rowCount = size <= 9 ? 1 : (size <= 16 ? 2 : 3)
+        let perRow = (size + rowCount - 1) / rowCount
+        let rows: [[Int]] = stride(from: 1, through: size, by: perRow).map { start in
+            Array(start ... min(start + perRow - 1, size))
+        }
+        return VStack(spacing: 6) {
+            ForEach(rows, id: \.first) { row in
+                HStack(spacing: 6) {
+                    ForEach(row, id: \.self) { digit in
+                        digitButton(digit, theme: theme)
+                    }
+                }
             }
         }
     }
@@ -114,12 +125,15 @@ struct DigitPadView: View {
     private func digitButton(_ digit: Int, theme: Theme) -> some View {
         let remaining = viewModel.remainingCount(for: digit)
         let isArmed = viewModel.armedDigit == digit
+        let variant = viewModel.session?.puzzle.variant ?? .classic
         return Button {
             viewModel.tapDigit(digit)
         } label: {
             VStack(spacing: 1) {
-                Text("\(digit)")
+                Text(VariantGlyphs.glyph(digit, for: variant))
                     .font(.system(.title2, design: .rounded).weight(.medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                 Text("\(remaining)")
                     .font(.caption2)
                     .opacity(remaining > 0 ? 0.7 : 0)
@@ -137,7 +151,7 @@ struct DigitPadView: View {
         .opacity(remaining == 0 && !isArmed ? 0.35 : 1)
         .accessibilityLabel(String(
             format: String(localized: "a11y.digit.button", bundle: .module),
-            digit,
+            VariantGlyphs.glyph(digit, for: variant),
             remaining,
         ))
     }

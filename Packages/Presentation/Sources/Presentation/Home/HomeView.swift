@@ -85,7 +85,8 @@ struct HomeView: View {
             }
             if let start = LaunchHooks.autostart,
                let variant = SudokuVariant(rawValue: start.variantSlug),
-               let difficulty = Difficulty(rawValue: start.difficultySlug) {
+               let difficulty = Difficulty(rawValue: start.difficultySlug)
+            {
                 router.push(.game(GameLaunch(
                     kind: .new(variant: variant, difficulty: difficulty, mode: .normal),
                 )))

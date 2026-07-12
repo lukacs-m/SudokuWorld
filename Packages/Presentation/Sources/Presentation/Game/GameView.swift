@@ -49,6 +49,7 @@ struct GameView: View {
             if let hint = viewModel.presentedHint {
                 HintSheetView(
                     hint: hint,
+                    variant: viewModel.session?.puzzle.variant ?? .classic,
                     onApply: { viewModel.applyPresentedHint() },
                     onReveal: { Task { await viewModel.requestReveal() } },
                     onDismiss: { viewModel.dismissHint() },

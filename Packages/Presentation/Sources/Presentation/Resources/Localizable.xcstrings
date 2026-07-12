@@ -79,13 +79,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "given %d"
+            "value" : "given %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "chiffre imposé %d"
+            "value" : "chiffre imposé %@"
           }
         }
       }
@@ -143,13 +143,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "value %d"
+            "value" : "value %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "valeur %d"
+            "value" : "valeur %@"
           }
         }
       }
@@ -159,13 +159,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Digit %1$d, %2$d remaining"
+            "value" : "Digit %1$@, %2$d remaining"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chiffre %1$d, %2$d restants"
+            "value" : "Chiffre %1$@, %2$d restants"
           }
         }
       }
@@ -3712,6 +3712,40 @@
         }
       }
     },
+    "variant.dodeka12" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodeka"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodeka"
+          }
+        }
+      }
+    },
+    "variant.dodeka12.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12×12, 3×4 boxes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12×12, blocs 3×4."
+          }
+        }
+      }
+    },
     "variant.evenodd" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3746,6 +3780,40 @@
         }
       }
     },
+    "variant.hexadoku16" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hexadoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hexadoku"
+          }
+        }
+      }
+    },
+    "variant.hexadoku16.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16×16 with 0–F."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16×16 avec 0–F."
+          }
+        }
+      }
+    },
     "variant.killer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3776,6 +3844,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cages et sommes."
+          }
+        }
+      }
+    },
+    "variant.mini4" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini 4×4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini 4×4"
+          }
+        }
+      }
+    },
+    "variant.mini4.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiny warm-up grid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petite grille d'échauffement."
           }
         }
       }
@@ -3878,6 +3980,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quatre zones en plus."
+          }
+        }
+      }
+    },
+    "variant.wordoku" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordoku"
+          }
+        }
+      }
+    },
+    "variant.wordoku.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letters, not numbers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des lettres, pas des chiffres."
           }
         }
       }

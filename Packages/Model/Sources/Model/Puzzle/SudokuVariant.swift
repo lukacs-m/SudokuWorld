@@ -10,6 +10,10 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case windoku
     case evenOdd = "evenodd"
     case samurai
+    case mini4
+    case dodeka12
+    case hexadoku16
+    case wordoku
 
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
@@ -19,10 +23,10 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     /// The catalog section this variant is displayed under.
     public var group: SudokuVariantGroup {
         switch self {
-        case .classic, .mini6: .gridSizes
+        case .mini4, .mini6, .classic, .dodeka12, .hexadoku16: .gridSizes
         case .killer, .diagonal, .windoku: .extraRegions
         case .samurai: .multiGrid
-        case .evenOdd: .twists
+        case .evenOdd, .wordoku: .twists
         }
     }
 

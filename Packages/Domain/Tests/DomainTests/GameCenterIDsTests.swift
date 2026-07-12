@@ -60,6 +60,7 @@ struct GameCenterIDsTests {
     @Test func slugsAreCanonical() {
         #expect(SudokuVariant.allCases.map(\.slug) == [
             "classic", "mini6", "killer", "diagonal", "windoku", "evenodd", "samurai",
+            "mini4", "dodeka12", "hexadoku16", "wordoku",
         ])
         #expect(Difficulty.allCases.map(\.slug) == [
             "beginner", "easy", "medium", "hard", "expert", "master",

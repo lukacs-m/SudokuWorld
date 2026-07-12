@@ -151,7 +151,8 @@ struct BoardView: View {
         cellSize: CGFloat,
         settings: GameSettings,
     ) {
-        let noteColumns = topology.size > 6 ? 3 : 3
+        let variant = session.puzzle.variant
+        let noteColumns = VariantGlyphs.noteColumns(forSize: topology.size)
         let noteRows = (topology.size + noteColumns - 1) / noteColumns
 
         for index in 0 ..< session.board.count {
@@ -167,9 +168,11 @@ struct BoardView: View {
                 } else {
                     theme.playerText
                 }
-                let text = Text("\(value)")
+                let glyph = VariantGlyphs.glyph(value, for: variant)
+                // Two-character values (10–16 on big grids) need a smaller face.
+                let text = Text(glyph)
                     .font(.system(
-                        size: cellSize * 0.55,
+                        size: cellSize * (glyph.count > 1 ? 0.44 : 0.55),
                         weight: cell.isGiven ? .semibold : .regular,
                         design: .rounded,
                     ))
@@ -184,8 +187,12 @@ struct BoardView: View {
                         x: rect.minX + cellSize * (CGFloat(column) + 0.5) / CGFloat(noteColumns),
                         y: rect.minY + cellSize * (CGFloat(row) + 0.5) / CGFloat(noteRows),
                     )
-                    let text = Text("\(digit)")
-                        .font(.system(size: cellSize * 0.24, design: .rounded))
+                    let glyph = VariantGlyphs.glyph(digit, for: variant)
+                    let text = Text(glyph)
+                        .font(.system(
+                            size: cellSize * (glyph.count > 1 ? 0.19 : 0.24),
+                            design: .rounded,
+                        ))
                         .foregroundStyle(theme.noteText)
                     context.draw(context.resolve(text), at: point, anchor: .center)
                 }

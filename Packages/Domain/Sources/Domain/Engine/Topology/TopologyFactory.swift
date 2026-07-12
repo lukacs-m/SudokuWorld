@@ -13,6 +13,10 @@ public enum TopologyFactory {
         case .windoku: windokuTopology
         case .evenOdd: evenOddTopology
         case .samurai: samuraiTopology
+        case .mini4: mini4Topology
+        case .dodeka12: dodeka12Topology
+        case .hexadoku16: hexadoku16Topology
+        case .wordoku: wordokuTopology
         }
     }
 
@@ -50,6 +54,27 @@ public enum TopologyFactory {
         includeWindows: true,
     )
     private static let samuraiTopology = SamuraiTopology.build()
+    private static let mini4Topology = rectangular(variant: .mini4, size: 4, boxRows: 2, boxCols: 2)
+    private static let dodeka12Topology = rectangular(
+        variant: .dodeka12,
+        size: 12,
+        boxRows: 3,
+        boxCols: 4,
+    )
+    private static let hexadoku16Topology = rectangular(
+        variant: .hexadoku16,
+        size: 16,
+        boxRows: 4,
+        boxCols: 4,
+    )
+    /// Wordoku is a classic 9×9 under letter glyphs; the glyph mapping is
+    /// purely presentational.
+    private static let wordokuTopology = rectangular(
+        variant: .wordoku,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
 
     /// A full square grid of `size`×`size` with `boxRows`×`boxCols` boxes,
     /// optionally decorated with diagonal or windoku houses.

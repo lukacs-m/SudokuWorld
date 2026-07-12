@@ -28,6 +28,17 @@ public struct Hint: Equatable, Sendable, Codable {
         }
     }
 
+    /// A typed format argument, so Presentation can render digits through a
+    /// variant's glyph set (hexadoku's 0–F, wordoku's letters) instead of the
+    /// engine baking digit strings into the message.
+    public enum Argument: Equatable, Sendable, Codable {
+        case digit(Int)
+        case digits([Int])
+        /// One-based, display-ready coordinates.
+        case row(Int)
+        case column(Int)
+    }
+
     public let kind: Kind
     /// Cells the UI should spotlight while explaining the step.
     public let cells: [Int]
@@ -36,7 +47,7 @@ public struct Hint: Equatable, Sendable, Codable {
     /// Localization key for the human-readable explanation (resolved by
     /// Presentation against its string catalog), plus its format arguments.
     public let explanationKey: String
-    public let explanationArgs: [String]
+    public let explanationArguments: [Argument]
 
     public init(
         kind: Kind,
@@ -44,13 +55,13 @@ public struct Hint: Equatable, Sendable, Codable {
         placement: Placement? = nil,
         eliminations: [Elimination] = [],
         explanationKey: String,
-        explanationArgs: [String] = [],
+        explanationArguments: [Argument] = [],
     ) {
         self.kind = kind
         self.cells = cells
         self.placement = placement
         self.eliminations = eliminations
         self.explanationKey = explanationKey
-        self.explanationArgs = explanationArgs
+        self.explanationArguments = explanationArguments
     }
 }

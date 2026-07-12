@@ -5,6 +5,7 @@ import SwiftUI
 /// offers to apply it (or reveal the selected cell instead).
 struct HintSheetView: View {
     let hint: Hint
+    let variant: SudokuVariant
     let onApply: () -> Void
     let onReveal: () -> Void
     let onDismiss: () -> Void
@@ -31,7 +32,7 @@ struct HintSheetView: View {
                 .accessibilityLabel(Text("common.close", bundle: .module))
             }
 
-            Text(GameAccessibility.hintExplanation(hint))
+            Text(GameAccessibility.hintExplanation(hint, variant: variant))
                 .font(.body)
                 .foregroundStyle(theme.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)

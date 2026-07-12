@@ -33,12 +33,30 @@ enum VariantIconArtwork {
     ) {
         switch variant {
         case .classic: classic(in: rect, context: &context, theme: theme)
+        case .mini4: mini(in: rect, context: &context, theme: theme, size: 4, label: "4×4")
         case .mini6: mini(in: rect, context: &context, theme: theme, size: 6, label: "6×6")
+        case .dodeka12: sized(
+                in: rect,
+                context: &context,
+                theme: theme,
+                size: 12,
+                boldEvery: nil,
+                label: "12",
+            )
+        case .hexadoku16: sized(
+                in: rect,
+                context: &context,
+                theme: theme,
+                size: 16,
+                boldEvery: 4,
+                label: "0–F",
+            )
         case .killer: killer(in: rect, context: &context, theme: theme)
         case .diagonal: diagonal(in: rect, context: &context, theme: theme)
         case .windoku: windoku(in: rect, context: &context, theme: theme)
         case .evenOdd: evenOdd(in: rect, context: &context, theme: theme)
         case .samurai: samurai(in: rect, context: &context, theme: theme)
+        case .wordoku: wordoku(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -70,6 +88,40 @@ enum VariantIconArtwork {
             context.resolve(text),
             at: CGPoint(x: rect.maxX - rect.width * 0.28, y: rect.maxY - rect.height * 0.18),
         )
+    }
+
+    /// A dense grid with a corner label on a soft plaque, for the big sizes.
+    private static func sized(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+        size: Int,
+        boldEvery: Int?,
+        label: String,
+    ) {
+        grid(size, boldEvery: boldEvery, in: rect, context: &context, theme: theme)
+        let plaque = CGRect(
+            x: rect.maxX - rect.width * 0.52,
+            y: rect.maxY - rect.height * 0.34,
+            width: rect.width * 0.52,
+            height: rect.height * 0.34,
+        )
+        context.fill(Path(roundedRect: plaque, cornerRadius: 2), with: .color(theme.cellBackground))
+        let text = Text(label)
+            .font(.system(size: rect.height * 0.26, weight: .semibold, design: .serif))
+            .foregroundColor(theme.accent)
+        context.draw(context.resolve(text), at: CGPoint(x: plaque.midX, y: plaque.midY))
+    }
+
+    private static func wordoku(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        for (glyph, row, col) in [("A", 0, 1), ("E", 4, 4), ("I", 7, 6)] {
+            let cell = cellRect(row: row, col: col, rowSpan: 2, colSpan: 2, grid: 9, in: rect)
+            let text = Text(glyph)
+                .font(.system(size: rect.height * 0.22, weight: .semibold, design: .serif))
+                .foregroundColor(theme.accent)
+            context.draw(context.resolve(text), at: CGPoint(x: cell.midX, y: cell.midY))
+        }
     }
 
     private static func killer(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
