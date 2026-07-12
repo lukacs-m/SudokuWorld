@@ -12,7 +12,7 @@ enum VariantGlyphs {
         case .wordoku:
             letter(digit, alphabet: "ABCDEFGHI")
         case .classic, .mini4, .mini6, .dodeka12, .killer, .diagonal, .windoku,
-             .evenOdd, .samurai:
+             .evenOdd, .samurai, .jigsaw, .argyle, .asterisk:
             "\(digit)"
         }
     }

@@ -67,9 +67,9 @@ public final class GameViewModel {
 
     // MARK: - Derived state
 
-    public var topology: GridTopology? {
-        session.map { TopologyFactory.topology(for: $0.puzzle.variant) }
-    }
+    /// Stored (not computed) because per-puzzle shapes (jigsaw) rebuild
+    /// their lookup tables on every construction; set alongside `session`.
+    public private(set) var topology: GridTopology?
 
     public var hintsRemaining: Int? {
         guard let session else { return nil }
@@ -168,6 +168,7 @@ public final class GameViewModel {
         }
         newSession.resume(at: now)
         session = newSession
+        topology = TopologyFactory.topology(for: newSession.puzzle)
         peersByCell = Self.buildPeers(for: newSession.puzzle)
         conflicts = []
         phase = .playing
@@ -365,11 +366,16 @@ public final class GameViewModel {
     }
 
     private static func buildPeers(for puzzle: PuzzleDefinition) -> [[Int]] {
-        let topology = TopologyFactory.topology(for: puzzle.variant)
+        let topology = TopologyFactory.topology(for: puzzle)
         var peers = [Set<Int>](repeating: [], count: topology.cellCount)
         for house in topology.houses {
             for cell in house {
                 peers[cell].formUnion(house)
+            }
+        }
+        for clique in topology.cliques {
+            for cell in clique {
+                peers[cell].formUnion(clique)
             }
         }
         for cage in puzzle.cages {

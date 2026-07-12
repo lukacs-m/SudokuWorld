@@ -10,7 +10,7 @@ struct GeneratorTests {
     private static let seed: UInt64 = 0xC0FF_EE00_5EED
 
     private func validate(_ puzzle: PuzzleDefinition) {
-        let topology = TopologyFactory.topology(for: puzzle.variant)
+        let topology = TopologyFactory.topology(for: puzzle)
         #expect(puzzle.givens.count == topology.cellCount)
         #expect(puzzle.solution.count == topology.cellCount)
 
@@ -57,6 +57,10 @@ struct GeneratorTests {
         (SudokuVariant.dodeka12, Difficulty.easy),
         (SudokuVariant.hexadoku16, Difficulty.easy),
         (SudokuVariant.wordoku, Difficulty.expert),
+        (SudokuVariant.jigsaw, Difficulty.easy),
+        (SudokuVariant.jigsaw, Difficulty.expert),
+        (SudokuVariant.argyle, Difficulty.easy),
+        (SudokuVariant.asterisk, Difficulty.easy),
     ])
     func generatesValidPuzzles(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(

@@ -46,6 +46,6 @@ enum VariantCatalog {
     }
 
     private static let newVariants: Set<SudokuVariant> = [
-        .mini4, .dodeka12, .hexadoku16, .wordoku,
+        .mini4, .dodeka12, .hexadoku16, .wordoku, .jigsaw, .argyle, .asterisk,
     ]
 }

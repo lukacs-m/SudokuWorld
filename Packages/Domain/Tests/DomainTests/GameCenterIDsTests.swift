@@ -61,6 +61,7 @@ struct GameCenterIDsTests {
         #expect(SudokuVariant.allCases.map(\.slug) == [
             "classic", "mini6", "killer", "diagonal", "windoku", "evenodd", "samurai",
             "mini4", "dodeka12", "hexadoku16", "wordoku",
+            "jigsaw", "argyle", "asterisk",
         ])
         #expect(Difficulty.allCases.map(\.slug) == [
             "beginner", "easy", "medium", "hard", "expert", "master",

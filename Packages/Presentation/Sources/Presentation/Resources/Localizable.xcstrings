@@ -3644,6 +3644,74 @@
     "variant.%@" : {
 
     },
+    "variant.argyle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argyle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argyle"
+          }
+        }
+      }
+    },
+    "variant.argyle.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diamond lattice diagonals."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonales en losange."
+          }
+        }
+      }
+    },
+    "variant.asterisk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asterisk"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astérisque"
+          }
+        }
+      }
+    },
+    "variant.asterisk.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One extra starred region."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une région étoilée en plus."
+          }
+        }
+      }
+    },
     "variant.classic" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3810,6 +3878,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "16×16 avec 0–F."
+          }
+        }
+      }
+    },
+    "variant.jigsaw" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jigsaw"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irrégulier"
+          }
+        }
+      }
+    },
+    "variant.jigsaw.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irregular regions."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Régions irrégulières."
           }
         }
       }

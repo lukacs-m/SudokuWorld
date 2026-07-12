@@ -4,6 +4,16 @@ public import Model
 /// Even-Odd share the classic shape — their extra constraints (cages,
 /// parity marks) are per-puzzle data, not structure.
 public enum TopologyFactory {
+    /// The shape of a specific puzzle: honors per-puzzle structure (jigsaw
+    /// region maps) and falls back to the variant's cached topology. Prefer
+    /// this overload anywhere a `PuzzleDefinition` is in hand.
+    public static func topology(for puzzle: PuzzleDefinition) -> GridTopology {
+        if let boxes = puzzle.irregularBoxes {
+            return JigsawTopology.build(boxes: boxes)
+        }
+        return topology(for: puzzle.variant)
+    }
+
     public static func topology(for variant: SudokuVariant) -> GridTopology {
         switch variant {
         case .classic: classicTopology
@@ -17,6 +27,11 @@ public enum TopologyFactory {
         case .dodeka12: dodeka12Topology
         case .hexadoku16: hexadoku16Topology
         case .wordoku: wordokuTopology
+        // Jigsaw's real shape is per-puzzle (`irregularBoxes`); this
+        // classic-box stand-in only sizes budgets before generation.
+        case .jigsaw: jigsawFallbackTopology
+        case .argyle: argyleTopology
+        case .asterisk: asteriskTopology
         }
     }
 
@@ -75,6 +90,63 @@ public enum TopologyFactory {
         boxRows: 3,
         boxCols: 3,
     )
+    private static let jigsawFallbackTopology = rectangular(
+        variant: .jigsaw,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+
+    /// Argyle: classic houses plus six marked diagonals — the two main
+    /// diagonals and the four edges of the inscribed diamond. The short
+    /// lines can't be houses (a house must contain every digit), so they
+    /// ride as `cliques`: pairwise-distinct groups feeding only the peer
+    /// sets. `diagonals` carries the same lines for rendering.
+    private static let argyleTopology: GridTopology = {
+        let base = rectangular(variant: .argyle, size: 9, boxRows: 3, boxCols: 3)
+        var lines: [[Int]] = [
+            (0 ... 8).map { $0 * 9 + $0 },
+            (0 ... 8).map { $0 * 9 + (8 - $0) },
+        ]
+        lines.append((0 ... 4).map { $0 * 9 + ($0 + 4) }) // NE diamond edge
+        lines.append((0 ... 4).map { $0 * 9 + (4 - $0) }) // NW
+        lines.append((4 ... 8).map { $0 * 9 + (12 - $0) }) // SE
+        lines.append((4 ... 8).map { $0 * 9 + ($0 - 4) }) // SW
+        return GridTopology(
+            variant: .argyle,
+            size: 9,
+            rowCount: 9,
+            colCount: 9,
+            cells: base.cells,
+            houses: base.houses,
+            houseKinds: base.houseKinds,
+            boxIndex: base.boxIndex,
+            diagonals: lines,
+            cliques: lines,
+        )
+    }()
+
+    /// Asterisk: classic houses plus one scattered 9-cell region (a full
+    /// house — it contains every digit), shaded like a windoku window.
+    private static let asteriskTopology: GridTopology = {
+        let base = rectangular(variant: .asterisk, size: 9, boxRows: 3, boxCols: 3)
+        let star = [
+            (1, 4), (2, 2), (2, 6),
+            (4, 1), (4, 4), (4, 7),
+            (6, 2), (6, 6), (7, 4),
+        ].map { $0.0 * 9 + $0.1 }
+        return GridTopology(
+            variant: .asterisk,
+            size: 9,
+            rowCount: 9,
+            colCount: 9,
+            cells: base.cells,
+            houses: base.houses + [star],
+            houseKinds: base.houseKinds + [.window],
+            boxIndex: base.boxIndex,
+            windows: [star],
+        )
+    }()
 
     /// A full square grid of `size`×`size` with `boxRows`×`boxCols` boxes,
     /// optionally decorated with diagonal or windoku houses.

@@ -152,6 +152,19 @@ public struct PuzzleGenerator: Sendable {
         grader: Grader,
     ) -> PuzzleDefinition? {
         var rng = Xoshiro256StarStar(seed: attemptSeed)
+
+        // Jigsaw regions are per-puzzle structure: each attempt draws a new
+        // partition, so a hard-to-fill layout just costs one retry.
+        var topology = topology
+        var fillContext = fillContext
+        var irregularBoxes: [Int]?
+        if variant == .jigsaw {
+            let boxes = RegionPartitioner.partition(size: topology.size, rng: &rng)
+            irregularBoxes = boxes
+            topology = JigsawTopology.build(boxes: boxes)
+            fillContext = SolverContext(topology: topology)
+        }
+
         guard let solution = GridFiller.fill(context: fillContext, rng: &rng) else {
             return nil
         }
@@ -214,6 +227,7 @@ public struct PuzzleGenerator: Sendable {
             solution: solution,
             cages: cages,
             parities: parities,
+            irregularBoxes: irregularBoxes,
         )
     }
 

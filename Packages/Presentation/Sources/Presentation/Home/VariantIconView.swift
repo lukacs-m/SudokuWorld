@@ -57,6 +57,9 @@ enum VariantIconArtwork {
         case .evenOdd: evenOdd(in: rect, context: &context, theme: theme)
         case .samurai: samurai(in: rect, context: &context, theme: theme)
         case .wordoku: wordoku(in: rect, context: &context, theme: theme)
+        case .jigsaw: jigsaw(in: rect, context: &context, theme: theme)
+        case .argyle: argyle(in: rect, context: &context, theme: theme)
+        case .asterisk: asterisk(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -199,6 +202,57 @@ enum VariantIconArtwork {
             context.stroke(Path(square), with: .color(theme.gridLineBold), lineWidth: 1)
         }
         context.stroke(Path(center), with: .color(theme.gridLineBold), lineWidth: 1)
+    }
+
+    private static func jigsaw(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        // Two interlocking organic regions, like the mock: no grid, just the
+        // suggestion of wonky pieces.
+        var upper = Path()
+        upper.move(to: point(0.18, 0.30, in: rect))
+        upper.addLine(to: point(0.52, 0.18, in: rect))
+        upper.addLine(to: point(0.66, 0.44, in: rect))
+        upper.addLine(to: point(0.40, 0.46, in: rect))
+        upper.addLine(to: point(0.32, 0.62, in: rect))
+        upper.closeSubpath()
+        var lower = Path()
+        lower.move(to: point(0.44, 0.56, in: rect))
+        lower.addLine(to: point(0.82, 0.46, in: rect))
+        lower.addLine(to: point(0.88, 0.74, in: rect))
+        lower.addLine(to: point(0.54, 0.84, in: rect))
+        lower.closeSubpath()
+        context.fill(upper, with: .color(theme.accent.opacity(0.45)))
+        context.stroke(upper, with: .color(theme.gridLineBold), lineWidth: 1)
+        context.fill(lower, with: .color(theme.cellBackgroundAlternate))
+        context.stroke(lower, with: .color(theme.gridLineBold), lineWidth: 1)
+    }
+
+    private static func argyle(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        var lines = Path()
+        // The X.
+        lines.move(to: point(0, 0, in: rect))
+        lines.addLine(to: point(1, 1, in: rect))
+        lines.move(to: point(1, 0, in: rect))
+        lines.addLine(to: point(0, 1, in: rect))
+        // The inscribed diamond.
+        lines.move(to: point(0.5, 0, in: rect))
+        lines.addLine(to: point(1, 0.5, in: rect))
+        lines.addLine(to: point(0.5, 1, in: rect))
+        lines.addLine(to: point(0, 0.5, in: rect))
+        lines.closeSubpath()
+        context.stroke(lines, with: .color(theme.accent), lineWidth: 1.3)
+    }
+
+    private static func asterisk(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        for (row, col) in [(1, 4), (4, 1), (4, 4), (4, 7), (7, 4)] {
+            let cell = cellRect(row: row, col: col, grid: 9, in: rect).insetBy(dx: 0.4, dy: 0.4)
+            context.fill(Path(ellipseIn: cell), with: .color(theme.accent.opacity(0.85)))
+        }
+    }
+
+    private static func point(_ x: CGFloat, _ y: CGFloat, in rect: CGRect) -> CGPoint {
+        CGPoint(x: rect.minX + rect.width * x, y: rect.minY + rect.height * y)
     }
 
     // MARK: - Shared sketch helpers

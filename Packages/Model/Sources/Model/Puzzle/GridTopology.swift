@@ -24,8 +24,13 @@ public struct GridTopology: Equatable, Sendable, Codable {
     public let boxIndex: [Int]
     /// Windoku's four shaded windows (also present in `houses`).
     public let windows: [[Int]]
-    /// The two main diagonals of an X-Sudoku (also present in `houses`).
+    /// Marked diagonal lines of X-Sudoku and argyle (drawn by the renderer;
+    /// full-length ones may also be houses).
     public let diagonals: [[Int]]
+    /// Pairwise-distinct groups that need NOT contain every digit — argyle's
+    /// short diagonals. Unlike houses these never feed hidden-single logic;
+    /// they only widen each member's peer set.
+    public let cliques: [[Int]]
 
     /// Row-major lookup table: position → cell index, -1 where inactive.
     private let indexByPosition: [Int]
@@ -41,6 +46,7 @@ public struct GridTopology: Equatable, Sendable, Codable {
         boxIndex: [Int],
         windows: [[Int]] = [],
         diagonals: [[Int]] = [],
+        cliques: [[Int]] = [],
     ) {
         self.variant = variant
         self.size = size
@@ -52,6 +58,7 @@ public struct GridTopology: Equatable, Sendable, Codable {
         self.boxIndex = boxIndex
         self.windows = windows
         self.diagonals = diagonals
+        self.cliques = cliques
 
         var lookup = [Int](repeating: -1, count: rowCount * colCount)
         for (index, position) in cells.enumerated() {

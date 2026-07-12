@@ -22,6 +22,9 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
     public let cages: [Cage]
     /// Parity marks by cell index; empty for non Even-Odd variants.
     public let parities: [Int: CellParity]
+    /// Jigsaw region id per cell; nil for variants with regular boxes.
+    /// Optional so saves from before this field decode unchanged.
+    public let irregularBoxes: [Int]?
 
     public init(
         id: UUID,
@@ -33,6 +36,7 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         solution: [Int],
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
+        irregularBoxes: [Int]? = nil,
     ) {
         self.id = id
         self.variant = variant
@@ -43,5 +47,6 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         self.solution = solution
         self.cages = cages
         self.parities = parities
+        self.irregularBoxes = irregularBoxes
     }
 }

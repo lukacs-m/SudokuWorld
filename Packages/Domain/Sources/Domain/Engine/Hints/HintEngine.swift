@@ -11,7 +11,7 @@ public struct HintEngine: Sendable {
     /// priority: the first one found becomes a corrective reveal hint.
     /// Returns nil only when the board is already complete.
     public func nextHint(board: Board, puzzle: PuzzleDefinition) -> Hint? {
-        let topology = TopologyFactory.topology(for: puzzle.variant)
+        let topology = TopologyFactory.topology(for: puzzle)
 
         for index in 0 ..< board.count {
             let cell = board[index]
@@ -60,7 +60,7 @@ public struct HintEngine: Sendable {
         guard let index = target else { return nil }
 
         let digit = puzzle.solution[index]
-        let position = TopologyFactory.topology(for: puzzle.variant).position(of: index)
+        let position = TopologyFactory.topology(for: puzzle).position(of: index)
         return Hint(
             kind: .reveal,
             cells: [index],

@@ -62,6 +62,13 @@ struct SolverContext {
                 peerSets[cell].formUnion(house)
             }
         }
+        // Cliques (argyle's short diagonals) are pairwise-distinct only:
+        // they widen peer sets but never participate in house logic.
+        for clique in topology.cliques {
+            for cell in clique {
+                peerSets[cell].formUnion(clique)
+            }
+        }
         for cage in cages {
             for cell in cage.cells {
                 peerSets[cell].formUnion(cage.cells)

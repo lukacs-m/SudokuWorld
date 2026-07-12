@@ -11,7 +11,7 @@ public struct ConflictDetector: Equatable, Sendable {
     public init(puzzle: PuzzleDefinition) {
         self.puzzle = puzzle
         let context = SolverContext(
-            topology: TopologyFactory.topology(for: puzzle.variant),
+            topology: TopologyFactory.topology(for: puzzle),
             cages: puzzle.cages,
             parities: puzzle.parities,
         )
