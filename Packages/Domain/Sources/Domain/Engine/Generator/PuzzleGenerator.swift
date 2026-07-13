@@ -197,8 +197,27 @@ public struct PuzzleGenerator: Sendable {
         var relations: [RelationClue] = []
         var thermometers: [[Int]] = []
         var arrows: [Arrow] = []
+        var outsideClues: [OutsideClue] = []
 
         switch variant {
+        case .sandwich, .skyscraper, .littleKiller:
+            outsideClues = Self.outsideClues(
+                variant: variant,
+                topology: topology,
+                solution: solution,
+                difficulty: difficulty,
+                rng: &rng,
+            )
+            let context = SolverContext(topology: topology, outsideClues: outsideClues)
+            outcome = carveAndTune(
+                context: context,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+                givensFloorScale: 0.55,
+            )
+
         case .thermo:
             thermometers = LinePlacer.thermometers(
                 topology: topology,
@@ -310,7 +329,68 @@ public struct PuzzleGenerator: Sendable {
             relations: relations,
             thermometers: thermometers,
             arrows: arrows,
+            outsideClues: outsideClues,
         )
+    }
+
+    /// Clue sets read off the finished solution. Sandwich shows every row
+    /// (left) and column (top) sum, skyscraper all four edges, and little
+    /// killer a seeded handful of diagonals.
+    private static func outsideClues(
+        variant: SudokuVariant,
+        topology: GridTopology,
+        solution: [Int],
+        difficulty: Difficulty,
+        rng: inout Xoshiro256StarStar,
+    ) -> [OutsideClue] {
+        let size = topology.size
+        switch variant {
+        case .sandwich:
+            let spots = (0 ..< size).map { (OutsideClue.Side.leading, $0) }
+                + (0 ..< size).map { (OutsideClue.Side.top, $0) }
+            return OutsideClues.derive(
+                kind: .sandwichSum,
+                clues: spots,
+                topology: topology,
+                solution: solution,
+            )
+        case .skyscraper:
+            let spots = (0 ..< size).flatMap { offset in
+                [
+                    (OutsideClue.Side.leading, offset),
+                    (OutsideClue.Side.trailing, offset),
+                    (OutsideClue.Side.top, offset),
+                    (OutsideClue.Side.bottom, offset),
+                ]
+            }
+            return OutsideClues.derive(
+                kind: .skyscraperCount,
+                clues: spots,
+                topology: topology,
+                solution: solution,
+            )
+        case .littleKiller:
+            let count = switch difficulty {
+            case .beginner, .easy: 10
+            case .medium, .hard: 8
+            case .expert, .master: 7
+            }
+            var spots: [(OutsideClue.Side, Int)] = []
+            for side in [OutsideClue.Side.top, .trailing, .bottom, .leading] {
+                for offset in 1 ..< size {
+                    spots.append((side, offset))
+                }
+            }
+            spots.shuffle(using: &rng)
+            return OutsideClues.derive(
+                kind: .diagonalSum,
+                clues: Array(spots.prefix(count)),
+                topology: topology,
+                solution: solution,
+            )
+        default:
+            return []
+        }
     }
 
     private func carveAndTune(

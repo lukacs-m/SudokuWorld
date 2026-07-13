@@ -32,6 +32,8 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
     public let thermometers: [[Int]]
     /// Arrow clues: shaft digits sum to the circled cell.
     public let arrows: [Arrow]
+    /// Clues printed outside the grid (sandwich, skyscraper, little killer).
+    public let outsideClues: [OutsideClue]
 
     public init(
         id: UUID,
@@ -47,6 +49,7 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         relations: [RelationClue] = [],
         thermometers: [[Int]] = [],
         arrows: [Arrow] = [],
+        outsideClues: [OutsideClue] = [],
     ) {
         self.id = id
         self.variant = variant
@@ -61,6 +64,7 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         self.relations = relations
         self.thermometers = thermometers
         self.arrows = arrows
+        self.outsideClues = outsideClues
     }
 
     /// Custom decoding so payload fields added after 1.0 fall back to empty
@@ -94,5 +98,9 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
             forKey: .thermometers,
         ) ?? []
         arrows = try container.decodeIfPresent([Arrow].self, forKey: .arrows) ?? []
+        outsideClues = try container.decodeIfPresent(
+            [OutsideClue].self,
+            forKey: .outsideClues,
+        ) ?? []
     }
 }

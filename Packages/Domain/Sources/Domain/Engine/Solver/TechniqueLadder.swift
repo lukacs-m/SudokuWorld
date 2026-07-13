@@ -60,6 +60,10 @@ enum TechniqueLadder {
         if let step = Techniques.xWing(in: grid) {
             return step
         }
+        guard cap >= Technique.outsideClueAnalysis.rank else { return nil }
+        if let step = Techniques.outsideClueAnalysis(in: grid) {
+            return step
+        }
         guard cap >= Technique.swordfish.rank else { return nil }
         if let step = Techniques.swordfish(in: grid) {
             return step

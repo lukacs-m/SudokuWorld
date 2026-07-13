@@ -85,7 +85,29 @@ struct SolverGrid {
         }
         guard updateRelations(afterPlacing: digit, at: cell) else { return false }
         guard updateSumLines(afterPlacing: digit, at: cell) else { return false }
+        guard updateOutsideClues(afterPlacing: digit, at: cell) else { return false }
         return updateCage(afterPlacing: digit, at: cell)
+    }
+
+    /// Verifies any sandwich/skyscraper line this assignment completes.
+    /// Bound propagation for these clues is deliberately partial; this
+    /// place-time check is what keeps uniqueness counting exact.
+    private mutating func updateOutsideClues(afterPlacing _: Int, at cell: Int) -> Bool {
+        for lineIndex in context.outsideLinesForCell[cell] {
+            let (clue, cells) = context.outsideLines[lineIndex]
+            var lineValues: [Int] = []
+            lineValues.reserveCapacity(cells.count)
+            for lineCell in cells {
+                guard values[lineCell] != 0 else { break }
+                lineValues.append(values[lineCell])
+            }
+            guard lineValues.count == cells.count else { continue }
+            if !OutsideClues.satisfied(clue: clue, lineValues: lineValues, size: context.size) {
+                isContradicted = true
+                return false
+            }
+        }
+        return true
     }
 
     /// Verifies any sum line this assignment completes, and rejects early
@@ -222,6 +244,121 @@ struct SolverGrid {
             if maxRank >= Technique.arrowArithmetic.rank {
                 guard propagateSumLines(changed: &changed) else { return false }
             }
+            if maxRank >= Technique.outsideClueAnalysis.rank {
+                guard propagateOutsideClues(changed: &changed) else { return false }
+            }
+        }
+        return !isContradicted
+    }
+
+    /// Partial deductions from edge clues. Skyscraper: the cell at distance
+    /// `d` from the clue can't exceed `size - clue + 1 + d`. Sandwich: a
+    /// crust digit (1 or size) can't sit where no partner position yields a
+    /// feasible between-sum. Sound but not complete — `updateOutsideClues`
+    /// covers exactness at the leaves.
+    private mutating func propagateOutsideClues(changed: inout Bool) -> Bool {
+        for (clue, cells) in context.outsideLines {
+            switch clue.kind {
+            case .skyscraperCount:
+                // Exact specials: clue 1 pins the tallest to the edge; clue
+                // `size` forces the whole line ascending.
+                if clue.value == 1, values[cells[0]] == 0 {
+                    guard prune(
+                        cell: cells[0],
+                        keepingRange: context.size ... context.size,
+                        rank: Technique.outsideClueAnalysis.rank,
+                        changed: &changed,
+                    ) else { return false }
+                }
+                if clue.value == context.size {
+                    for (distance, cell) in cells.enumerated() where values[cell] == 0 {
+                        guard prune(
+                            cell: cell,
+                            keepingRange: (distance + 1) ... (distance + 1),
+                            rank: Technique.outsideClueAnalysis.rank,
+                            changed: &changed,
+                        ) else { return false }
+                    }
+                }
+                for (distance, cell) in cells.enumerated() where values[cell] == 0 {
+                    let cap = context.size - clue.value + 1 + distance
+                    guard cap < context.size else { break }
+                    var keep: DigitMask = 0
+                    for digit in 1 ... cap {
+                        keep |= SolverContext.mask(for: digit)
+                    }
+                    let removed = candidates[cell] & ~keep
+                    guard removed != 0 else { continue }
+                    for digit in context.digits(in: removed) {
+                        guard eliminate(digit, at: cell) else { return false }
+                    }
+                    propagationHardestRank = max(
+                        propagationHardestRank,
+                        Technique.outsideClueAnalysis.rank,
+                    )
+                    changed = true
+                }
+
+            case .sandwichSum:
+                guard sandwichPrune(clue: clue, cells: cells, changed: &changed) else {
+                    return false
+                }
+
+            case .diagonalSum:
+                continue // handled as a fixed-target sum line
+            }
+        }
+        return !isContradicted
+    }
+
+    /// Eliminates crust digits (1 and size) from positions with no feasible
+    /// partner: the cells strictly between the two crusts must be able to
+    /// reach the clue with digits from 2...(size-1).
+    private mutating func sandwichPrune(
+        clue: OutsideClue,
+        cells: [Int],
+        changed: inout Bool,
+    ) -> Bool {
+        let size = context.size
+        let oneMask = SolverContext.mask(for: 1)
+        let topMask = SolverContext.mask(for: size)
+
+        func mayHost(_ mask: DigitMask, at index: Int) -> Bool {
+            values[cells[index]] == 0
+                ? candidates[cells[index]] & mask != 0
+                : SolverContext.mask(for: values[cells[index]]) & mask != 0
+        }
+        /// A sandwich line is a whole row or column — one house — so the k
+        /// interior digits are distinct values from 2...(size-1).
+        func feasible(_ a: Int, _ b: Int) -> Bool {
+            let k = abs(a - b) - 1
+            guard k > 0 else { return clue.value == 0 }
+            guard k <= size - 2 else { return false }
+            let minSum = k * (k + 3) / 2 // 2 + 3 + … + (k+1)
+            let maxSum = k * (2 * size - k - 1) / 2 // (size-k) + … + (size-1)
+            return clue.value >= minSum && clue.value <= maxSum
+        }
+
+        for (mask, partnerMask) in [(oneMask, topMask), (topMask, oneMask)] {
+            for index in cells.indices where mayHost(mask, at: index) {
+                let hasPartner = cells.indices.contains { partner in
+                    partner != index && mayHost(partnerMask, at: partner)
+                        && feasible(index, partner)
+                }
+                if !hasPartner {
+                    guard values[cells[index]] == 0 else {
+                        isContradicted = true
+                        return false
+                    }
+                    let digit = mask == oneMask ? 1 : size
+                    guard eliminate(digit, at: cells[index]) else { return false }
+                    propagationHardestRank = max(
+                        propagationHardestRank,
+                        Technique.outsideClueAnalysis.rank,
+                    )
+                    changed = true
+                }
+            }
         }
         return !isContradicted
     }
@@ -280,6 +417,7 @@ struct SolverGrid {
     private mutating func prune(
         cell: Int,
         keepingRange range: ClosedRange<Int>,
+        rank: Int = Technique.arrowArithmetic.rank,
         changed: inout Bool,
     ) -> Bool {
         let low = max(1, range.lowerBound)
@@ -295,7 +433,7 @@ struct SolverGrid {
         for digit in context.digits(in: removed) {
             guard eliminate(digit, at: cell) else { return false }
         }
-        propagationHardestRank = max(propagationHardestRank, Technique.arrowArithmetic.rank)
+        propagationHardestRank = max(propagationHardestRank, rank)
         changed = true
         return !isContradicted
     }

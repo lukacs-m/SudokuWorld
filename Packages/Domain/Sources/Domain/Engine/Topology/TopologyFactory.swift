@@ -47,6 +47,9 @@ public enum TopologyFactory {
         case .miracle: miracleTopology
         case .thermo: thermoTopology
         case .arrow: arrowTopology
+        case .sandwich: sandwichTopology
+        case .skyscraper: skyscraperTopology
+        case .littleKiller: littleKillerTopology
         }
     }
 
@@ -209,6 +212,24 @@ public enum TopologyFactory {
     )
     private static let arrowTopology = rectangular(
         variant: .arrow,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let sandwichTopology = rectangular(
+        variant: .sandwich,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let skyscraperTopology = rectangular(
+        variant: .skyscraper,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let littleKillerTopology = rectangular(
+        variant: .littleKiller,
         size: 9,
         boxRows: 3,
         boxCols: 3,

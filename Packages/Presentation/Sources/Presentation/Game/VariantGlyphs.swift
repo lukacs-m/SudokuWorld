@@ -18,7 +18,7 @@ enum VariantGlyphs {
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
              .antiKnight, .antiKing,
              .greaterThan, .kropki, .xv, .consecutive, .miracle,
-             .thermo, .arrow:
+             .thermo, .arrow, .sandwich, .skyscraper, .littleKiller:
             "\(digit)"
         }
     }

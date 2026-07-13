@@ -38,6 +38,10 @@ struct SolverContext {
     let sumLines: [SumLine]
     /// Indices into `sumLines` involving each cell (shaft or target).
     let sumLinesForCell: [[Int]]
+    /// Sandwich and skyscraper clues with their resolved lines (edge-first).
+    let outsideLines: [(clue: OutsideClue, cells: [Int])]
+    /// Indices into `outsideLines` involving each cell.
+    let outsideLinesForCell: [[Int]]
 
     /// `expandsNegativeConvention` exists for one caller: generation-time
     /// filling of mark-deriving variants (kropki/XV/consecutive), where
@@ -49,6 +53,7 @@ struct SolverContext {
         relations: [RelationClue] = [],
         thermometers: [[Int]] = [],
         arrows: [Arrow] = [],
+        outsideClues: [OutsideClue] = [],
         expandsNegativeConvention: Bool = true,
     ) {
         self.topology = topology
@@ -73,7 +78,22 @@ struct SolverContext {
         }
         relationsForCell = relationMembership
 
-        sumLines = arrows.map { SumLine(cells: $0.shaft, target: .cell($0.circle)) }
+        // Little-killer diagonals are plain fixed-sum lines; sandwich and
+        // skyscraper clues need their own reasoning.
+        var lines = arrows.map { SumLine(cells: $0.shaft, target: .cell($0.circle)) }
+        var edgeLines: [(clue: OutsideClue, cells: [Int])] = []
+        for clue in outsideClues {
+            let cells = OutsideClues.line(for: clue, topology: topology)
+            guard cells.count >= 2 else { continue }
+            switch clue.kind {
+            case .diagonalSum:
+                lines.append(SumLine(cells: cells, target: .fixed(clue.value)))
+            case .sandwichSum, .skyscraperCount:
+                edgeLines.append((clue, cells))
+            }
+        }
+        sumLines = lines
+        outsideLines = edgeLines
         var lineMembership = [[Int]](repeating: [], count: topology.cellCount)
         for (index, line) in sumLines.enumerated() {
             for cell in line.cells {
@@ -84,6 +104,13 @@ struct SolverContext {
             }
         }
         sumLinesForCell = lineMembership
+        var edgeMembership = [[Int]](repeating: [], count: topology.cellCount)
+        for (index, line) in outsideLines.enumerated() {
+            for cell in line.cells {
+                edgeMembership[cell].append(index)
+            }
+        }
+        outsideLinesForCell = edgeMembership
         size = topology.size
         cellCount = topology.cellCount
         houses = topology.houses

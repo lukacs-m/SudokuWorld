@@ -135,6 +135,9 @@ enum VariantIconArtwork {
         case .miracle: miracle(in: rect, context: &context, theme: theme)
         case .thermo: thermo(in: rect, context: &context, theme: theme)
         case .arrow: arrow(in: rect, context: &context, theme: theme)
+        case .sandwich: outside(in: rect, context: &context, theme: theme, labels: ["17", "4"])
+        case .skyscraper: outside(in: rect, context: &context, theme: theme, labels: ["3", "1"])
+        case .littleKiller: littleKiller(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -513,6 +516,58 @@ enum VariantIconArtwork {
             shaft,
             with: .color(theme.accent),
             style: StrokeStyle(lineWidth: 1.4, lineCap: .round),
+        )
+    }
+
+    /// A smaller inset grid with clue numbers hovering outside its edge.
+    private static func outside(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+        labels: [String],
+    ) {
+        let inner = rect.insetBy(dx: rect.width * 0.16, dy: rect.height * 0.16)
+            .offsetBy(dx: rect.width * 0.08, dy: rect.height * 0.08)
+        grid(9, boldEvery: 3, in: inner, context: &context, theme: theme)
+        let spots = [
+            CGPoint(x: rect.minX + rect.width * 0.02, y: inner.minY + inner.height * 0.17),
+            CGPoint(x: inner.minX + inner.width * 0.5, y: rect.minY + rect.height * 0.02),
+        ]
+        for (label, spot) in zip(labels, spots) {
+            let text = Text(label)
+                .font(.system(size: rect.height * 0.2, weight: .semibold, design: .rounded))
+                .foregroundColor(theme.accent)
+            context.draw(context.resolve(text), at: spot, anchor: .topLeading)
+        }
+    }
+
+    private static func littleKiller(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+    ) {
+        let inner = rect.insetBy(dx: rect.width * 0.16, dy: rect.height * 0.16)
+            .offsetBy(dx: rect.width * 0.08, dy: rect.height * 0.08)
+        grid(9, boldEvery: 3, in: inner, context: &context, theme: theme)
+        let label = Text("21")
+            .font(.system(size: rect.height * 0.19, weight: .semibold, design: .rounded))
+            .foregroundColor(theme.accent)
+        context.draw(
+            context.resolve(label),
+            at: CGPoint(x: rect.minX, y: rect.minY),
+            anchor: .topLeading,
+        )
+        var arrowPath = Path()
+        arrowPath.move(to: point(0.16, 0.16, in: rect))
+        arrowPath.addLine(to: point(0.4, 0.4, in: rect))
+        arrowPath.move(to: point(0.4, 0.4, in: rect))
+        arrowPath.addLine(to: point(0.4, 0.28, in: rect))
+        arrowPath.move(to: point(0.4, 0.4, in: rect))
+        arrowPath.addLine(to: point(0.28, 0.4, in: rect))
+        context.stroke(
+            arrowPath,
+            with: .color(theme.accent),
+            style: StrokeStyle(lineWidth: 1.3, lineCap: .round),
         )
     }
 

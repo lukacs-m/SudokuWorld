@@ -9,6 +9,7 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
     case cageArithmetic
     case relationAnalysis
     case arrowArithmetic
+    case outsideClueAnalysis
     case pointingPair
     case boxLineReduction
     case nakedTriple
@@ -33,6 +34,8 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
         case .relationAnalysis: 1
         // Arrow-sum bounding is cage-arithmetic-grade spotting work.
         case .arrowArithmetic: 4
+        // Reasoning from edge clues shares the hard band with X-wing.
+        case .outsideClueAnalysis: 9
         case .pointingPair: 5
         case .boxLineReduction: 6
         case .nakedTriple: 7

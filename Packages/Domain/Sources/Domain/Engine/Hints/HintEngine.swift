@@ -35,6 +35,7 @@ public struct HintEngine: Sendable {
             relations: puzzle.relations,
             thermometers: puzzle.thermometers,
             arrows: puzzle.arrows,
+            outsideClues: puzzle.outsideClues,
         )
         let grid = SolverGrid(context: context, givens: board.values)
         if !grid.isContradicted, let step = TechniqueLadder.nextStep(in: grid) {

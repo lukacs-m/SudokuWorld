@@ -16,6 +16,7 @@ public struct Solver: Sendable {
         relations: [RelationClue] = [],
         thermometers: [[Int]] = [],
         arrows: [Arrow] = [],
+        outsideClues: [OutsideClue] = [],
     ) {
         context = SolverContext(
             topology: topology,
@@ -24,6 +25,7 @@ public struct Solver: Sendable {
             relations: relations,
             thermometers: thermometers,
             arrows: arrows,
+            outsideClues: outsideClues,
         )
         self.givens = givens
     }

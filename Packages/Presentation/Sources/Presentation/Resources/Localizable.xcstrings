@@ -1835,6 +1835,23 @@
         }
       }
     },
+    "hint.technique.outsideClueAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The clue at the edge of the highlighted line rules out %1$@ here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'indice au bord de la ligne en évidence exclut %1$@ ici."
+          }
+        }
+      }
+    },
     "hint.technique.pointingPair" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3502,6 +3519,23 @@
         }
       }
     },
+    "technique.outsideClueAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edge clue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indice de bord"
+          }
+        }
+      }
+    },
     "technique.pointingPair" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4358,6 +4392,40 @@
         }
       }
     },
+    "variant.littlekiller" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Little Killer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Little Killer"
+          }
+        }
+      }
+    },
+    "variant.littlekiller.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonal sums outside."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommes diagonales en marge."
+          }
+        }
+      }
+    },
     "variant.mini4" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4494,6 +4562,40 @@
         }
       }
     },
+    "variant.sandwich" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich"
+          }
+        }
+      }
+    },
+    "variant.sandwich.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sums between 1 and 9."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommes entre 1 et 9."
+          }
+        }
+      }
+    },
     "variant.shogun" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4524,6 +4626,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Onze grilles en largeur."
+          }
+        }
+      }
+    },
+    "variant.skyscraper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skyscraper"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratte-ciel"
+          }
+        }
+      }
+    },
+    "variant.skyscraper.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edge counts of visible digits."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiffres visibles depuis le bord."
           }
         }
       }

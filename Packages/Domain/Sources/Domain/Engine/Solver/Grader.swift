@@ -16,6 +16,7 @@ public struct Grader: Sendable {
         relations: [RelationClue] = [],
         thermometers: [[Int]] = [],
         arrows: [Arrow] = [],
+        outsideClues: [OutsideClue] = [],
     ) -> Difficulty? {
         let context = SolverContext(
             topology: topology,
@@ -24,6 +25,7 @@ public struct Grader: Sendable {
             relations: relations,
             thermometers: thermometers,
             arrows: arrows,
+            outsideClues: outsideClues,
         )
         return grade(context: context, givens: givens)
     }

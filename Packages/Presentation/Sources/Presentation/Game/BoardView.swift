@@ -17,13 +17,17 @@ struct BoardView: View {
     var body: some View {
         if let session = viewModel.session, let topology = viewModel.topology {
             let theme = themeStore.theme(for: colorScheme)
+            // Outside clues (sandwich/skyscraper/little killer) reserve a
+            // one-cell gutter around the grid for their labels.
+            let gutterCells: CGFloat = session.puzzle.outsideClues.isEmpty ? 0 : 2
             GeometryReader { proxy in
                 let cellSize = min(
-                    proxy.size.width / CGFloat(topology.colCount),
-                    proxy.size.height / CGFloat(topology.rowCount),
+                    proxy.size.width / (CGFloat(topology.colCount) + gutterCells),
+                    proxy.size.height / (CGFloat(topology.rowCount) + gutterCells),
                 )
-                let boardWidth = cellSize * CGFloat(topology.colCount)
-                let boardHeight = cellSize * CGFloat(topology.rowCount)
+                let gutter = cellSize * gutterCells / 2
+                let boardWidth = cellSize * CGFloat(topology.colCount) + gutter * 2
+                let boardHeight = cellSize * CGFloat(topology.rowCount) + gutter * 2
 
                 ZStack(alignment: .topLeading) {
                     boardCanvas(
@@ -31,14 +35,17 @@ struct BoardView: View {
                         topology: topology,
                         theme: theme,
                         cellSize: cellSize,
+                        gutter: gutter,
                     )
                     tapLayer(session: session, topology: topology, cellSize: cellSize)
+                        .offset(x: gutter, y: gutter)
                 }
                 .frame(width: boardWidth, height: boardHeight)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .aspectRatio(
-                CGFloat(topology.colCount) / CGFloat(topology.rowCount),
+                (CGFloat(topology.colCount) + gutterCells)
+                    / (CGFloat(topology.rowCount) + gutterCells),
                 contentMode: .fit,
             )
         }
@@ -49,6 +56,7 @@ struct BoardView: View {
         topology: GridTopology,
         theme: Theme,
         cellSize: CGFloat,
+        gutter: CGFloat,
     ) -> some View {
         // Snapshot observable state outside the canvas closure.
         let selected = viewModel.selectedCell
@@ -59,6 +67,18 @@ struct BoardView: View {
         let settings = viewModel.settings
 
         return Canvas { context, _ in
+            if gutter > 0 {
+                OutsideClueOverlay.draw(
+                    context,
+                    clues: session.puzzle.outsideClues,
+                    topology: topology,
+                    theme: theme,
+                    cellSize: cellSize,
+                    gutter: gutter,
+                )
+            }
+            var context = context
+            context.translateBy(x: gutter, y: gutter)
             // Inactive positions (samurai corners) stay transparent; active
             // cells get the base fill.
             for index in 0 ..< topology.cellCount {

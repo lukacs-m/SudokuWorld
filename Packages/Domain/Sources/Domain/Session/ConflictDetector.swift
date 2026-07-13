@@ -8,6 +8,7 @@ public struct ConflictDetector: Equatable, Sendable {
     private let puzzle: PuzzleDefinition
     let peers: [[Int]]
     private let relationEdges: [RelationEdge]
+    private let topology: GridTopology
 
     public init(puzzle: PuzzleDefinition) {
         self.puzzle = puzzle
@@ -18,9 +19,11 @@ public struct ConflictDetector: Equatable, Sendable {
             relations: puzzle.relations,
             thermometers: puzzle.thermometers,
             arrows: puzzle.arrows,
+            outsideClues: puzzle.outsideClues,
         )
         peers = context.peers
         relationEdges = context.relationEdges
+        topology = context.topology
     }
 
     public static func == (lhs: ConflictDetector, rhs: ConflictDetector) -> Bool {
@@ -69,6 +72,20 @@ public struct ConflictDetector: Equatable, Sendable {
             if shaft.reduce(0, +) != circle {
                 conflicted.insert(arrow.circle)
                 conflicted.formUnion(arrow.shaft)
+            }
+        }
+
+        // Completed outside-clue lines that miss their clue.
+        for clue in puzzle.outsideClues {
+            let cells = OutsideClues.line(for: clue, topology: topology)
+            let lineValues = cells.compactMap { board[$0].value }
+            guard lineValues.count == cells.count else { continue }
+            if !OutsideClues.satisfied(
+                clue: clue,
+                lineValues: lineValues,
+                size: topology.size,
+            ) {
+                conflicted.formUnion(cells)
             }
         }
         return conflicted
