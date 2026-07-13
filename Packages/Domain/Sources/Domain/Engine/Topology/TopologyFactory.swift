@@ -38,6 +38,8 @@ public enum TopologyFactory {
         case .shogun: shogunTopology
         case .sumo: sumoTopology
         case .alphadoku25: alphadoku25Topology
+        case .antiKnight: antiKnightTopology
+        case .antiKing: antiKingTopology
         }
     }
 
@@ -159,6 +161,55 @@ public enum TopologyFactory {
         boxRows: 3,
         boxCols: 3,
     )
+
+    /// Chess variants: classic houses plus a "sees" pair for every knight
+    /// move (anti-knight) or diagonal-touch (anti-king; orthogonal touches
+    /// already share a row or column). Each pair is a 2-cell clique, so the
+    /// whole engine inherits the rule through the widened peer sets — no
+    /// overlay renders because these variants carry no visual marks.
+    private static let antiKnightTopology: GridTopology = {
+        let base = rectangular(variant: .antiKnight, size: 9, boxRows: 3, boxCols: 3)
+        return withCliques(base, movePairs(size: 9, offsets: [
+            (1, 2), (1, -2), (2, 1), (2, -1),
+        ]))
+    }()
+
+    private static let antiKingTopology: GridTopology = {
+        let base = rectangular(variant: .antiKing, size: 9, boxRows: 3, boxCols: 3)
+        return withCliques(base, movePairs(size: 9, offsets: [(1, 1), (1, -1)]))
+    }()
+
+    /// Every unordered in-bounds cell pair reachable by one of the given
+    /// canonical offsets (offsets must not contain both a move and its
+    /// inverse, or pairs would double).
+    private static func movePairs(size: Int, offsets: [(Int, Int)]) -> [[Int]] {
+        var pairs: [[Int]] = []
+        for row in 0 ..< size {
+            for col in 0 ..< size {
+                for (dr, dc) in offsets {
+                    let r = row + dr
+                    let c = col + dc
+                    guard r >= 0, r < size, c >= 0, c < size else { continue }
+                    pairs.append([row * size + col, r * size + c])
+                }
+            }
+        }
+        return pairs
+    }
+
+    private static func withCliques(_ base: GridTopology, _ cliques: [[Int]]) -> GridTopology {
+        GridTopology(
+            variant: base.variant,
+            size: base.size,
+            rowCount: base.rowCount,
+            colCount: base.colCount,
+            cells: base.cells,
+            houses: base.houses,
+            houseKinds: base.houseKinds,
+            boxIndex: base.boxIndex,
+            cliques: cliques,
+        )
+    }
 
     /// Argyle: classic houses plus six marked diagonals — the two main
     /// diagonals and the four edges of the inscribed diamond. The short

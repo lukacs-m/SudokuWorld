@@ -3678,6 +3678,74 @@
         }
       }
     },
+    "variant.antiking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-King"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-roi"
+          }
+        }
+      }
+    },
+    "variant.antiking.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touching cells differ."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cases voisines diffèrent."
+          }
+        }
+      }
+    },
+    "variant.antiknight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-cavalier"
+          }
+        }
+      }
+    },
+    "variant.antiknight.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight moves can't repeat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les sauts de cavalier diffèrent."
+          }
+        }
+      }
+    },
     "variant.argyle" : {
       "extractionState" : "manual",
       "localizations" : {

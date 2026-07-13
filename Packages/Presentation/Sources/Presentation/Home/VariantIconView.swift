@@ -126,6 +126,8 @@ enum VariantIconArtwork {
         case .jigsaw: jigsaw(in: rect, context: &context, theme: theme)
         case .argyle: argyle(in: rect, context: &context, theme: theme)
         case .asterisk: asterisk(in: rect, context: &context, theme: theme)
+        case .antiKnight: antiKnight(in: rect, context: &context, theme: theme)
+        case .antiKing: antiKing(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -326,6 +328,49 @@ enum VariantIconArtwork {
         for (row, col) in [(1, 4), (4, 1), (4, 4), (4, 7), (7, 4)] {
             let cell = cellRect(row: row, col: col, grid: 9, in: rect).insetBy(dx: 0.4, dy: 0.4)
             context.fill(Path(ellipseIn: cell), with: .color(theme.accent.opacity(0.85)))
+        }
+    }
+
+    private static func antiKnight(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        // A filled cell, an L-shaped move, and the forbidden landing square.
+        let origin = cellRect(row: 4, col: 2, grid: 9, in: rect)
+        context.fill(
+            Path(ellipseIn: origin.insetBy(dx: 0.3, dy: 0.3)),
+            with: .color(theme.accent),
+        )
+        var move = Path()
+        move.move(to: CGPoint(x: origin.midX, y: origin.midY))
+        let corner = cellRect(row: 2, col: 2, grid: 9, in: rect)
+        move.addLine(to: CGPoint(x: corner.midX, y: corner.midY))
+        let landing = cellRect(row: 2, col: 3, grid: 9, in: rect)
+        move.addLine(to: CGPoint(x: landing.midX, y: landing.midY))
+        context.stroke(
+            move,
+            with: .color(theme.accent.opacity(0.7)),
+            style: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round),
+        )
+        context.stroke(
+            Path(ellipseIn: landing.insetBy(dx: 0.3, dy: 0.3)),
+            with: .color(theme.accent),
+            lineWidth: 1,
+        )
+    }
+
+    private static func antiKing(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        let center = cellRect(row: 4, col: 4, grid: 9, in: rect)
+        context.fill(
+            Path(ellipseIn: center.insetBy(dx: 0.3, dy: 0.3)),
+            with: .color(theme.accent),
+        )
+        for (dr, dc) in [(-2, -2), (-2, 2), (2, -2), (2, 2)] {
+            let cell = cellRect(row: 4 + dr / 2, col: 4 + dc / 2, grid: 9, in: rect)
+            context.stroke(
+                Path(ellipseIn: cell.insetBy(dx: 0.5, dy: 0.5)),
+                with: .color(theme.accent.opacity(0.7)),
+                lineWidth: 1,
+            )
         }
     }
 

@@ -23,6 +23,8 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case shogun
     case sumo
     case alphadoku25
+    case antiKnight = "antiknight"
+    case antiKing = "antiking"
 
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
@@ -34,6 +36,7 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
         switch self {
         case .mini4, .mini6, .classic, .dodeka12, .hexadoku16, .alphadoku25: .gridSizes
         case .killer, .diagonal, .windoku, .jigsaw, .argyle, .asterisk: .extraRegions
+        case .antiKnight, .antiKing: .chess
         case .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo: .multiGrid
         case .evenOdd, .wordoku: .twists
         }

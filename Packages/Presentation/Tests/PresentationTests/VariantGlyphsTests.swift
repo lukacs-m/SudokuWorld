@@ -67,7 +67,8 @@ private enum TestTopologySizes {
         case .alphadoku25: 25
         case .classic, .killer, .diagonal, .windoku, .evenOdd, .samurai, .wordoku,
              .jigsaw, .argyle, .asterisk,
-             .gattai2, .gattai3, .gattai8, .shogun, .sumo: 9
+             .gattai2, .gattai3, .gattai8, .shogun, .sumo,
+             .antiKnight, .antiKing: 9
         }
     }
 }
