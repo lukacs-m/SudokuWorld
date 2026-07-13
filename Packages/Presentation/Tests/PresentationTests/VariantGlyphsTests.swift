@@ -69,7 +69,8 @@ private enum TestTopologySizes {
              .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
              .antiKnight, .antiKing,
-             .greaterThan, .kropki, .xv, .consecutive, .miracle: 9
+             .greaterThan, .kropki, .xv, .consecutive, .miracle,
+             .thermo, .arrow: 9
         }
     }
 }

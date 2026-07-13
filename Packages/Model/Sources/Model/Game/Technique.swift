@@ -8,6 +8,7 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
     case hiddenPair
     case cageArithmetic
     case relationAnalysis
+    case arrowArithmetic
     case pointingPair
     case boxLineReduction
     case nakedTriple
@@ -30,6 +31,8 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
         // otherwise no kropki could ever grade below medium. Ranks are
         // code-only and freely tunable — unlike slugs they never persist.
         case .relationAnalysis: 1
+        // Arrow-sum bounding is cage-arithmetic-grade spotting work.
+        case .arrowArithmetic: 4
         case .pointingPair: 5
         case .boxLineReduction: 6
         case .nakedTriple: 7

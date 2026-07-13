@@ -1682,6 +1682,23 @@
         }
       }
     },
+    "hint.technique.arrowArithmetic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The sum along the highlighted line rules out %1$@ here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La somme le long de la ligne en évidence exclut %1$@ ici."
+          }
+        }
+      }
+    },
     "hint.technique.boxLineReduction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3332,6 +3349,23 @@
         }
       }
     },
+    "technique.arrowArithmetic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrow arithmetic"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arithmétique de flèche"
+          }
+        }
+      }
+    },
     "technique.boxLineReduction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3810,6 +3844,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diagonales en losange."
+          }
+        }
+      }
+    },
+    "variant.arrow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrow"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flèche"
+          }
+        }
+      }
+    },
+    "variant.arrow.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shafts sum to circles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les flèches somment au cercle."
           }
         }
       }
@@ -4490,6 +4558,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un colosse de treize grilles."
+          }
+        }
+      }
+    },
+    "variant.thermo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermo"
+          }
+        }
+      }
+    },
+    "variant.thermo.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digits climb the bulbs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les chiffres montent du bulbe."
           }
         }
       }

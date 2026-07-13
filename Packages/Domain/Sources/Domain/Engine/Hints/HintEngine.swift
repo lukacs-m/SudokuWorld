@@ -33,6 +33,8 @@ public struct HintEngine: Sendable {
             cages: puzzle.cages,
             parities: puzzle.parities,
             relations: puzzle.relations,
+            thermometers: puzzle.thermometers,
+            arrows: puzzle.arrows,
         )
         let grid = SolverGrid(context: context, givens: board.values)
         if !grid.isContradicted, let step = TechniqueLadder.nextStep(in: grid) {

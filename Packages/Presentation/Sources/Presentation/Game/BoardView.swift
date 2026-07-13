@@ -79,6 +79,14 @@ struct BoardView: View {
                 theme: theme,
                 cellSize: cellSize,
             )
+            LineOverlay.draw(
+                context,
+                thermometers: session.puzzle.thermometers,
+                arrows: session.puzzle.arrows,
+                topology: topology,
+                theme: theme,
+                cellSize: cellSize,
+            )
 
             // Highlights, back to front: related, same digit, hint, selection.
             for index in related {

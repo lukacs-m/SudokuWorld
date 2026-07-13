@@ -28,6 +28,10 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
     /// Pairwise marks (kropki dots, XV letters, inequalities, bars); empty
     /// for variants without relation clues.
     public let relations: [RelationClue]
+    /// Thermometer paths, bulb first; digits strictly increase along each.
+    public let thermometers: [[Int]]
+    /// Arrow clues: shaft digits sum to the circled cell.
+    public let arrows: [Arrow]
 
     public init(
         id: UUID,
@@ -41,6 +45,8 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         parities: [Int: CellParity] = [:],
         irregularBoxes: [Int]? = nil,
         relations: [RelationClue] = [],
+        thermometers: [[Int]] = [],
+        arrows: [Arrow] = [],
     ) {
         self.id = id
         self.variant = variant
@@ -53,6 +59,8 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         self.parities = parities
         self.irregularBoxes = irregularBoxes
         self.relations = relations
+        self.thermometers = thermometers
+        self.arrows = arrows
     }
 
     /// Custom decoding so payload fields added after 1.0 fall back to empty
@@ -81,5 +89,10 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
             [RelationClue].self,
             forKey: .relations,
         ) ?? []
+        thermometers = try container.decodeIfPresent(
+            [[Int]].self,
+            forKey: .thermometers,
+        ) ?? []
+        arrows = try container.decodeIfPresent([Arrow].self, forKey: .arrows) ?? []
     }
 }

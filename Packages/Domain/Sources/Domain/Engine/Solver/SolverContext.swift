@@ -29,10 +29,15 @@ struct SolverContext {
     let housePairs: [HousePair]
     /// Bitmask with one bit set per digit 1...size.
     let fullMask: DigitMask
-    /// Pairwise constraints (marks plus expanded negatives).
+    /// Pairwise constraints (marks plus expanded negatives). Thermometers
+    /// are chains of strict greater-than edges, so they live here too.
     let relationEdges: [RelationEdge]
     /// Indices into `relationEdges` touching each cell.
     let relationsForCell: [[Int]]
+    /// Summed runs (arrow shafts; little-killer diagonals).
+    let sumLines: [SumLine]
+    /// Indices into `sumLines` involving each cell (shaft or target).
+    let sumLinesForCell: [[Int]]
 
     /// `expandsNegativeConvention` exists for one caller: generation-time
     /// filling of mark-deriving variants (kropki/XV/consecutive), where
@@ -42,23 +47,43 @@ struct SolverContext {
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
         relations: [RelationClue] = [],
+        thermometers: [[Int]] = [],
+        arrows: [Arrow] = [],
         expandsNegativeConvention: Bool = true,
     ) {
         self.topology = topology
         self.cages = cages
         self.parities = parities
-        relationEdges = RelationExpansion.edges(
+        var edges = RelationExpansion.edges(
             variant: topology.variant,
             relations: relations,
             topology: topology,
             includeNegatives: expandsNegativeConvention,
         )
+        for path in thermometers {
+            for step in 1 ..< path.count {
+                edges.append(RelationEdge(a: path[step], b: path[step - 1], constraint: .greater))
+            }
+        }
+        relationEdges = edges
         var relationMembership = [[Int]](repeating: [], count: topology.cellCount)
         for (index, edge) in relationEdges.enumerated() {
             relationMembership[edge.a].append(index)
             relationMembership[edge.b].append(index)
         }
         relationsForCell = relationMembership
+
+        sumLines = arrows.map { SumLine(cells: $0.shaft, target: .cell($0.circle)) }
+        var lineMembership = [[Int]](repeating: [], count: topology.cellCount)
+        for (index, line) in sumLines.enumerated() {
+            for cell in line.cells {
+                lineMembership[cell].append(index)
+            }
+            if case let .cell(target) = line.target {
+                lineMembership[target].append(index)
+            }
+        }
+        sumLinesForCell = lineMembership
         size = topology.size
         cellCount = topology.cellCount
         houses = topology.houses

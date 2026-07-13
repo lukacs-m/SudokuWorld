@@ -14,12 +14,16 @@ public struct Solver: Sendable {
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
         relations: [RelationClue] = [],
+        thermometers: [[Int]] = [],
+        arrows: [Arrow] = [],
     ) {
         context = SolverContext(
             topology: topology,
             cages: cages,
             parities: parities,
             relations: relations,
+            thermometers: thermometers,
+            arrows: arrows,
         )
         self.givens = givens
     }

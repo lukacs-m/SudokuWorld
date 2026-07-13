@@ -45,6 +45,8 @@ public enum TopologyFactory {
         case .xv: xvTopology
         case .consecutive: consecutiveTopology
         case .miracle: miracleTopology
+        case .thermo: thermoTopology
+        case .arrow: arrowTopology
         }
     }
 
@@ -199,6 +201,18 @@ public enum TopologyFactory {
         boxCols: 3,
     )
     private static let xvTopology = rectangular(variant: .xv, size: 9, boxRows: 3, boxCols: 3)
+    private static let thermoTopology = rectangular(
+        variant: .thermo,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let arrowTopology = rectangular(
+        variant: .arrow,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
     private static let consecutiveTopology = rectangular(
         variant: .consecutive,
         size: 9,

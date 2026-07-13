@@ -84,7 +84,62 @@ struct SolverGrid {
             guard eliminate(digit, at: peer) else { return false }
         }
         guard updateRelations(afterPlacing: digit, at: cell) else { return false }
+        guard updateSumLines(afterPlacing: digit, at: cell) else { return false }
         return updateCage(afterPlacing: digit, at: cell)
+    }
+
+    /// Verifies any sum line this assignment completes, and rejects early
+    /// when the already-placed shaft exceeds the largest possible target.
+    /// Runs inside `place` so backtracking and uniqueness counting stay
+    /// exact even where bound propagation is weak.
+    private mutating func updateSumLines(afterPlacing _: Int, at cell: Int) -> Bool {
+        for lineIndex in context.sumLinesForCell[cell] {
+            let line = context.sumLines[lineIndex]
+            var placedSum = 0
+            var openCells = 0
+            for shaftCell in line.cells {
+                if values[shaftCell] == 0 {
+                    openCells += 1
+                } else {
+                    placedSum += values[shaftCell]
+                }
+            }
+            let targetValue: Int? = switch line.target {
+            case let .fixed(total): total
+            case let .cell(target): values[target] == 0 ? nil : values[target]
+            }
+
+            if openCells == 0, let targetValue {
+                if placedSum != targetValue {
+                    isContradicted = true
+                    return false
+                }
+                continue
+            }
+            // Cheap bound: the placed part alone must not exceed the largest
+            // reachable target (open shaft cells contribute at least 1 each).
+            let maxTarget = switch line.target {
+            case let .fixed(total): total
+            case let .cell(target): values[target] == 0
+                ? maxCandidate(of: target)
+                : values[target]
+            }
+            if placedSum + openCells > maxTarget {
+                isContradicted = true
+                return false
+            }
+        }
+        return true
+    }
+
+    private func minCandidate(of cell: Int) -> Int {
+        values[cell] != 0 ? values[cell] : candidates[cell].trailingZeroBitCount + 1
+    }
+
+    private func maxCandidate(of cell: Int) -> Int {
+        values[cell] != 0
+            ? values[cell]
+            : DigitMask.bitWidth - candidates[cell].leadingZeroBitCount
     }
 
     /// Prunes relation partners after an assignment: with one endpoint
@@ -164,7 +219,84 @@ struct SolverGrid {
             if maxRank >= Technique.relationAnalysis.rank {
                 guard propagateRelations(changed: &changed) else { return false }
             }
+            if maxRank >= Technique.arrowArithmetic.rank {
+                guard propagateSumLines(changed: &changed) else { return false }
+            }
         }
+        return !isContradicted
+    }
+
+    /// Interval propagation over sum lines: the target is boxed into the
+    /// shaft's reachable [min, max] sum, and each shaft cell into what the
+    /// target leaves after the other cells' extremes.
+    private mutating func propagateSumLines(changed: inout Bool) -> Bool {
+        for line in context.sumLines {
+            var shaftMin = 0
+            var shaftMax = 0
+            for cell in line.cells {
+                shaftMin += minCandidate(of: cell)
+                shaftMax += maxCandidate(of: cell)
+            }
+
+            let targetMin: Int
+            let targetMax: Int
+            switch line.target {
+            case let .fixed(total):
+                targetMin = total
+                targetMax = total
+                if shaftMin > total || shaftMax < total {
+                    isContradicted = true
+                    return false
+                }
+            case let .cell(target):
+                if values[target] == 0 {
+                    guard prune(
+                        cell: target,
+                        keepingRange: shaftMin ... max(shaftMin, shaftMax),
+                        changed: &changed,
+                    ) else { return false }
+                }
+                targetMin = minCandidate(of: target)
+                targetMax = maxCandidate(of: target)
+            }
+
+            for cell in line.cells where values[cell] == 0 {
+                let othersMin = shaftMin - minCandidate(of: cell)
+                let othersMax = shaftMax - maxCandidate(of: cell)
+                let low = targetMin - othersMax
+                let high = targetMax - othersMin
+                guard low <= high else {
+                    isContradicted = true
+                    return false
+                }
+                guard prune(cell: cell, keepingRange: low ... high, changed: &changed) else {
+                    return false
+                }
+            }
+        }
+        return !isContradicted
+    }
+
+    private mutating func prune(
+        cell: Int,
+        keepingRange range: ClosedRange<Int>,
+        changed: inout Bool,
+    ) -> Bool {
+        let low = max(1, range.lowerBound)
+        let high = min(context.size, range.upperBound)
+        var keep: DigitMask = 0
+        if low <= high {
+            for digit in low ... high {
+                keep |= SolverContext.mask(for: digit)
+            }
+        }
+        let removed = candidates[cell] & ~keep
+        guard removed != 0 else { return true }
+        for digit in context.digits(in: removed) {
+            guard eliminate(digit, at: cell) else { return false }
+        }
+        propagationHardestRank = max(propagationHardestRank, Technique.arrowArithmetic.rank)
+        changed = true
         return !isContradicted
     }
 

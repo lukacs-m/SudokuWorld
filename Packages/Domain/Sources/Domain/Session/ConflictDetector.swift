@@ -16,6 +16,8 @@ public struct ConflictDetector: Equatable, Sendable {
             cages: puzzle.cages,
             parities: puzzle.parities,
             relations: puzzle.relations,
+            thermometers: puzzle.thermometers,
+            arrows: puzzle.arrows,
         )
         peers = context.peers
         relationEdges = context.relationEdges
@@ -49,13 +51,24 @@ public struct ConflictDetector: Equatable, Sendable {
         }
 
         // Relation marks (and their negative convention) violated by two
-        // filled endpoints.
+        // filled endpoints. Thermometers arrive here as greater-than chains.
         for edge in relationEdges {
             guard let aValue = board[edge.a].value,
                   let bValue = board[edge.b].value else { continue }
             if !edge.satisfied(a: aValue, b: bValue) {
                 conflicted.insert(edge.a)
                 conflicted.insert(edge.b)
+            }
+        }
+
+        // Completed arrows whose shaft misses the circled total.
+        for arrow in puzzle.arrows {
+            guard let circle = board[arrow.circle].value else { continue }
+            let shaft = arrow.shaft.compactMap { board[$0].value }
+            guard shaft.count == arrow.shaft.count else { continue }
+            if shaft.reduce(0, +) != circle {
+                conflicted.insert(arrow.circle)
+                conflicted.formUnion(arrow.shaft)
             }
         }
         return conflicted

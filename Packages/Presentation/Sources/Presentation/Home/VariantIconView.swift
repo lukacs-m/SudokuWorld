@@ -133,6 +133,8 @@ enum VariantIconArtwork {
         case .xv: edgeMarks(in: rect, context: &context, theme: theme, symbols: ["X", "V"])
         case .consecutive: consecutiveBars(in: rect, context: &context, theme: theme)
         case .miracle: miracle(in: rect, context: &context, theme: theme)
+        case .thermo: thermo(in: rect, context: &context, theme: theme)
+        case .arrow: arrow(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -457,6 +459,60 @@ enum VariantIconArtwork {
             context.resolve(sparkle),
             at: CGPoint(x: rect.midX + rect.width * 0.12, y: rect.midY - rect.height * 0.12),
             anchor: .center,
+        )
+    }
+
+    private static func thermo(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        // Bulb bottom-left, stem rising to the upper right.
+        let bulb = point(0.22, 0.78, in: rect)
+        var stem = Path()
+        stem.move(to: bulb)
+        stem.addLine(to: point(0.22, 0.4, in: rect))
+        stem.addLine(to: point(0.6, 0.4, in: rect))
+        stem.addLine(to: point(0.6, 0.18, in: rect))
+        context.stroke(
+            stem,
+            with: .color(theme.accent.opacity(0.55)),
+            style: StrokeStyle(lineWidth: rect.width * 0.14, lineCap: .round, lineJoin: .round),
+        )
+        let radius = rect.width * 0.13
+        context.fill(
+            Path(ellipseIn: CGRect(
+                x: bulb.x - radius,
+                y: bulb.y - radius,
+                width: radius * 2,
+                height: radius * 2,
+            )),
+            with: .color(theme.accent),
+        )
+    }
+
+    private static func arrow(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        let circleCenter = point(0.26, 0.26, in: rect)
+        let radius = rect.width * 0.14
+        context.stroke(
+            Path(ellipseIn: CGRect(
+                x: circleCenter.x - radius,
+                y: circleCenter.y - radius,
+                width: radius * 2,
+                height: radius * 2,
+            )),
+            with: .color(theme.accent),
+            lineWidth: 1.4,
+        )
+        var shaft = Path()
+        shaft.move(to: point(0.36, 0.36, in: rect))
+        shaft.addLine(to: point(0.74, 0.74, in: rect))
+        shaft.move(to: point(0.74, 0.74, in: rect))
+        shaft.addLine(to: point(0.74, 0.52, in: rect))
+        shaft.move(to: point(0.74, 0.74, in: rect))
+        shaft.addLine(to: point(0.52, 0.74, in: rect))
+        context.stroke(
+            shaft,
+            with: .color(theme.accent),
+            style: StrokeStyle(lineWidth: 1.4, lineCap: .round),
         )
     }
 

@@ -38,6 +38,10 @@ enum TechniqueLadder {
         if let step = Techniques.cageArithmetic(in: grid) {
             return step
         }
+        guard cap >= Technique.arrowArithmetic.rank else { return nil }
+        if let step = Techniques.arrowArithmetic(in: grid) {
+            return step
+        }
         // Locked candidates yields pointing (5) or box-line (6); the grade
         // bands never split that pair, so one gate covers both.
         guard cap >= Technique.pointingPair.rank else { return nil }

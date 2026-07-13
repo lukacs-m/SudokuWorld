@@ -46,8 +46,7 @@ public struct PuzzleGenerator: Sendable {
     ) -> PuzzleDefinition {
         let topology = TopologyFactory.topology(for: variant)
 
-        // MARK: - deriving variants (kropki/XV/…) fill unconstrained — their
-
+        // Variants that derive marks (kropki/XV/…) fill unconstrained: the
         // marks are read off the finished solution, so "no mark yet" must
         // not be treated as the negative convention. Miracle's rules are
         // global and DO constrain the fill.
@@ -196,8 +195,44 @@ public struct PuzzleGenerator: Sendable {
         var cages: [Cage] = []
         var parities: [Int: CellParity] = [:]
         var relations: [RelationClue] = []
+        var thermometers: [[Int]] = []
+        var arrows: [Arrow] = []
 
         switch variant {
+        case .thermo:
+            thermometers = LinePlacer.thermometers(
+                topology: topology,
+                solution: solution,
+                difficulty: difficulty,
+                rng: &rng,
+            )
+            let context = SolverContext(topology: topology, thermometers: thermometers)
+            outcome = carveAndTune(
+                context: context,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+                givensFloorScale: 0.55,
+            )
+
+        case .arrow:
+            arrows = LinePlacer.arrows(
+                topology: topology,
+                solution: solution,
+                difficulty: difficulty,
+                rng: &rng,
+            )
+            let context = SolverContext(topology: topology, arrows: arrows)
+            outcome = carveAndTune(
+                context: context,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+                givensFloorScale: 0.55,
+            )
+
         case .greaterThan, .kropki, .xv, .consecutive, .miracle:
             relations = RelationMarks.derive(
                 variant: variant,
@@ -273,6 +308,8 @@ public struct PuzzleGenerator: Sendable {
             parities: parities,
             irregularBoxes: irregularBoxes,
             relations: relations,
+            thermometers: thermometers,
+            arrows: arrows,
         )
     }
 

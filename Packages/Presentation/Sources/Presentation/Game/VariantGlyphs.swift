@@ -17,7 +17,8 @@ enum VariantGlyphs {
              .evenOdd, .samurai, .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
              .antiKnight, .antiKing,
-             .greaterThan, .kropki, .xv, .consecutive, .miracle:
+             .greaterThan, .kropki, .xv, .consecutive, .miracle,
+             .thermo, .arrow:
             "\(digit)"
         }
     }

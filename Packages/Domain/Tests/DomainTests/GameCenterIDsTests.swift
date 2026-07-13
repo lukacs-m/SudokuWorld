@@ -65,6 +65,7 @@ struct GameCenterIDsTests {
             "gattai2", "gattai3", "gattai8", "shogun", "sumo",
             "alphadoku25", "antiknight", "antiking",
             "greaterthan", "kropki", "xv", "consecutive", "miracle",
+            "thermo", "arrow",
         ])
         #expect(Difficulty.allCases.map(\.slug) == [
             "beginner", "easy", "medium", "hard", "expert", "master",
