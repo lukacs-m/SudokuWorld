@@ -127,6 +127,13 @@ struct BoardView: View {
                 theme: theme,
                 cellSize: cellSize,
             )
+            EdgeMarkOverlay.draw(
+                context,
+                relations: session.puzzle.relations,
+                topology: topology,
+                theme: theme,
+                cellSize: cellSize,
+            )
         }
     }
 

@@ -16,7 +16,8 @@ enum VariantGlyphs {
         case .classic, .mini4, .mini6, .dodeka12, .killer, .diagonal, .windoku,
              .evenOdd, .samurai, .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
-             .antiKnight, .antiKing:
+             .antiKnight, .antiKing,
+             .greaterThan, .kropki, .xv, .consecutive, .miracle:
             "\(digit)"
         }
     }

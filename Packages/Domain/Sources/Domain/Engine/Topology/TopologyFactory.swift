@@ -40,6 +40,11 @@ public enum TopologyFactory {
         case .alphadoku25: alphadoku25Topology
         case .antiKnight: antiKnightTopology
         case .antiKing: antiKingTopology
+        case .greaterThan: greaterThanTopology
+        case .kropki: kropkiTopology
+        case .xv: xvTopology
+        case .consecutive: consecutiveTopology
+        case .miracle: miracleTopology
         }
     }
 
@@ -177,6 +182,38 @@ public enum TopologyFactory {
     private static let antiKingTopology: GridTopology = {
         let base = rectangular(variant: .antiKing, size: 9, boxRows: 3, boxCols: 3)
         return withCliques(base, movePairs(size: 9, offsets: [(1, 1), (1, -1)]))
+    }()
+
+    /// Relation-clue variants share the classic shape; their marks are
+    /// per-puzzle data on PuzzleDefinition.
+    private static let greaterThanTopology = rectangular(
+        variant: .greaterThan,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let kropkiTopology = rectangular(
+        variant: .kropki,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let xvTopology = rectangular(variant: .xv, size: 9, boxRows: 3, boxCols: 3)
+    private static let consecutiveTopology = rectangular(
+        variant: .consecutive,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+
+    /// Miracle: anti-knight + anti-king cliques; the third rule (orthogonal
+    /// neighbors are never consecutive) is a relation constraint expanded
+    /// from the variant, not structure.
+    private static let miracleTopology: GridTopology = {
+        let base = rectangular(variant: .miracle, size: 9, boxRows: 3, boxCols: 3)
+        let knight = movePairs(size: 9, offsets: [(1, 2), (1, -2), (2, 1), (2, -1)])
+        let king = movePairs(size: 9, offsets: [(1, 1), (1, -1)])
+        return withCliques(base, knight + king)
     }()
 
     /// Every unordered in-bounds cell pair reachable by one of the given

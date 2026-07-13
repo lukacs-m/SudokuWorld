@@ -68,7 +68,8 @@ private enum TestTopologySizes {
         case .classic, .killer, .diagonal, .windoku, .evenOdd, .samurai, .wordoku,
              .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
-             .antiKnight, .antiKing: 9
+             .antiKnight, .antiKing,
+             .greaterThan, .kropki, .xv, .consecutive, .miracle: 9
         }
     }
 }

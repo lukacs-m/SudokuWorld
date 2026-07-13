@@ -13,8 +13,14 @@ public struct Solver: Sendable {
         givens: [Int?],
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
+        relations: [RelationClue] = [],
     ) {
-        context = SolverContext(topology: topology, cages: cages, parities: parities)
+        context = SolverContext(
+            topology: topology,
+            cages: cages,
+            parities: parities,
+            relations: relations,
+        )
         self.givens = givens
     }
 

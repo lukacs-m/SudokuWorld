@@ -45,7 +45,16 @@ public struct PuzzleGenerator: Sendable {
         seed: UInt64,
     ) -> PuzzleDefinition {
         let topology = TopologyFactory.topology(for: variant)
-        let fillContext = SolverContext(topology: topology)
+
+        // MARK: - deriving variants (kropki/XV/…) fill unconstrained — their
+
+        // marks are read off the finished solution, so "no mark yet" must
+        // not be treated as the negative convention. Miracle's rules are
+        // global and DO constrain the fill.
+        let fillContext = SolverContext(
+            topology: topology,
+            expandsNegativeConvention: !Self.derivesRelationMarks(variant),
+        )
         let grader = Grader()
 
         let maxAttempts = Self.attemptBudget(cellCount: topology.cellCount)
@@ -114,6 +123,15 @@ public struct PuzzleGenerator: Sendable {
         )
     }
 
+    /// Variants whose relation marks are derived from the finished solution
+    /// (as opposed to miracle, whose rules exist before any solution).
+    static func derivesRelationMarks(_ variant: SudokuVariant) -> Bool {
+        switch variant {
+        case .greaterThan, .kropki, .xv, .consecutive: true
+        default: false
+        }
+    }
+
     /// The fewest clues a puzzle of this difficulty may keep, as a fraction of
     /// the grid. This is what makes difficulties *feel* different to humans:
     /// beginner boards stay dense (≈45 givens on a 9×9) even though deeper
@@ -177,8 +195,29 @@ public struct PuzzleGenerator: Sendable {
         let outcome: DifficultyTargeter.Outcome?
         var cages: [Cage] = []
         var parities: [Int: CellParity] = [:]
+        var relations: [RelationClue] = []
 
         switch variant {
+        case .greaterThan, .kropki, .xv, .consecutive, .miracle:
+            relations = RelationMarks.derive(
+                variant: variant,
+                topology: topology,
+                solution: solution,
+                rng: &rng,
+            )
+            let context = SolverContext(topology: topology, relations: relations)
+            // Relation variants carry most of their information in the
+            // marks; keeping the classic givens density would bury that, so
+            // the floors shrink sharply.
+            outcome = carveAndTune(
+                context: context,
+                solution: solution,
+                difficulty: difficulty,
+                grader: grader,
+                rng: &rng,
+                givensFloorScale: 0.3,
+            )
+
         case .killer:
             cages = CagePartitioner.partition(
                 topology: topology,
@@ -233,6 +272,7 @@ public struct PuzzleGenerator: Sendable {
             cages: cages,
             parities: parities,
             irregularBoxes: irregularBoxes,
+            relations: relations,
         )
     }
 
@@ -242,6 +282,7 @@ public struct PuzzleGenerator: Sendable {
         difficulty: Difficulty,
         grader: Grader,
         rng: inout Xoshiro256StarStar,
+        givensFloorScale: Double = 1,
     ) -> DifficultyTargeter.Outcome? {
         // Symmetry is an aesthetic for approachable boards; expert/master
         // digs need the freedom of single-cell removals to reach the deep,
@@ -250,14 +291,14 @@ public struct PuzzleGenerator: Sendable {
             context: context,
             solution: solution,
             target: difficulty,
-            minimumGivens: Self.minimumGivens(
+            minimumGivens: Int(Double(Self.minimumGivens(
                 for: difficulty,
                 cellCount: context.cellCount,
-            ),
-            hardeningFloor: Self.hardeningFloor(
+            )) * givensFloorScale),
+            hardeningFloor: Int(Double(Self.hardeningFloor(
                 for: difficulty,
                 cellCount: context.cellCount,
-            ),
+            )) * givensFloorScale),
             symmetric: difficulty <= .hard,
             rng: &rng,
             grader: grader,

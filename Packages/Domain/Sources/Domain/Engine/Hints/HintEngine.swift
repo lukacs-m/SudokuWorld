@@ -32,6 +32,7 @@ public struct HintEngine: Sendable {
             topology: topology,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
         )
         let grid = SolverGrid(context: context, givens: board.values)
         if !grid.isContradicted, let step = TechniqueLadder.nextStep(in: grid) {

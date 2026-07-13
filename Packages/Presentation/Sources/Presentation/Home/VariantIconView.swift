@@ -128,6 +128,11 @@ enum VariantIconArtwork {
         case .asterisk: asterisk(in: rect, context: &context, theme: theme)
         case .antiKnight: antiKnight(in: rect, context: &context, theme: theme)
         case .antiKing: antiKing(in: rect, context: &context, theme: theme)
+        case .greaterThan: edgeMarks(in: rect, context: &context, theme: theme, symbols: ["‹", "›"])
+        case .kropki: kropki(in: rect, context: &context, theme: theme)
+        case .xv: edgeMarks(in: rect, context: &context, theme: theme, symbols: ["X", "V"])
+        case .consecutive: consecutiveBars(in: rect, context: &context, theme: theme)
+        case .miracle: miracle(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -372,6 +377,87 @@ enum VariantIconArtwork {
                 lineWidth: 1,
             )
         }
+    }
+
+    /// A coarse 3×3 sketch with two symbol marks on cell borders, for the
+    /// XV and greater-than tiles.
+    private static func edgeMarks(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+        symbols: [String],
+    ) {
+        grid(3, boldEvery: nil, in: rect, context: &context, theme: theme)
+        let spots = [
+            CGPoint(x: rect.minX + rect.width / 3, y: rect.minY + rect.height / 6),
+            CGPoint(x: rect.minX + rect.width * 0.5, y: rect.minY + rect.height * 2 / 3),
+        ]
+        for (symbol, spot) in zip(symbols, spots) {
+            let text = Text(symbol)
+                .font(.system(size: rect.height * 0.24, weight: .bold, design: .rounded))
+                .foregroundColor(theme.accent)
+            context.draw(context.resolve(text), at: spot, anchor: .center)
+        }
+    }
+
+    private static func kropki(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(3, boldEvery: nil, in: rect, context: &context, theme: theme)
+        let radius = rect.width * 0.07
+        let spots: [(CGFloat, CGFloat, Bool)] = [
+            (1 / 3, 1 / 6, false), (2 / 3, 0.5, true), (1 / 6, 2 / 3, false),
+        ]
+        for (x, y, filled) in spots {
+            let dot = CGRect(
+                x: rect.minX + rect.width * x - radius,
+                y: rect.minY + rect.height * y - radius,
+                width: radius * 2,
+                height: radius * 2,
+            )
+            if filled {
+                context.fill(Path(ellipseIn: dot), with: .color(theme.accent))
+            } else {
+                context.fill(Path(ellipseIn: dot), with: .color(theme.cellBackground))
+                context.stroke(Path(ellipseIn: dot), with: .color(theme.accent), lineWidth: 1.2)
+            }
+        }
+    }
+
+    private static func consecutiveBars(
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+    ) {
+        grid(3, boldEvery: nil, in: rect, context: &context, theme: theme)
+        var bars = Path()
+        let third = rect.width / 3
+        bars.move(to: CGPoint(x: rect.minX + third, y: rect.minY + third * 0.25))
+        bars.addLine(to: CGPoint(x: rect.minX + third, y: rect.minY + third * 0.75))
+        bars.move(to: CGPoint(x: rect.minX + third * 1.25, y: rect.minY + third * 2))
+        bars.addLine(to: CGPoint(x: rect.minX + third * 1.75, y: rect.minY + third * 2))
+        context.stroke(
+            bars,
+            with: .color(theme.accent),
+            style: StrokeStyle(lineWidth: 3, lineCap: .round),
+        )
+    }
+
+    private static func miracle(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        // A near-empty board with a lone given and a sparkle: the "no clues
+        // at all" fantasy.
+        let lone = cellRect(row: 6, col: 2, grid: 9, in: rect)
+        context.fill(
+            Path(ellipseIn: lone.insetBy(dx: 0.3, dy: 0.3)),
+            with: .color(theme.accent),
+        )
+        let sparkle = Text("✦")
+            .font(.system(size: rect.height * 0.34))
+            .foregroundColor(theme.accent)
+        context.draw(
+            context.resolve(sparkle),
+            at: CGPoint(x: rect.midX + rect.width * 0.12, y: rect.midY - rect.height * 0.12),
+            anchor: .center,
+        )
     }
 
     private static func point(_ x: CGFloat, _ y: CGFloat, in rect: CGRect) -> CGPoint {

@@ -1835,6 +1835,23 @@
         }
       }
     },
+    "hint.technique.relationAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The mark between the highlighted cells rules out %1$@ here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La marque entre les cases en évidence exclut %1$@ ici."
+          }
+        }
+      }
+    },
     "hint.technique.xWing" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3468,6 +3485,23 @@
         }
       }
     },
+    "technique.relationAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relation mark"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marque relationnelle"
+          }
+        }
+      }
+    },
     "technique.xWing" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3848,6 +3882,40 @@
         }
       }
     },
+    "variant.consecutive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consecutive"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consécutif"
+          }
+        }
+      }
+    },
+    "variant.consecutive.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bars join neighbors."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des barres lient les voisins."
+          }
+        }
+      }
+    },
     "variant.diagonal" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4052,6 +4120,40 @@
         }
       }
     },
+    "variant.greaterthan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Greater-Than"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparaison"
+          }
+        }
+      }
+    },
+    "variant.greaterthan.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inequalities inside boxes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inégalités dans les blocs."
+          }
+        }
+      }
+    },
     "variant.hexadoku16" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4154,6 +4256,40 @@
         }
       }
     },
+    "variant.kropki" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kropki"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kropki"
+          }
+        }
+      }
+    },
+    "variant.kropki.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dots mark pairs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des points marquent les paires."
+          }
+        }
+      }
+    },
     "variant.mini4" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4218,6 +4354,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grille 6×6 rapide."
+          }
+        }
+      }
+    },
+    "variant.miracle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miracle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miracle"
+          }
+        }
+      }
+    },
+    "variant.miracle.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three rules, few clues."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois règles, peu d'indices."
           }
         }
       }
@@ -4388,6 +4558,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des lettres, pas des chiffres."
+          }
+        }
+      }
+    },
+    "variant.xv" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XV"
+          }
+        }
+      }
+    },
+    "variant.xv.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X sums 10, V sums 5."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X somme 10, V somme 5."
           }
         }
       }

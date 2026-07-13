@@ -29,11 +29,36 @@ struct SolverContext {
     let housePairs: [HousePair]
     /// Bitmask with one bit set per digit 1...size.
     let fullMask: DigitMask
+    /// Pairwise constraints (marks plus expanded negatives).
+    let relationEdges: [RelationEdge]
+    /// Indices into `relationEdges` touching each cell.
+    let relationsForCell: [[Int]]
 
-    init(topology: GridTopology, cages: [Cage] = [], parities: [Int: CellParity] = [:]) {
+    /// `expandsNegativeConvention` exists for one caller: generation-time
+    /// filling of mark-deriving variants (kropki/XV/consecutive), where
+    /// marks don't exist yet and "no mark" must not mean "constrained".
+    init(
+        topology: GridTopology,
+        cages: [Cage] = [],
+        parities: [Int: CellParity] = [:],
+        relations: [RelationClue] = [],
+        expandsNegativeConvention: Bool = true,
+    ) {
         self.topology = topology
         self.cages = cages
         self.parities = parities
+        relationEdges = RelationExpansion.edges(
+            variant: topology.variant,
+            relations: relations,
+            topology: topology,
+            includeNegatives: expandsNegativeConvention,
+        )
+        var relationMembership = [[Int]](repeating: [], count: topology.cellCount)
+        for (index, edge) in relationEdges.enumerated() {
+            relationMembership[edge.a].append(index)
+            relationMembership[edge.b].append(index)
+        }
+        relationsForCell = relationMembership
         size = topology.size
         cellCount = topology.cellCount
         houses = topology.houses

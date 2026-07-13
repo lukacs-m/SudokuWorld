@@ -30,6 +30,7 @@ struct GeneratorTests {
             givens: puzzle.givens,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
         )
         #expect(solver.solutionCount(limit: 2) == 1)
         #expect(solver.solve() == puzzle.solution)
@@ -40,6 +41,7 @@ struct GeneratorTests {
             givens: puzzle.givens,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
         )
         #expect(graded == puzzle.gradedDifficulty)
     }
@@ -66,6 +68,12 @@ struct GeneratorTests {
         (SudokuVariant.alphadoku25, Difficulty.beginner),
         (SudokuVariant.antiKnight, Difficulty.easy),
         (SudokuVariant.antiKing, Difficulty.medium),
+        (SudokuVariant.greaterThan, Difficulty.easy),
+        (SudokuVariant.kropki, Difficulty.easy),
+        (SudokuVariant.kropki, Difficulty.expert),
+        (SudokuVariant.xv, Difficulty.easy),
+        (SudokuVariant.consecutive, Difficulty.medium),
+        (SudokuVariant.miracle, Difficulty.easy),
     ])
     func generatesValidPuzzles(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(

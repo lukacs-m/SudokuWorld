@@ -25,6 +25,9 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
     /// Jigsaw region id per cell; nil for variants with regular boxes.
     /// Optional so saves from before this field decode unchanged.
     public let irregularBoxes: [Int]?
+    /// Pairwise marks (kropki dots, XV letters, inequalities, bars); empty
+    /// for variants without relation clues.
+    public let relations: [RelationClue]
 
     public init(
         id: UUID,
@@ -37,6 +40,7 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
         irregularBoxes: [Int]? = nil,
+        relations: [RelationClue] = [],
     ) {
         self.id = id
         self.variant = variant
@@ -48,5 +52,34 @@ public struct PuzzleDefinition: Identifiable, Equatable, Sendable, Codable {
         self.cages = cages
         self.parities = parities
         self.irregularBoxes = irregularBoxes
+        self.relations = relations
+    }
+
+    /// Custom decoding so payload fields added after 1.0 fall back to empty
+    /// when a stored save predates them — synthesized decoding would throw
+    /// on the missing key. Encoding stays synthesized. Every future payload
+    /// field needs one `decodeIfPresent` line here.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        variant = try container.decode(SudokuVariant.self, forKey: .variant)
+        requestedDifficulty = try container.decode(
+            Difficulty.self,
+            forKey: .requestedDifficulty,
+        )
+        gradedDifficulty = try container.decode(Difficulty.self, forKey: .gradedDifficulty)
+        seed = try container.decode(UInt64.self, forKey: .seed)
+        givens = try container.decode([Int?].self, forKey: .givens)
+        solution = try container.decode([Int].self, forKey: .solution)
+        cages = try container.decodeIfPresent([Cage].self, forKey: .cages) ?? []
+        parities = try container.decodeIfPresent(
+            [Int: CellParity].self,
+            forKey: .parities,
+        ) ?? [:]
+        irregularBoxes = try container.decodeIfPresent([Int].self, forKey: .irregularBoxes)
+        relations = try container.decodeIfPresent(
+            [RelationClue].self,
+            forKey: .relations,
+        ) ?? []
     }
 }

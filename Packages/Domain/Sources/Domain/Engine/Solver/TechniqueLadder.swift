@@ -22,6 +22,10 @@ enum TechniqueLadder {
         if let step = Techniques.hiddenSingle(in: grid) {
             return step
         }
+        guard cap >= Technique.relationAnalysis.rank else { return nil }
+        if let step = Techniques.relationAnalysis(in: grid) {
+            return step
+        }
         guard cap >= Technique.nakedPair.rank else { return nil }
         if let step = Techniques.nakedSubset(in: grid, subsetSize: 2) {
             return step

@@ -7,6 +7,7 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
     case nakedPair
     case hiddenPair
     case cageArithmetic
+    case relationAnalysis
     case pointingPair
     case boxLineReduction
     case nakedTriple
@@ -24,6 +25,11 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
         case .nakedPair: 2
         case .hiddenPair: 3
         case .cageArithmetic: 4
+        // Reading a dot/inequality mark is the *basic* move of relation
+        // variants — as easy as a hidden single — so it shares that rank;
+        // otherwise no kropki could ever grade below medium. Ranks are
+        // code-only and freely tunable — unlike slugs they never persist.
+        case .relationAnalysis: 1
         case .pointingPair: 5
         case .boxLineReduction: 6
         case .nakedTriple: 7

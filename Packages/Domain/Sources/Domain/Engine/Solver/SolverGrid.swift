@@ -83,7 +83,40 @@ struct SolverGrid {
         for peer in context.peers[cell] {
             guard eliminate(digit, at: peer) else { return false }
         }
+        guard updateRelations(afterPlacing: digit, at: cell) else { return false }
         return updateCage(afterPlacing: digit, at: cell)
+    }
+
+    /// Prunes relation partners after an assignment: with one endpoint
+    /// fixed, the partner keeps only digits satisfying the edge. This runs
+    /// inside `place` (not just the fixpoint passes) so plain backtracking —
+    /// filling, uniqueness counting — always honors relation constraints.
+    private mutating func updateRelations(afterPlacing digit: Int, at cell: Int) -> Bool {
+        for edgeIndex in context.relationsForCell[cell] {
+            let edge = context.relationEdges[edgeIndex]
+            let partner = edge.a == cell ? edge.b : edge.a
+            guard values[partner] == 0 else {
+                // Both endpoints fixed: verify directly.
+                let aValue = values[edge.a]
+                let bValue = values[edge.b]
+                if !edge.satisfied(a: aValue, b: bValue) {
+                    isContradicted = true
+                    return false
+                }
+                continue
+            }
+            let allowed = edge.allowedMask(
+                forA: edge.a == partner,
+                partnerCandidates: SolverContext.mask(for: digit),
+                size: context.size,
+            )
+            let removed = candidates[partner] & ~allowed
+            guard removed != 0 else { continue }
+            for digit in context.digits(in: removed) {
+                guard eliminate(digit, at: partner) else { return false }
+            }
+        }
+        return true
     }
 
     /// Removes a candidate. Returns false on contradiction (empty cell).
@@ -127,6 +160,40 @@ struct SolverGrid {
             }
             if maxRank >= Technique.cageArithmetic.rank {
                 guard propagateCageCombinations(changed: &changed) else { return false }
+            }
+            if maxRank >= Technique.relationAnalysis.rank {
+                guard propagateRelations(changed: &changed) else { return false }
+            }
+        }
+        return !isContradicted
+    }
+
+    /// Arc consistency over relation edges: each endpoint keeps only digits
+    /// with at least one compatible partner candidate.
+    private mutating func propagateRelations(changed: inout Bool) -> Bool {
+        for edge in context.relationEdges {
+            for forA in [true, false] {
+                let cell = forA ? edge.a : edge.b
+                let partner = forA ? edge.b : edge.a
+                guard values[cell] == 0 else { continue }
+                let partnerMask = values[partner] == 0
+                    ? candidates[partner]
+                    : SolverContext.mask(for: values[partner])
+                let allowed = edge.allowedMask(
+                    forA: forA,
+                    partnerCandidates: partnerMask,
+                    size: context.size,
+                )
+                let removed = candidates[cell] & ~allowed
+                guard removed != 0 else { continue }
+                for digit in context.digits(in: removed) {
+                    guard eliminate(digit, at: cell) else { return false }
+                }
+                propagationHardestRank = max(
+                    propagationHardestRank,
+                    Technique.relationAnalysis.rank,
+                )
+                changed = true
             }
         }
         return !isContradicted

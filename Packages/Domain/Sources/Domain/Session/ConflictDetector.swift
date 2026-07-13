@@ -7,6 +7,7 @@ public import Model
 public struct ConflictDetector: Equatable, Sendable {
     private let puzzle: PuzzleDefinition
     let peers: [[Int]]
+    private let relationEdges: [RelationEdge]
 
     public init(puzzle: PuzzleDefinition) {
         self.puzzle = puzzle
@@ -14,8 +15,10 @@ public struct ConflictDetector: Equatable, Sendable {
             topology: TopologyFactory.topology(for: puzzle),
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
         )
         peers = context.peers
+        relationEdges = context.relationEdges
     }
 
     public static func == (lhs: ConflictDetector, rhs: ConflictDetector) -> Bool {
@@ -42,6 +45,17 @@ public struct ConflictDetector: Equatable, Sendable {
             guard values.count == cage.cells.count else { continue }
             if values.reduce(0, +) != cage.sum {
                 conflicted.formUnion(cage.cells)
+            }
+        }
+
+        // Relation marks (and their negative convention) violated by two
+        // filled endpoints.
+        for edge in relationEdges {
+            guard let aValue = board[edge.a].value,
+                  let bValue = board[edge.b].value else { continue }
+            if !edge.satisfied(a: aValue, b: bValue) {
+                conflicted.insert(edge.a)
+                conflicted.insert(edge.b)
             }
         }
         return conflicted
