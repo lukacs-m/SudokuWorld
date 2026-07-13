@@ -14,7 +14,7 @@ extension Techniques {
                 return count >= 2 && count <= subsetSize
             }
             for combo in combinations(of: eligible, choose: subsetSize) {
-                let union = combo.reduce(UInt16(0)) { $0 | grid.candidates[$1] }
+                let union = combo.reduce(DigitMask(0)) { $0 | grid.candidates[$1] }
                 guard union.nonzeroBitCount == subsetSize else { continue }
 
                 var eliminations: [(cell: Int, digit: Int)] = []
@@ -65,7 +65,7 @@ extension Techniques {
                 }
                 guard cellUnion.count == subsetSize else { continue }
 
-                let comboMask = digitCombo.reduce(UInt16(0)) { $0 | SolverContext.mask(for: $1) }
+                let comboMask = digitCombo.reduce(DigitMask(0)) { $0 | SolverContext.mask(for: $1) }
                 var eliminations: [(cell: Int, digit: Int)] = []
                 for cell in cellUnion {
                     let extras = grid.candidates[cell] & ~comboMask

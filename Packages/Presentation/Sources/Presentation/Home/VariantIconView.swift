@@ -51,6 +51,14 @@ enum VariantIconArtwork {
                 boldEvery: 4,
                 label: "0–F",
             )
+        case .alphadoku25: sized(
+                in: rect,
+                context: &context,
+                theme: theme,
+                size: 25,
+                boldEvery: 5,
+                label: "A–Y",
+            )
         case .killer: killer(in: rect, context: &context, theme: theme)
         case .diagonal: diagonal(in: rect, context: &context, theme: theme)
         case .windoku: windoku(in: rect, context: &context, theme: theme)

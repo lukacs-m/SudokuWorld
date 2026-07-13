@@ -67,7 +67,7 @@ extension Techniques {
                 var path = [start]
                 var visited: Set<Int> = [start]
 
-                func search(from cell: Int, forced: UInt16) -> SolveStep? {
+                func search(from cell: Int, forced: DigitMask) -> SolveStep? {
                     for peer in context.peers[cell] {
                         guard !visited.contains(peer),
                               let peerMask = masks[peer],
@@ -118,9 +118,9 @@ extension Techniques {
     // MARK: - Shared helpers
 
     /// Unsolved cells with exactly two candidates, ascending.
-    private static func bivalueCells(in grid: SolverGrid) -> [(Int, UInt16)] {
+    private static func bivalueCells(in grid: SolverGrid) -> [(Int, DigitMask)] {
         let context = grid.context
-        var cells: [(Int, UInt16)] = []
+        var cells: [(Int, DigitMask)] = []
         for cell in 0 ..< context.cellCount where grid.values[cell] == 0 {
             let mask = grid.candidates[cell]
             if mask.nonzeroBitCount == 2 {

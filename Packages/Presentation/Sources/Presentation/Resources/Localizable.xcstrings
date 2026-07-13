@@ -3644,6 +3644,40 @@
     "variant.%@" : {
 
     },
+    "variant.alphadoku25" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphadoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphadoku"
+          }
+        }
+      }
+    },
+    "variant.alphadoku25.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25×25, letters A–Y."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25×25, lettres A–Y."
+          }
+        }
+      }
+    },
     "variant.argyle" : {
       "extractionState" : "manual",
       "localizations" : {

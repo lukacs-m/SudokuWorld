@@ -28,7 +28,7 @@ struct SolverContext {
     /// Ordered pairs of distinct houses sharing at least two cells.
     let housePairs: [HousePair]
     /// Bitmask with one bit set per digit 1...size.
-    let fullMask: UInt16
+    let fullMask: DigitMask
 
     init(topology: GridTopology, cages: [Cage] = [], parities: [Int: CellParity] = [:]) {
         self.topology = topology
@@ -38,7 +38,7 @@ struct SolverContext {
         cellCount = topology.cellCount
         houses = topology.houses
         houseKinds = topology.houseKinds
-        fullMask = UInt16((1 << topology.size) - 1)
+        fullMask = DigitMask((1 << topology.size) - 1)
 
         var membership = [[Int]](repeating: [], count: topology.cellCount)
         for (houseIndex, house) in topology.houses.enumerated() {
@@ -96,12 +96,12 @@ struct SolverContext {
         housePairs = pairs
     }
 
-    static func mask(for digit: Int) -> UInt16 {
-        UInt16(1) << UInt16(digit - 1)
+    static func mask(for digit: Int) -> DigitMask {
+        DigitMask(1) << DigitMask(digit - 1)
     }
 
     /// Digits present in a candidate mask, ascending.
-    func digits(in mask: UInt16) -> [Int] {
+    func digits(in mask: DigitMask) -> [Int] {
         (1 ... size).filter { mask & Self.mask(for: $0) != 0 }
     }
 }

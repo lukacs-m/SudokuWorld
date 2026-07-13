@@ -37,6 +37,7 @@ public enum TopologyFactory {
         case .gattai8: gattai8Topology
         case .shogun: shogunTopology
         case .sumo: sumoTopology
+        case .alphadoku25: alphadoku25Topology
         }
     }
 
@@ -126,6 +127,12 @@ public enum TopologyFactory {
         spanCols: 33,
     )
     private static let mini4Topology = rectangular(variant: .mini4, size: 4, boxRows: 2, boxCols: 2)
+    private static let alphadoku25Topology = rectangular(
+        variant: .alphadoku25,
+        size: 25,
+        boxRows: 5,
+        boxCols: 5,
+    )
     private static let dodeka12Topology = rectangular(
         variant: .dodeka12,
         size: 12,

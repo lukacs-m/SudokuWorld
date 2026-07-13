@@ -11,6 +11,8 @@ enum VariantGlyphs {
             String(digit - 1, radix: 16).uppercased()
         case .wordoku:
             letter(digit, alphabet: "ABCDEFGHI")
+        case .alphadoku25:
+            letter(digit, alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXY")
         case .classic, .mini4, .mini6, .dodeka12, .killer, .diagonal, .windoku,
              .evenOdd, .samurai, .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo:

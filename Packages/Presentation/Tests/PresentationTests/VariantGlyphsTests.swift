@@ -22,6 +22,11 @@ struct VariantGlyphsTests {
         #expect(VariantGlyphs.glyph(9, for: .wordoku) == "I")
     }
 
+    @Test func alphadokuSpansTwentyFiveLetters() {
+        #expect(VariantGlyphs.glyph(1, for: .alphadoku25) == "A")
+        #expect(VariantGlyphs.glyph(25, for: .alphadoku25) == "Y")
+    }
+
     @Test func everyVariantGlyphsItsFullDigitRange() {
         for variant in SudokuVariant.allCases {
             let size = TestTopologySizes.size(for: variant)
@@ -59,6 +64,7 @@ private enum TestTopologySizes {
         case .mini6: 6
         case .dodeka12: 12
         case .hexadoku16: 16
+        case .alphadoku25: 25
         case .classic, .killer, .diagonal, .windoku, .evenOdd, .samurai, .wordoku,
              .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo: 9
