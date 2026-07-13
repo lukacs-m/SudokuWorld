@@ -139,6 +139,8 @@ enum VariantIconArtwork {
         case .skyscraper: outside(in: rect, context: &context, theme: theme, labels: ["3", "1"])
         case .littleKiller: littleKiller(in: rect, context: &context, theme: theme)
         case .fogOfWar: fogOfWar(in: rect, context: &context, theme: theme)
+        case .killerGT: killerGT(in: rect, context: &context, theme: theme)
+        case .tredoku: tredoku(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -596,6 +598,66 @@ enum VariantIconArtwork {
             height: rect.height * 0.55,
         ))
         context.fill(fog, with: .color(theme.gridLineBold.opacity(0.4)))
+    }
+
+    private static func killerGT(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        let cage = cellRect(row: 0, col: 1, rowSpan: 1, colSpan: 2, grid: 3, in: rect)
+            .insetBy(dx: 2, dy: 2)
+        context.stroke(
+            Path(roundedRect: cage, cornerRadius: 2),
+            with: .color(theme.accent),
+            style: StrokeStyle(lineWidth: 1, dash: [3, 2.2]),
+        )
+        let mark = Text("›")
+            .font(.system(size: rect.height * 0.3, weight: .bold, design: .rounded))
+            .foregroundColor(theme.accent)
+        context.draw(
+            context.resolve(mark),
+            at: CGPoint(x: cage.midX, y: cage.midY),
+            anchor: .center,
+        )
+    }
+
+    private static func tredoku(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        // An isometric cube corner: top rhombus and two visible faces.
+        let cx = rect.midX
+        let cy = rect.midY
+        let w = rect.width * 0.42
+        let h = rect.height * 0.24
+        let top = CGPoint(x: cx, y: cy - h * 2)
+        let left = CGPoint(x: cx - w, y: cy - h)
+        let right = CGPoint(x: cx + w, y: cy - h)
+        let center = CGPoint(x: cx, y: cy)
+        let bottomLeft = CGPoint(x: cx - w, y: cy + h)
+        let bottomRight = CGPoint(x: cx + w, y: cy + h)
+        let bottom = CGPoint(x: cx, y: cy + h * 2)
+
+        var topFace = Path()
+        topFace.move(to: top)
+        topFace.addLine(to: right)
+        topFace.addLine(to: center)
+        topFace.addLine(to: left)
+        topFace.closeSubpath()
+        var leftFace = Path()
+        leftFace.move(to: left)
+        leftFace.addLine(to: center)
+        leftFace.addLine(to: bottom)
+        leftFace.addLine(to: bottomLeft)
+        leftFace.closeSubpath()
+        var rightFace = Path()
+        rightFace.move(to: center)
+        rightFace.addLine(to: right)
+        rightFace.addLine(to: bottomRight)
+        rightFace.addLine(to: bottom)
+        rightFace.closeSubpath()
+
+        context.fill(topFace, with: .color(theme.accent.opacity(0.45)))
+        context.fill(leftFace, with: .color(theme.accent.opacity(0.25)))
+        context.fill(rightFace, with: .color(theme.cellBackgroundAlternate))
+        for face in [topFace, leftFace, rightFace] {
+            context.stroke(face, with: .color(theme.gridLineBold), lineWidth: 1)
+        }
     }
 
     private static func point(_ x: CGFloat, _ y: CGFloat, in rect: CGRect) -> CGPoint {

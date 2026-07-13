@@ -272,16 +272,26 @@ public struct PuzzleGenerator: Sendable {
                 givensFloorScale: 0.3,
             )
 
-        case .killer:
+        case .killer, .killerGT:
             cages = CagePartitioner.partition(
                 topology: topology,
                 solution: solution,
                 difficulty: difficulty,
                 rng: &rng,
             )
+            if variant == .killerGT {
+                // The combo: inequality marks on every orthogonally adjacent
+                // in-cage pair, read from the larger value.
+                relations = Self.inCageInequalities(
+                    cages: cages,
+                    topology: topology,
+                    solution: solution,
+                )
+            }
             outcome = killerGivens(
                 topology: topology,
                 cages: cages,
+                relations: relations,
                 solution: solution,
                 target: difficulty,
                 grader: grader,
@@ -428,15 +438,37 @@ public struct PuzzleGenerator: Sendable {
     /// time until the technique ladder can finish the puzzle (which also
     /// guarantees uniqueness), difficulty-tuned, then topped up to the
     /// difficulty's givens floor so easier killers stay approachable.
+    /// Inequality marks between orthogonally adjacent cells of one cage,
+    /// oriented from the larger solution value.
+    static func inCageInequalities(
+        cages: [Cage],
+        topology: GridTopology,
+        solution: [Int],
+    ) -> [RelationClue] {
+        var cageIndex = [Int](repeating: -1, count: topology.cellCount)
+        for (index, cage) in cages.enumerated() {
+            for cell in cage.cells {
+                cageIndex[cell] = index
+            }
+        }
+        return RelationExpansion.orthogonalPairs(in: topology).compactMap { a, b in
+            guard cageIndex[a] >= 0, cageIndex[a] == cageIndex[b] else { return nil }
+            return solution[a] > solution[b]
+                ? RelationClue(a: a, b: b, kind: .greaterThan)
+                : RelationClue(a: b, b: a, kind: .greaterThan)
+        }
+    }
+
     private func killerGivens(
         topology: GridTopology,
         cages: [Cage],
+        relations: [RelationClue] = [],
         solution: [Int],
         target: Difficulty,
         grader: Grader,
         rng: inout Xoshiro256StarStar,
     ) -> DifficultyTargeter.Outcome? {
-        let context = SolverContext(topology: topology, cages: cages)
+        let context = SolverContext(topology: topology, cages: cages, relations: relations)
         var givens = [Int?](repeating: nil, count: topology.cellCount)
         var addQueue = Array(0 ..< topology.cellCount).shuffled(using: &rng)
 

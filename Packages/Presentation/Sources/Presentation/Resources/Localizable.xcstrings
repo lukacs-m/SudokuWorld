@@ -4409,6 +4409,40 @@
         }
       }
     },
+    "variant.killergt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Killer GT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Killer GT"
+          }
+        }
+      }
+    },
+    "variant.killergt.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages plus inequalities."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages et inégalités."
+          }
+        }
+      }
+    },
     "variant.kropki" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4779,6 +4813,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les chiffres montent du bulbe."
+          }
+        }
+      }
+    },
+    "variant.tredoku" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tredoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tredoku"
+          }
+        }
+      }
+    },
+    "variant.tredoku.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three faces of a corner."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois faces d'un coin."
           }
         }
       }

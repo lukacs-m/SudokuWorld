@@ -51,6 +51,8 @@ public enum TopologyFactory {
         case .skyscraper: skyscraperTopology
         case .littleKiller: littleKillerTopology
         case .fogOfWar: fogOfWarTopology
+        case .killerGT: killerGTTopology
+        case .tredoku: tredokuTopology
         }
     }
 
@@ -243,6 +245,13 @@ public enum TopologyFactory {
         boxRows: 3,
         boxCols: 3,
     )
+    private static let killerGTTopology = rectangular(
+        variant: .killerGT,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    private static let tredokuTopology = TredokuTopology.build()
     private static let consecutiveTopology = rectangular(
         variant: .consecutive,
         size: 9,

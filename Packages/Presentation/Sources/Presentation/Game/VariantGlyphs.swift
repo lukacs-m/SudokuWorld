@@ -19,7 +19,7 @@ enum VariantGlyphs {
              .antiKnight, .antiKing,
              .greaterThan, .kropki, .xv, .consecutive, .miracle,
              .thermo, .arrow, .sandwich, .skyscraper, .littleKiller,
-             .fogOfWar:
+             .fogOfWar, .killerGT, .tredoku:
             "\(digit)"
         }
     }

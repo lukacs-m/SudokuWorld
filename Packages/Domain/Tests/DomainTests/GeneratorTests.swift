@@ -87,6 +87,9 @@ struct GeneratorTests {
         (SudokuVariant.skyscraper, Difficulty.easy),
         (SudokuVariant.littleKiller, Difficulty.easy),
         (SudokuVariant.fogOfWar, Difficulty.medium),
+        (SudokuVariant.killerGT, Difficulty.easy),
+        (SudokuVariant.killerGT, Difficulty.hard),
+        (SudokuVariant.tredoku, Difficulty.easy),
     ])
     func generatesValidPuzzles(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(

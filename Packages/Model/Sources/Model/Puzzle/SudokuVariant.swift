@@ -36,6 +36,8 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case skyscraper
     case littleKiller = "littlekiller"
     case fogOfWar = "fogofwar"
+    case killerGT = "killergt"
+    case tredoku
 
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
@@ -51,13 +53,13 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
              .sandwich, .skyscraper, .littleKiller: .relationClues
         case .antiKnight, .antiKing, .miracle: .chess
         case .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo: .multiGrid
-        case .evenOdd, .wordoku, .fogOfWar: .twists
+        case .evenOdd, .wordoku, .fogOfWar, .killerGT, .tredoku: .twists
         }
     }
 
     /// Killer puzzles replace most givens with cage-sum constraints.
     public var usesCages: Bool {
-        self == .killer
+        self == .killer || self == .killerGT
     }
 
     /// Even-Odd puzzles constrain marked cells to a parity.
