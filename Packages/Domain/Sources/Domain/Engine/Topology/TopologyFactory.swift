@@ -32,6 +32,11 @@ public enum TopologyFactory {
         case .jigsaw: jigsawFallbackTopology
         case .argyle: argyleTopology
         case .asterisk: asteriskTopology
+        case .gattai2: gattai2Topology
+        case .gattai3: gattai3Topology
+        case .gattai8: gattai8Topology
+        case .shogun: shogunTopology
+        case .sumo: sumoTopology
         }
     }
 
@@ -68,7 +73,58 @@ public enum TopologyFactory {
         boxCols: 3,
         includeWindows: true,
     )
-    private static let samuraiTopology = SamuraiTopology.build()
+    /// Multi-grid layouts: origins sit on multiples of 6 so overlaps land on
+    /// whole 3×3 boxes.
+    private static let samuraiTopology = OverlappingGrids.build(
+        variant: .samurai,
+        origins: [(0, 0), (0, 12), (6, 6), (12, 0), (12, 12)],
+        spanRows: 21,
+        spanCols: 21,
+    )
+    private static let gattai2Topology = OverlappingGrids.build(
+        variant: .gattai2,
+        origins: [(0, 0), (6, 6)],
+        spanRows: 15,
+        spanCols: 15,
+    )
+    private static let gattai3Topology = OverlappingGrids.build(
+        variant: .gattai3,
+        origins: [(0, 0), (6, 6), (12, 12)],
+        spanRows: 21,
+        spanCols: 21,
+    )
+    private static let gattai8Topology = OverlappingGrids.build(
+        variant: .gattai8,
+        origins: [
+            (0, 0), (0, 12), (0, 24),
+            (6, 6), (6, 18),
+            (12, 0), (12, 12), (12, 24),
+        ],
+        spanRows: 21,
+        spanCols: 33,
+    )
+    private static let shogunTopology = OverlappingGrids.build(
+        variant: .shogun,
+        origins: [
+            (0, 0), (0, 12), (0, 24), (0, 36),
+            (6, 6), (6, 18), (6, 30),
+            (12, 0), (12, 12), (12, 24), (12, 36),
+        ],
+        spanRows: 21,
+        spanCols: 45,
+    )
+    private static let sumoTopology = OverlappingGrids.build(
+        variant: .sumo,
+        origins: [
+            (0, 0), (0, 12), (0, 24),
+            (6, 6), (6, 18),
+            (12, 0), (12, 12), (12, 24),
+            (18, 6), (18, 18),
+            (24, 0), (24, 12), (24, 24),
+        ],
+        spanRows: 33,
+        spanCols: 33,
+    )
     private static let mini4Topology = rectangular(variant: .mini4, size: 4, boxRows: 2, boxCols: 2)
     private static let dodeka12Topology = rectangular(
         variant: .dodeka12,

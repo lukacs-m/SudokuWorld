@@ -17,6 +17,11 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case jigsaw
     case argyle
     case asterisk
+    case gattai2
+    case gattai3
+    case gattai8
+    case shogun
+    case sumo
 
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
@@ -28,7 +33,7 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
         switch self {
         case .mini4, .mini6, .classic, .dodeka12, .hexadoku16: .gridSizes
         case .killer, .diagonal, .windoku, .jigsaw, .argyle, .asterisk: .extraRegions
-        case .samurai: .multiGrid
+        case .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo: .multiGrid
         case .evenOdd, .wordoku: .twists
         }
     }

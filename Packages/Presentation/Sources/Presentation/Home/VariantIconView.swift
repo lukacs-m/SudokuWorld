@@ -55,7 +55,65 @@ enum VariantIconArtwork {
         case .diagonal: diagonal(in: rect, context: &context, theme: theme)
         case .windoku: windoku(in: rect, context: &context, theme: theme)
         case .evenOdd: evenOdd(in: rect, context: &context, theme: theme)
-        case .samurai: samurai(in: rect, context: &context, theme: theme)
+        case .samurai: multiGrid(
+                origins: [(0, 0), (0, 12), (6, 6), (12, 0), (12, 12)],
+                span: (21, 21), in: rect, context: &context, theme: theme,
+            )
+        case .gattai2: multiGrid(
+                origins: [(0, 0), (6, 6)],
+                span: (15, 15), in: rect, context: &context, theme: theme,
+            )
+        case .gattai3: multiGrid(
+                origins: [(0, 0), (6, 6), (12, 12)],
+                span: (21, 21), in: rect, context: &context, theme: theme,
+            )
+        case .gattai8: multiGrid(
+                origins: [
+                    (0, 0),
+                    (0, 12),
+                    (0, 24),
+                    (6, 6),
+                    (6, 18),
+                    (12, 0),
+                    (12, 12),
+                    (12, 24),
+                ],
+                span: (21, 33), in: rect, context: &context, theme: theme,
+            )
+        case .shogun: multiGrid(
+                origins: [
+                    (0, 0),
+                    (0, 12),
+                    (0, 24),
+                    (0, 36),
+                    (6, 6),
+                    (6, 18),
+                    (6, 30),
+                    (12, 0),
+                    (12, 12),
+                    (12, 24),
+                    (12, 36),
+                ],
+                span: (21, 45), in: rect, context: &context, theme: theme,
+            )
+        case .sumo: multiGrid(
+                origins: [
+                    (0, 0),
+                    (0, 12),
+                    (0, 24),
+                    (6, 6),
+                    (6, 18),
+                    (12, 0),
+                    (12, 12),
+                    (12, 24),
+                    (18, 6),
+                    (18, 18),
+                    (24, 0),
+                    (24, 12),
+                    (24, 24),
+                ],
+                span: (33, 33), in: rect, context: &context, theme: theme,
+            )
         case .wordoku: wordoku(in: rect, context: &context, theme: theme)
         case .jigsaw: jigsaw(in: rect, context: &context, theme: theme)
         case .argyle: argyle(in: rect, context: &context, theme: theme)
@@ -180,28 +238,40 @@ enum VariantIconArtwork {
         )
     }
 
-    private static func samurai(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
-        // Five overlapping grids: four corner squares plus a tinted center.
-        let side = rect.width * 0.42
-        let corners = [
-            CGPoint(x: rect.minX, y: rect.minY),
-            CGPoint(x: rect.maxX - side, y: rect.minY),
-            CGPoint(x: rect.minX, y: rect.maxY - side),
-            CGPoint(x: rect.maxX - side, y: rect.maxY - side),
-        ]
-        let center = CGRect(
-            x: rect.midX - side / 2,
-            y: rect.midY - side / 2,
-            width: side,
-            height: side,
+    /// A true miniature of an overlapping-grid layout: each 9×9 sub-grid is
+    /// a stroked square, centers (row offset 6 or 18) tinted.
+    private static func multiGrid(
+        origins: [(Int, Int)],
+        span: (rows: Int, cols: Int),
+        in rect: CGRect,
+        context: inout GraphicsContext,
+        theme: Theme,
+    ) {
+        let scale = min(
+            rect.width / CGFloat(span.cols),
+            rect.height / CGFloat(span.rows),
         )
-        context.fill(Path(center), with: .color(theme.accent.opacity(0.3)))
-        for origin in corners {
-            let square = CGRect(origin: origin, size: CGSize(width: side, height: side))
-            grid(3, boldEvery: nil, in: square, context: &context, theme: theme)
+        let side = 9 * scale
+        let originX = rect.midX - CGFloat(span.cols) * scale / 2
+        let originY = rect.midY - CGFloat(span.rows) * scale / 2
+        for (row, col) in origins where row % 12 == 6 {
+            let square = CGRect(
+                x: originX + CGFloat(col) * scale,
+                y: originY + CGFloat(row) * scale,
+                width: side,
+                height: side,
+            )
+            context.fill(Path(square), with: .color(theme.accent.opacity(0.3)))
+        }
+        for (row, col) in origins {
+            let square = CGRect(
+                x: originX + CGFloat(col) * scale,
+                y: originY + CGFloat(row) * scale,
+                width: side,
+                height: side,
+            )
             context.stroke(Path(square), with: .color(theme.gridLineBold), lineWidth: 1)
         }
-        context.stroke(Path(center), with: .color(theme.gridLineBold), lineWidth: 1)
     }
 
     private static func jigsaw(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {

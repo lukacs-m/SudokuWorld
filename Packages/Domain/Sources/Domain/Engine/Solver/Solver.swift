@@ -42,29 +42,66 @@ public struct Solver: Sendable {
         return count
     }
 
+    /// Iterative DFS with an explicit frame stack: recursion would go one
+    /// frame per placed cell, which overflows the 512 KB cooperative-pool
+    /// stacks on 900-cell layouts (sumo). Visit order matches the recursive
+    /// formulation (ascending digits), so solve() results are unchanged.
     private func search(
         _ grid: inout SolverGrid,
         limit: Int,
         count: inout Int,
         solution: inout [Int]?,
     ) {
-        guard grid.propagate() else { return }
-        if grid.isSolved {
-            count += 1
-            if solution == nil {
-                solution = grid.values
-            }
-            return
+        struct Frame {
+            let grid: SolverGrid
+            let cell: Int
+            var nextDigit = 1
         }
-        guard let cell = grid.minimumRemainingCell() else { return }
+        enum Entry {
+            case deadEnd
+            case solved
+            case frame(Frame)
+        }
 
-        let mask = grid.candidates[cell]
-        for digit in 1 ... context.size where mask & SolverContext.mask(for: digit) != 0 {
-            var branch = grid
-            guard branch.place(digit, at: cell) else { continue }
-            search(&branch, limit: limit, count: &count, solution: &solution)
-            if count >= limit {
-                return
+        /// Inout so propagation mutates uniquely-owned buffers in place; a
+        /// by-value parameter would copy every solver array at each node.
+        func enter(_ grid: inout SolverGrid) -> Entry {
+            guard grid.propagate() else { return .deadEnd }
+            if grid.isSolved {
+                count += 1
+                if solution == nil {
+                    solution = grid.values
+                }
+                return .solved
+            }
+            guard let cell = grid.minimumRemainingCell() else { return .deadEnd }
+            return .frame(Frame(grid: grid, cell: cell))
+        }
+
+        var stack: [Frame] = []
+        switch enter(&grid) {
+        case .deadEnd, .solved: return
+        case let .frame(first): stack.append(first)
+        }
+
+        while var top = stack.popLast(), count < limit {
+            let mask = top.grid.candidates[top.cell]
+            var digit: Int?
+            while top.nextDigit <= context.size {
+                let candidate = top.nextDigit
+                top.nextDigit += 1
+                if mask & SolverContext.mask(for: candidate) != 0 {
+                    digit = candidate
+                    break
+                }
+            }
+            guard let digit else { continue }
+            stack.append(top)
+
+            var branch = top.grid
+            guard branch.place(digit, at: top.cell) else { continue }
+            if case let .frame(child) = enter(&branch) {
+                stack.append(child)
             }
         }
     }

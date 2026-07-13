@@ -61,6 +61,8 @@ struct GeneratorTests {
         (SudokuVariant.jigsaw, Difficulty.expert),
         (SudokuVariant.argyle, Difficulty.easy),
         (SudokuVariant.asterisk, Difficulty.easy),
+        (SudokuVariant.gattai2, Difficulty.easy),
+        (SudokuVariant.gattai3, Difficulty.medium),
     ])
     func generatesValidPuzzles(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(
@@ -211,6 +213,8 @@ struct GeneratorTests {
         (SudokuVariant.classic, Difficulty.master),
         (SudokuVariant.dodeka12, Difficulty.master),
         (SudokuVariant.hexadoku16, Difficulty.master),
+        (SudokuVariant.sumo, Difficulty.beginner),
+        (SudokuVariant.shogun, Difficulty.easy),
     ])
     func worstCaseTargetsFinishWithinBudget(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(

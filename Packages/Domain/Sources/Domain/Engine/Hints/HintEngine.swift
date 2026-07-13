@@ -50,7 +50,7 @@ public struct HintEngine: Sendable {
             return cell.value != puzzle.solution[index]
         }
 
-        var target: Int? = if let preferredCell, preferredCell < board.count,
+        let target: Int? = if let preferredCell, preferredCell < board.count,
                               isRevealable(preferredCell)
         {
             preferredCell

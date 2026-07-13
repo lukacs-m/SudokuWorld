@@ -16,9 +16,14 @@ public struct PuzzleGenerator: Sendable {
     public init() {}
 
     /// Total attempts: generous for 9×9-class grids, tight for samurai-size
-    /// boards where every attempt is ~5× more expensive.
+    /// boards where every attempt is ~5× more expensive, tighter still for
+    /// shogun/sumo-size layouts.
     static func attemptBudget(cellCount: Int) -> Int {
-        cellCount > 200 ? 3 : 40
+        switch cellCount {
+        case ...200: 40
+        case ...600: 3
+        default: 2
+        }
     }
 
     /// Generates on the global concurrent executor. `@concurrent` matters:

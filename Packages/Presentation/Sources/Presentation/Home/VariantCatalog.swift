@@ -1,4 +1,3 @@
-import Common
 import Model
 
 /// Presentation metadata for the type catalog: which variants the sheet
@@ -21,7 +20,7 @@ enum VariantCatalog {
 
     /// Every variant the catalog currently surfaces.
     static var available: [SudokuVariant] {
-        SudokuVariant.allCases.filter { $0 != .samurai || FeatureFlags.samuraiEnabled }
+        SudokuVariant.allCases
     }
 
     /// The catalog grouped into display sections, in `SudokuVariantGroup`
@@ -46,6 +45,6 @@ enum VariantCatalog {
     }
 
     private static let newVariants: Set<SudokuVariant> = [
-        .mini4, .dodeka12, .hexadoku16, .wordoku, .jigsaw, .argyle, .asterisk,
+        .gattai2, .gattai3, .gattai8, .shogun, .sumo,
     ]
 }

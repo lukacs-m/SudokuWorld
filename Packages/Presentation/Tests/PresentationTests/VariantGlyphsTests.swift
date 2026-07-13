@@ -60,7 +60,8 @@ private enum TestTopologySizes {
         case .dodeka12: 12
         case .hexadoku16: 16
         case .classic, .killer, .diagonal, .windoku, .evenOdd, .samurai, .wordoku,
-             .jigsaw, .argyle, .asterisk: 9
+             .jigsaw, .argyle, .asterisk,
+             .gattai2, .gattai3, .gattai8, .shogun, .sumo: 9
         }
     }
 }
