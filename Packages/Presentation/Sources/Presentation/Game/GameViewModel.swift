@@ -178,6 +178,8 @@ public final class GameViewModel {
 
     public func tapCell(_ index: Int) {
         guard phase == .playing, let session, !session.isOver else { return }
+        // Fogged cells are not interactable until revealed.
+        guard !session.isFogged(index) else { return }
         if let digit = armedDigit {
             apply(digit: digit, at: index)
             return

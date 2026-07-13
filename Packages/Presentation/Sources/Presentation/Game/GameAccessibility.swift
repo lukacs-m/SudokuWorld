@@ -9,6 +9,7 @@ enum GameAccessibility {
         board: Board,
         puzzle: PuzzleDefinition,
         topology: GridTopology,
+        fogged: Bool = false,
     ) -> String {
         let position = topology.position(of: index)
         var parts: [String] = [
@@ -18,6 +19,10 @@ enum GameAccessibility {
                 position.col + 1,
             ),
         ]
+        if fogged {
+            parts.append(String(localized: "a11y.cell.fogged", bundle: .module))
+            return parts.joined(separator: ", ")
+        }
 
         let cell = board[index]
         if let value = cell.value {

@@ -74,6 +74,23 @@
         }
       }
     },
+    "a11y.cell.fogged" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hidden by fog"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cachée par le brouillard"
+          }
+        }
+      }
+    },
     "a11y.cell.given" : {
       "localizations" : {
         "en" : {
@@ -4116,6 +4133,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cases paires et impaires."
+          }
+        }
+      }
+    },
+    "variant.fogofwar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fog of War"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brouillard"
+          }
+        }
+      }
+    },
+    "variant.fogofwar.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal the board as you solve."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révélez la grille en jouant."
           }
         }
       }

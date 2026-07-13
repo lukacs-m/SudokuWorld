@@ -138,6 +138,7 @@ enum VariantIconArtwork {
         case .sandwich: outside(in: rect, context: &context, theme: theme, labels: ["17", "4"])
         case .skyscraper: outside(in: rect, context: &context, theme: theme, labels: ["3", "1"])
         case .littleKiller: littleKiller(in: rect, context: &context, theme: theme)
+        case .fogOfWar: fogOfWar(in: rect, context: &context, theme: theme)
         }
     }
 
@@ -569,6 +570,32 @@ enum VariantIconArtwork {
             with: .color(theme.accent),
             style: StrokeStyle(lineWidth: 1.3, lineCap: .round),
         )
+    }
+
+    private static func fogOfWar(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
+        fillCells(
+            [(2, 2), (6, 5)],
+            grid: 9,
+            in: rect,
+            context: &context,
+            color: theme.accent.opacity(0.85),
+        )
+        // A soft fog bank rolling over the far side.
+        var fog = Path()
+        fog.addEllipse(in: CGRect(
+            x: rect.minX + rect.width * 0.45,
+            y: rect.minY - rect.height * 0.1,
+            width: rect.width * 0.75,
+            height: rect.height * 0.62,
+        ))
+        fog.addEllipse(in: CGRect(
+            x: rect.minX + rect.width * 0.62,
+            y: rect.minY + rect.height * 0.35,
+            width: rect.width * 0.6,
+            height: rect.height * 0.55,
+        ))
+        context.fill(fog, with: .color(theme.gridLineBold.opacity(0.4)))
     }
 
     private static func point(_ x: CGFloat, _ y: CGFloat, in rect: CGRect) -> CGPoint {

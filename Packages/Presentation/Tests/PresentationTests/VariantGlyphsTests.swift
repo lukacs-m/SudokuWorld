@@ -70,7 +70,8 @@ private enum TestTopologySizes {
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
              .antiKnight, .antiKing,
              .greaterThan, .kropki, .xv, .consecutive, .miracle,
-             .thermo, .arrow, .sandwich, .skyscraper, .littleKiller: 9
+             .thermo, .arrow, .sandwich, .skyscraper, .littleKiller,
+             .fogOfWar: 9
         }
     }
 }

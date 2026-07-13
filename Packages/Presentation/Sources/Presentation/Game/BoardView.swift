@@ -191,6 +191,19 @@ struct BoardView: View {
         let noteRows = (topology.size + noteColumns - 1) / noteColumns
 
         for index in 0 ..< session.board.count {
+            // Fogged cells hide their contents — givens included.
+            if session.isFogged(index) {
+                let rect = BoardDecorations.cellRect(
+                    index,
+                    topology: topology,
+                    cellSize: cellSize,
+                )
+                context.fill(
+                    Path(rect),
+                    with: .color(theme.gridLineBold.opacity(0.22)),
+                )
+                continue
+            }
             let cell = session.board[index]
             let center = BoardDecorations.cellCenter(index, topology: topology, cellSize: cellSize)
 
@@ -252,6 +265,7 @@ struct BoardView: View {
                     board: session.board,
                     puzzle: session.puzzle,
                     topology: topology,
+                    fogged: session.isFogged(index),
                 ))
                 .accessibilityAddTraits(
                     viewModel.selectedCell == index ? [.isButton, .isSelected] : .isButton,

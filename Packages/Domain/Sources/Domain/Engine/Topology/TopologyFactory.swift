@@ -50,6 +50,7 @@ public enum TopologyFactory {
         case .sandwich: sandwichTopology
         case .skyscraper: skyscraperTopology
         case .littleKiller: littleKillerTopology
+        case .fogOfWar: fogOfWarTopology
         }
     }
 
@@ -230,6 +231,14 @@ public enum TopologyFactory {
     )
     private static let littleKillerTopology = rectangular(
         variant: .littleKiller,
+        size: 9,
+        boxRows: 3,
+        boxCols: 3,
+    )
+    /// Fog of war plays a classic board; the fog is session state, not
+    /// structure or constraint.
+    private static let fogOfWarTopology = rectangular(
+        variant: .fogOfWar,
         size: 9,
         boxRows: 3,
         boxCols: 3,
