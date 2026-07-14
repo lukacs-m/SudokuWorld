@@ -14,6 +14,7 @@ public enum TopologyFactory {
         return topology(for: puzzle.variant)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     public static func topology(for variant: SudokuVariant) -> GridTopology {
         switch variant {
         case .classic: classicTopology
@@ -55,7 +56,11 @@ public enum TopologyFactory {
         case .tredoku: tredokuTopology
         }
     }
+}
 
+// MARK: - Cached shapes
+
+extension TopologyFactory {
     private static let classicTopology = rectangular(
         variant: .classic,
         size: 9,
@@ -276,11 +281,12 @@ public enum TopologyFactory {
         var pairs: [[Int]] = []
         for row in 0 ..< size {
             for col in 0 ..< size {
-                for (dr, dc) in offsets {
-                    let r = row + dr
-                    let c = col + dc
-                    guard r >= 0, r < size, c >= 0, c < size else { continue }
-                    pairs.append([row * size + col, r * size + c])
+                for (rowDelta, colDelta) in offsets {
+                    let targetRow = row + rowDelta
+                    let targetCol = col + colDelta
+                    guard targetRow >= 0, targetRow < size,
+                          targetCol >= 0, targetCol < size else { continue }
+                    pairs.append([row * size + col, targetRow * size + targetCol])
                 }
             }
         }
@@ -379,7 +385,48 @@ public enum TopologyFactory {
             houses.append((0 ..< size).map { $0 * size + col })
             kinds.append(.column)
         }
+        let boxIndex = appendBoxes(
+            to: &houses,
+            kinds: &kinds,
+            size: size,
+            boxRows: boxRows,
+            boxCols: boxCols,
+        )
 
+        var diagonals: [[Int]] = []
+        if includeDiagonals {
+            let main = (0 ..< size).map { $0 * size + $0 }
+            let anti = (0 ..< size).map { $0 * size + (size - 1 - $0) }
+            diagonals = [main, anti]
+            houses.append(contentsOf: diagonals)
+            kinds.append(contentsOf: [.diagonal, .diagonal])
+        }
+        let windows = includeWindows
+            ? appendWindows(to: &houses, kinds: &kinds, size: size)
+            : []
+
+        return GridTopology(
+            variant: variant,
+            size: size,
+            rowCount: size,
+            colCount: size,
+            cells: cells,
+            houses: houses,
+            houseKinds: kinds,
+            boxIndex: boxIndex,
+            windows: windows,
+            diagonals: diagonals,
+        )
+    }
+
+    /// Appends the box houses and returns the per-cell box map.
+    private static func appendBoxes(
+        to houses: inout [[Int]],
+        kinds: inout [HouseKind],
+        size: Int,
+        boxRows: Int,
+        boxCols: Int,
+    ) -> [Int] {
         let boxesPerRow = size / boxCols
         var boxIndex = [Int](repeating: 0, count: size * size)
         for boxId in 0 ..< size {
@@ -396,45 +443,29 @@ public enum TopologyFactory {
             houses.append(box)
             kinds.append(.box)
         }
+        return boxIndex
+    }
 
-        var diagonals: [[Int]] = []
-        if includeDiagonals {
-            let main = (0 ..< size).map { $0 * size + $0 }
-            let anti = (0 ..< size).map { $0 * size + (size - 1 - $0) }
-            diagonals = [main, anti]
-            houses.append(contentsOf: diagonals)
-            kinds.append(contentsOf: [.diagonal, .diagonal])
-        }
-
+    /// Appends windoku's four 3×3 windows (rows/cols 1-3 and 5-7).
+    private static func appendWindows(
+        to houses: inout [[Int]],
+        kinds: inout [HouseKind],
+        size: Int,
+    ) -> [[Int]] {
         var windows: [[Int]] = []
-        if includeWindows {
-            // The four 3×3 windows of a windoku, at rows/cols 1-3 and 5-7.
-            for originRow in [1, 5] {
-                for originCol in [1, 5] {
-                    var window: [Int] = []
-                    for row in 0 ..< 3 {
-                        for col in 0 ..< 3 {
-                            window.append((originRow + row) * size + (originCol + col))
-                        }
+        for originRow in [1, 5] {
+            for originCol in [1, 5] {
+                var window: [Int] = []
+                for row in 0 ..< 3 {
+                    for col in 0 ..< 3 {
+                        window.append((originRow + row) * size + (originCol + col))
                     }
-                    windows.append(window)
-                    houses.append(window)
-                    kinds.append(.window)
                 }
+                windows.append(window)
+                houses.append(window)
+                kinds.append(.window)
             }
         }
-
-        return GridTopology(
-            variant: variant,
-            size: size,
-            rowCount: size,
-            colCount: size,
-            cells: cells,
-            houses: houses,
-            houseKinds: kinds,
-            boxIndex: boxIndex,
-            windows: windows,
-            diagonals: diagonals,
-        )
+        return windows
     }
 }

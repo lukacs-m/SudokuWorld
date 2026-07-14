@@ -17,6 +17,7 @@ struct PauseOverlayView: View {
             Image(systemName: "pause.circle.fill")
                 .font(.system(size: 56))
                 .foregroundStyle(theme.accent)
+                .accessibilityHidden(true)
             Text("game.paused.title", bundle: .module)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(theme.textPrimary)

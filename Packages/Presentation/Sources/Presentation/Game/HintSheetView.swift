@@ -19,6 +19,7 @@ struct HintSheetView: View {
             HStack {
                 Image(systemName: "lightbulb.fill")
                     .foregroundStyle(theme.accent)
+                    .accessibilityHidden(true)
                 Text(verbatim: titleText)
                     .font(.headline)
                 Spacer()
@@ -64,6 +65,7 @@ struct HintSheetView: View {
         switch hint.kind {
         case let .logical(technique):
             moduleString("technique.\(technique.rawValue)")
+
         case .reveal:
             moduleString("hint.reveal.title")
         }

@@ -19,6 +19,169 @@ import Model
 /// digging stops after a run of consecutive failed removals. Works in
 /// 180°-symmetric pairs when asked.
 enum GivensCarver {
+    struct Request {
+        let context: SolverContext
+        let solution: [Int]
+        let target: Difficulty
+        let minimumGivens: Int
+        let hardeningFloor: Int
+        let symmetric: Bool
+    }
+
+    struct Result {
+        var givens: [Int?]
+        /// The grade after carving; nil never escapes (a full board grades
+        /// beginner, and only solvable states are kept).
+        var graded: Difficulty?
+    }
+
+    static func carve(
+        _ request: Request,
+        grader: Grader,
+        rng: inout Xoshiro256StarStar,
+    ) -> Result {
+        var digger = Digger(request: request, grader: grader)
+        digger.units = removalUnits(
+            context: request.context,
+            symmetric: request.symmetric,
+            rng: &rng,
+        )
+
+        // Stage 1: respect the density floor.
+        digger.dig(floor: request.minimumGivens, probeGrade: false)
+        var graded = grader.grade(context: request.context, givens: digger.givens)
+
+        // Stage 2: harden past the floor when the grade came up short.
+        // Beginner/easy floor states are their target by construction (or a
+        // hair below, which is fine at that tier); mid and upper tiers need
+        // boards that *require* their techniques. The hardening floor keeps
+        // the tiers' density ladder intact (a hard board must not carve down
+        // to master sparseness). Restricted to 9×9-class grids: on
+        // samurai-size boards the per-probe grade is too expensive and the
+        // density floor matters more than label exactness.
+        if request.target >= .medium, request.context.cellCount <= 200,
+           request.hardeningFloor < request.minimumGivens,
+           let current = graded, current < request.target
+        {
+            // A fresh pass over everything still given — stage 1 consumed its
+            // unit list, including cells its floor guard merely skipped.
+            digger.units = (0 ..< request.context.cellCount)
+                .filter { digger.givens[$0] != nil }
+                .shuffled(using: &rng)
+                .map { [$0] }
+            digger.index = 0
+            digger.consecutiveRejections = 0
+
+            // Master wants maximum depth regardless — skip the per-batch
+            // probes and grade once at the end.
+            digger.dig(
+                floor: request.hardeningFloor,
+                probeGrade: request.target != .master,
+            )
+            graded = grader.grade(context: request.context, givens: digger.givens)
+        }
+        return Result(givens: digger.givens, graded: graded)
+    }
+
+    /// The mutable digging state one carve walks through.
+    private struct Digger {
+        let request: Request
+        let grader: Grader
+        let rejectionLimit: Int
+        let batchSize: Int
+        var givens: [Int?]
+        var givensCount: Int
+        var consecutiveRejections = 0
+        var index = 0
+        var units: [[Int]] = []
+
+        init(request: Request, grader: Grader) {
+            self.request = request
+            self.grader = grader
+            rejectionLimit = GivensCarver.rejectionLimit(cellCount: request.context.cellCount)
+            batchSize = GivensCarver.batchUnits(cellCount: request.context.cellCount)
+            givens = request.solution
+            givensCount = request.context.cellCount
+        }
+
+        /// Digs from the current cursor down to `floor`. With `probeGrade`,
+        /// the full grade runs after every round that removed something, and
+        /// digging stops as soon as the target grade is reached.
+        mutating func dig(floor: Int, probeGrade: Bool) {
+            while index < units.count {
+                if givensCount <= floor || consecutiveRejections >= rejectionLimit {
+                    break
+                }
+
+                let end = min(index + batchSize, units.count)
+                let batch = Array(units[index ..< end])
+                let batchCells = batch.flatMap(\.self)
+                var accepted = false
+
+                // Speculative batch: one solvability check for several units.
+                if batch.count > 1,
+                   givensCount - batchCells.count >= floor,
+                   tryRemove(batchCells)
+                {
+                    consecutiveRejections = 0
+                    accepted = true
+                } else {
+                    accepted = digUnits(batch, floor: floor)
+                }
+                index = end
+
+                if probeGrade, accepted,
+                   grader.grade(context: request.context, givens: givens) == request.target
+                {
+                    return
+                }
+            }
+        }
+
+        /// The batch failed or didn't fit: retry its units one by one.
+        private mutating func digUnits(_ batch: [[Int]], floor: Int) -> Bool {
+            var accepted = false
+            for unit in batch {
+                if givensCount <= floor || consecutiveRejections >= rejectionLimit {
+                    break
+                }
+                // A pair may overshoot the floor where a single fits.
+                if givensCount - unit.count < floor {
+                    continue
+                }
+
+                if tryRemove(unit) {
+                    consecutiveRejections = 0
+                    accepted = true
+                } else {
+                    consecutiveRejections += 1
+                }
+            }
+            return accepted
+        }
+
+        /// Attempts to remove `cells` as one step at the target's acceptance
+        /// cap; restores them on failure.
+        private mutating func tryRemove(_ cells: [Int]) -> Bool {
+            let backup = cells.map { givens[$0] }
+            for cell in cells {
+                givens[cell] = nil
+            }
+            if grader.solvesWithin(
+                target: request.target,
+                context: request.context,
+                givens: givens,
+            ) {
+                givensCount -= cells.count
+                return true
+            }
+            for (offset, cell) in cells.enumerated() {
+                givens[cell] = backup[offset]
+            }
+            return false
+        }
+    }
+
     /// Units speculatively removed per batch check. Large grids batch more
     /// aggressively — their per-check solves are the expensive part.
     private static func batchUnits(cellCount: Int) -> Int {
@@ -31,141 +194,6 @@ enum GivensCarver {
     /// cost); 9×9-class grids get enough persistence for deep master digs.
     private static func rejectionLimit(cellCount: Int) -> Int {
         cellCount > 200 ? 10 : 30
-    }
-
-    struct Result {
-        var givens: [Int?]
-        /// The grade after carving; nil never escapes (a full board grades
-        /// beginner, and only solvable states are kept).
-        var graded: Difficulty?
-    }
-
-    static func carve(
-        context: SolverContext,
-        solution: [Int],
-        target: Difficulty,
-        minimumGivens: Int,
-        hardeningFloor: Int,
-        symmetric: Bool,
-        rng: inout Xoshiro256StarStar,
-        grader: Grader,
-    ) -> Result {
-        var givens: [Int?] = solution
-        var givensCount = context.cellCount
-        var consecutiveRejections = 0
-        var index = 0
-        let rejectionLimit = Self.rejectionLimit(cellCount: context.cellCount)
-        let batchUnits = Self.batchUnits(cellCount: context.cellCount)
-        var units = removalUnits(context: context, symmetric: symmetric, rng: &rng)
-
-        /// Attempts to remove `cells` as one step at the given acceptance
-        /// cap; restores them on failure.
-        func tryRemove(_ cells: [Int], acceptance: Difficulty) -> Bool {
-            let backup = cells.map { givens[$0] }
-            for cell in cells {
-                givens[cell] = nil
-            }
-            if grader.solvesWithin(target: acceptance, context: context, givens: givens) {
-                givensCount -= cells.count
-                return true
-            }
-            for (offset, cell) in cells.enumerated() {
-                givens[cell] = backup[offset]
-            }
-            return false
-        }
-
-        /// Digs from the current cursor down to `floor`. With `probeGrade`,
-        /// the full grade runs after every round that removed something, and
-        /// digging stops as soon as the target grade is reached.
-        func dig(floor: Int, acceptance: Difficulty, probeGrade: Bool) {
-            while index < units.count {
-                if givensCount <= floor {
-                    break
-                }
-                if consecutiveRejections >= rejectionLimit {
-                    break
-                }
-
-                let end = min(index + batchUnits, units.count)
-                let batch = Array(units[index ..< end])
-                let batchCells = batch.flatMap(\.self)
-                var accepted = false
-
-                // Speculative batch: one solvability check for several units.
-                if batch.count > 1,
-                   givensCount - batchCells.count >= floor,
-                   tryRemove(batchCells, acceptance: acceptance)
-                {
-                    consecutiveRejections = 0
-                    accepted = true
-                } else {
-                    // Batch failed or didn't fit: retry its units one by one.
-                    for unit in batch {
-                        if givensCount <= floor {
-                            break
-                        }
-                        if consecutiveRejections >= rejectionLimit {
-                            break
-                        }
-                        // A pair may overshoot the floor where a single fits.
-                        if givensCount - unit.count < floor {
-                            continue
-                        }
-
-                        if tryRemove(unit, acceptance: acceptance) {
-                            consecutiveRejections = 0
-                            accepted = true
-                        } else {
-                            consecutiveRejections += 1
-                        }
-                    }
-                }
-                index = end
-
-                if probeGrade, accepted,
-                   grader.grade(context: context, givens: givens) == target
-                {
-                    return
-                }
-            }
-        }
-
-        // Stage 1: respect the density floor.
-        dig(floor: minimumGivens, acceptance: target, probeGrade: false)
-        var graded = grader.grade(context: context, givens: givens)
-
-        // Stage 2: harden past the floor when the grade came up short.
-        // Beginner/easy floor states are their target by construction (or a
-        // hair below, which is fine at that tier); mid and upper tiers need
-        // boards that *require* their techniques. The hardening floor keeps
-        // the tiers' density ladder intact (a hard board must not carve down
-        // to master sparseness). Restricted to 9×9-class grids: on
-        // samurai-size boards the per-probe grade is too expensive and the
-        // density floor matters more than label exactness.
-        if target >= .medium, context.cellCount <= 200,
-           hardeningFloor < minimumGivens, // else stage 1 already dug this deep
-           let current = graded, current < target
-        {
-            // A fresh pass over everything still given — stage 1 consumed its
-            // unit list, including cells its floor guard merely skipped.
-            units = (0 ..< context.cellCount)
-                .filter { givens[$0] != nil }
-                .shuffled(using: &rng)
-                .map { [$0] }
-            index = 0
-            consecutiveRejections = 0
-
-            // Master wants maximum depth regardless — skip the per-batch
-            // probes and grade once at the end.
-            dig(
-                floor: hardeningFloor,
-                acceptance: target,
-                probeGrade: target != .master,
-            )
-            graded = grader.grade(context: context, givens: givens)
-        }
-        return Result(givens: givens, graded: graded)
     }
 
     /// Shuffled removal units: single cells, or 180°-symmetric pairs.

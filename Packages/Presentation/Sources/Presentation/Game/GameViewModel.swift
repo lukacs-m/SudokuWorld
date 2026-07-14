@@ -117,52 +117,7 @@ public final class GameViewModel {
         settings = await settingsRepository.gameSettings()
         isPremium = await getEntitlements().isPremium
 
-        var restored: GameSession?
-        switch launch.kind {
-        case .resume:
-            restored = await resumeGame(context: .regular)
-
-        case let .new(variant, difficulty, mode):
-            restored = await startGame(
-                variant: variant,
-                difficulty: difficulty,
-                mode: mode,
-                context: .regular,
-                at: now,
-            )
-
-        case .daily:
-            let dateKey = EventSeeds.dailyDateKey(for: now)
-            let context = GameContext.daily(dateKey: dateKey)
-            if let saved = await resumeGame(context: context) {
-                restored = saved
-            } else {
-                let plan = EventSeeds.dailyPlan(dateKey: dateKey)
-                restored = await startGame(
-                    variant: plan.variant,
-                    difficulty: plan.difficulty,
-                    mode: .normal,
-                    context: context,
-                    at: now,
-                )
-            }
-
-        case let .weekly(variant, difficulty):
-            let context = GameContext.weekly(weekKey: EventSeeds.weekKey(for: now))
-            if let saved = await resumeGame(context: context) {
-                restored = saved
-            } else {
-                restored = await startGame(
-                    variant: variant,
-                    difficulty: difficulty,
-                    mode: .normal,
-                    context: context,
-                    at: now,
-                )
-            }
-        }
-
-        guard var newSession = restored else {
+        guard var newSession = await restoreOrStartSession(now: now) else {
             phase = .failed
             return
         }
@@ -241,8 +196,10 @@ public final class GameViewModel {
         switch result {
         case .solved:
             Task { await finish(outcome: .won, now: now) }
+
         case .hardcoreLoss:
             Task { await finish(outcome: .lost, now: now) }
+
         default:
             break
         }
@@ -366,16 +323,65 @@ public final class GameViewModel {
             await saveGame(snapshot)
         }
     }
+}
 
-    private static func buildPeers(for puzzle: PuzzleDefinition) -> [[Int]] {
-        let topology = TopologyFactory.topology(for: puzzle)
-        var peers = [Set<Int>](repeating: [], count: topology.cellCount)
-        for house in topology.houses {
+// MARK: - Session restoration & peer lookup
+
+private extension GameViewModel {
+    /// Resumes the saved session for the launch context, or starts a new one.
+    func restoreOrStartSession(now: Date) async -> GameSession? {
+        switch launch.kind {
+        case .resume:
+            return await resumeGame(context: .regular)
+
+        case let .new(variant, difficulty, mode):
+            return await startGame(
+                variant: variant,
+                difficulty: difficulty,
+                mode: mode,
+                context: .regular,
+                at: now,
+            )
+
+        case .daily:
+            let dateKey = EventSeeds.dailyDateKey(for: now)
+            let context = GameContext.daily(dateKey: dateKey)
+            if let saved = await resumeGame(context: context) {
+                return saved
+            }
+            let plan = EventSeeds.dailyPlan(dateKey: dateKey)
+            return await startGame(
+                variant: plan.variant,
+                difficulty: plan.difficulty,
+                mode: .normal,
+                context: context,
+                at: now,
+            )
+
+        case let .weekly(variant, difficulty):
+            let context = GameContext.weekly(weekKey: EventSeeds.weekKey(for: now))
+            if let saved = await resumeGame(context: context) {
+                return saved
+            }
+            return await startGame(
+                variant: variant,
+                difficulty: difficulty,
+                mode: .normal,
+                context: context,
+                at: now,
+            )
+        }
+    }
+
+    static func buildPeers(for puzzle: PuzzleDefinition) -> [[Int]] {
+        let gridTopology = TopologyFactory.topology(for: puzzle)
+        var peers = [Set<Int>](repeating: [], count: gridTopology.cellCount)
+        for house in gridTopology.houses {
             for cell in house {
                 peers[cell].formUnion(house)
             }
         }
-        for clique in topology.cliques {
+        for clique in gridTopology.cliques {
             for cell in clique {
                 peers[cell].formUnion(clique)
             }

@@ -13,6 +13,7 @@ enum RelationMarks {
         switch variant {
         case .kropki:
             kropki(topology: topology, solution: solution, rng: &rng)
+
         case .xv:
             RelationExpansion.orthogonalPairs(in: topology).compactMap { a, b in
                 switch solution[a] + solution[b] {
@@ -21,12 +22,14 @@ enum RelationMarks {
                 default: nil
                 }
             }
+
         case .consecutive:
             RelationExpansion.orthogonalPairs(in: topology).compactMap { a, b in
                 abs(solution[a] - solution[b]) == 1
                     ? RelationClue(a: a, b: b, kind: .consecutive)
                     : nil
             }
+
         case .greaterThan:
             // Futoshiki-style: an inequality on every adjacent pair that
             // shares a box, oriented from the larger value.
@@ -36,9 +39,11 @@ enum RelationMarks {
                     ? RelationClue(a: a, b: b, kind: .greaterThan)
                     : RelationClue(a: b, b: a, kind: .greaterThan)
             }
+
         case .miracle:
             // Pure miracle: no visible marks at all — the rules are global.
             []
+
         default:
             []
         }
@@ -61,12 +66,15 @@ enum RelationMarks {
                 return RelationClue(
                     a: a,
                     b: b,
-                    kind: rng.next() % 2 == 0 ? .whiteDot : .blackDot,
+                    kind: rng.next().isMultiple(of: 2) ? .whiteDot : .blackDot,
                 )
+
             case (true, false):
                 return RelationClue(a: a, b: b, kind: .whiteDot)
+
             case (false, true):
                 return RelationClue(a: a, b: b, kind: .blackDot)
+
             case (false, false):
                 return nil
             }

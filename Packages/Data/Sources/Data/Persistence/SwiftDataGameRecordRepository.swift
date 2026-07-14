@@ -18,7 +18,7 @@ public actor SwiftDataGameRecordRepository: GameRecordRepository {
         self.container = container
     }
 
-    public func insert(_ record: GameRecord) async throws {
+    public func insert(_ record: GameRecord) throws {
         let payload = try PersistenceMappers.encode(record)
         context.insert(GameRecordEntity(
             id: record.id,
@@ -32,7 +32,7 @@ public actor SwiftDataGameRecordRepository: GameRecordRepository {
         }
     }
 
-    public func allRecords() async throws -> [GameRecord] {
+    public func allRecords() throws -> [GameRecord] {
         let descriptor = FetchDescriptor<GameRecordEntity>(
             sortBy: [SortDescriptor(\.finishedAt, order: .reverse)],
         )

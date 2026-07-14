@@ -59,6 +59,7 @@ struct DigitPadView: View {
             VStack(spacing: 2) {
                 Image(systemName: "pencil")
                     .font(.body.weight(.medium))
+                    .accessibilityHidden(true)
                 Text("game.tool.notes", bundle: .module)
                     .font(.caption2)
             }
@@ -87,6 +88,7 @@ struct DigitPadView: View {
             VStack(spacing: 2) {
                 Image(systemName: systemImage)
                     .font(.body.weight(.medium))
+                    .accessibilityHidden(true)
                 Text(titleKey, bundle: .module)
                     .font(.caption2)
             }

@@ -15,16 +15,20 @@ enum OutsideClues {
             case .leading: (0 ..< size).compactMap {
                     topology.index(row: clue.offset, col: $0)
                 }
+
             case .trailing: (0 ..< size).compactMap {
                     topology.index(row: clue.offset, col: size - 1 - $0)
                 }
+
             case .top: (0 ..< size).compactMap {
                     topology.index(row: $0, col: clue.offset)
                 }
+
             case .bottom: (0 ..< size).compactMap {
                     topology.index(row: size - 1 - $0, col: clue.offset)
                 }
             }
+
         case .diagonalSum:
             let (start, step): ((Int, Int), (Int, Int)) = switch clue.side {
             case .top: ((0, clue.offset), (1, 1))
@@ -51,6 +55,7 @@ enum OutsideClues {
         switch clue.kind {
         case .diagonalSum:
             return values.reduce(0, +) == clue.value
+
         case .skyscraperCount:
             var tallest = 0
             var visible = 0
@@ -59,6 +64,7 @@ enum OutsideClues {
                 visible += 1
             }
             return visible == clue.value
+
         case .sandwichSum:
             guard let low = values.firstIndex(of: 1),
                   let high = values.firstIndex(of: size) else { return false }
@@ -82,6 +88,7 @@ enum OutsideClues {
             let value: Int = switch kind {
             case .diagonalSum:
                 values.reduce(0, +)
+
             case .skyscraperCount:
                 values.reduce(into: (tallest: 0, visible: 0)) { state, value in
                     if value > state.tallest {
@@ -89,6 +96,7 @@ enum OutsideClues {
                         state.visible += 1
                     }
                 }.visible
+
             case .sandwichSum:
                 {
                     guard let low = values.firstIndex(of: 1),

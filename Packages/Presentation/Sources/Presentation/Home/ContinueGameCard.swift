@@ -18,6 +18,7 @@ struct ContinueGameCard: View {
                     Image(systemName: "play.circle.fill")
                         .font(.system(size: 40))
                         .foregroundStyle(theme.accent)
+                        .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("home.continue.title", bundle: .module)
                             .font(.headline)
@@ -41,6 +42,7 @@ struct ContinueGameCard: View {
                     Spacer()
                     Image(systemName: "chevron.right")
                         .foregroundStyle(theme.textSecondary)
+                        .accessibilityHidden(true)
                 }
             }
         }

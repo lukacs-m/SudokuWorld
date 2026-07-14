@@ -43,9 +43,9 @@ enum GridFiller {
             case frame(Frame)
         }
 
-        /// Takes the grid inout so propagation mutates uniquely-owned buffers
-        /// in place — a by-value parameter would force a full copy-on-write
-        /// of every solver array at each node.
+        // Takes the grid inout so propagation mutates uniquely-owned buffers
+        // in place — a by-value parameter would force a full copy-on-write
+        // of every solver array at each node.
         func enter(_ grid: inout SolverGrid) -> Entry {
             guard grid.propagate() else { return .deadEnd }
             if grid.isSolved {

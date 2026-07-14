@@ -24,6 +24,7 @@ extension Techniques {
             case let .fixed(total):
                 targetMin = total
                 targetMax = total
+
             case let .cell(target):
                 focus.append(target)
                 if grid.values[target] == 0 {

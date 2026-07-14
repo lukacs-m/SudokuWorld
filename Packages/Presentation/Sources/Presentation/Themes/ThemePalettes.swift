@@ -5,18 +5,28 @@ public import SwiftUI
 /// rendition. Pure data — the store picks, views draw.
 public enum ThemePalettes {
     public static func palette(for id: ThemeID, scheme: ColorScheme) -> Theme {
-        switch (id, scheme) {
-        case (.classicBlue, .dark): classicBlueDark
-        case (.classicBlue, _): classicBlueLight
-        case (.slate, .dark): slateDark
-        case (.slate, _): slateLight
-        case (.forest, .dark): forestDark
-        case (.forest, _): forestLight
-        case (.midnight, _): midnight // deliberately always-dark
-        case (.rose, .dark): roseDark
-        case (.rose, _): roseLight
-        case (.amber, .dark): amberDark
-        case (.amber, _): amberLight
+        scheme == .dark ? darkPalette(for: id) : lightPalette(for: id)
+    }
+
+    private static func lightPalette(for id: ThemeID) -> Theme {
+        switch id {
+        case .classicBlue: classicBlueLight
+        case .slate: slateLight
+        case .forest: forestLight
+        case .midnight: midnight // deliberately always-dark
+        case .rose: roseLight
+        case .amber: amberLight
+        }
+    }
+
+    private static func darkPalette(for id: ThemeID) -> Theme {
+        switch id {
+        case .classicBlue: classicBlueDark
+        case .slate: slateDark
+        case .forest: forestDark
+        case .midnight: midnight
+        case .rose: roseDark
+        case .amber: amberDark
         }
     }
 

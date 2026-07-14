@@ -22,6 +22,7 @@ struct CompletionView: View {
                 .font(.system(size: 52))
                 .foregroundStyle(won ? theme.success : theme.conflict)
                 .symbolEffect(.bounce, value: won)
+                .accessibilityHidden(true)
 
             Text(won ? "game.finished.won" : "game.finished.lost", bundle: .module)
                 .font(.title.weight(.bold))

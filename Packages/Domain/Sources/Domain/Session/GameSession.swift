@@ -119,12 +119,13 @@ public struct GameSession: Equatable, Sendable {
         let row = index / size
         let col = index % size
         var cells = Set<Int>()
-        for dr in -1 ... 1 {
-            for dc in -1 ... 1 {
-                let r = row + dr
-                let c = col + dc
-                guard r >= 0, r < size, c >= 0, c < size else { continue }
-                cells.insert(r * size + c)
+        for rowDelta in -1 ... 1 {
+            for colDelta in -1 ... 1 {
+                let neighborRow = row + rowDelta
+                let neighborCol = col + colDelta
+                guard neighborRow >= 0, neighborRow < size,
+                      neighborCol >= 0, neighborCol < size else { continue }
+                cells.insert(neighborRow * size + neighborCol)
             }
         }
         return cells

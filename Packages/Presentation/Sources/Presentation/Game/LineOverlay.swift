@@ -7,14 +7,35 @@ import SwiftUI
 enum LineOverlay {
     static func draw(
         _ context: GraphicsContext,
+        puzzle: PuzzleDefinition,
+        topology: GridTopology,
+        theme: Theme,
+        cellSize: CGFloat,
+    ) {
+        drawThermometers(
+            context,
+            thermometers: puzzle.thermometers,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        drawArrows(
+            context,
+            arrows: puzzle.arrows,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+    }
+
+    private static func drawThermometers(
+        _ context: GraphicsContext,
         thermometers: [[Int]],
-        arrows: [Arrow],
         topology: GridTopology,
         theme: Theme,
         cellSize: CGFloat,
     ) {
         let lineColor = theme.gridLineBold.opacity(0.35)
-
         for path in thermometers {
             guard let bulb = path.first else { continue }
             var stem = Path()
@@ -47,7 +68,15 @@ enum LineOverlay {
                 with: .color(lineColor),
             )
         }
+    }
 
+    private static func drawArrows(
+        _ context: GraphicsContext,
+        arrows: [Arrow],
+        topology: GridTopology,
+        theme: Theme,
+        cellSize: CGFloat,
+    ) {
         for arrow in arrows {
             let circleCenter = BoardDecorations.cellCenter(
                 arrow.circle,
@@ -107,21 +136,37 @@ enum LineOverlay {
                     cellSize: cellSize,
                 )
                 : circleCenter
-            let angle = atan2(lastCenter.y - previous.y, lastCenter.x - previous.x)
-            let head = cellSize * 0.22
-            var arrowhead = Path()
-            for side in [angle + .pi * 0.78, angle - .pi * 0.78] {
-                arrowhead.move(to: lastCenter)
-                arrowhead.addLine(to: CGPoint(
-                    x: lastCenter.x + cos(side) * head,
-                    y: lastCenter.y + sin(side) * head,
-                ))
-            }
-            context.stroke(
-                arrowhead,
-                with: .color(theme.gridLineBold.opacity(0.7)),
-                style: StrokeStyle(lineWidth: 1.5, lineCap: .round),
+            drawArrowhead(
+                context,
+                at: lastCenter,
+                from: previous,
+                theme: theme,
+                cellSize: cellSize,
             )
         }
+    }
+
+    private static func drawArrowhead(
+        _ context: GraphicsContext,
+        at tip: CGPoint,
+        from previous: CGPoint,
+        theme: Theme,
+        cellSize: CGFloat,
+    ) {
+        let angle = atan2(tip.y - previous.y, tip.x - previous.x)
+        let head = cellSize * 0.22
+        var arrowhead = Path()
+        for side in [angle + .pi * 0.78, angle - .pi * 0.78] {
+            arrowhead.move(to: tip)
+            arrowhead.addLine(to: CGPoint(
+                x: tip.x + cos(side) * head,
+                y: tip.y + sin(side) * head,
+            ))
+        }
+        context.stroke(
+            arrowhead,
+            with: .color(theme.gridLineBold.opacity(0.7)),
+            style: StrokeStyle(lineWidth: 1.5, lineCap: .round),
+        )
     }
 }

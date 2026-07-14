@@ -82,28 +82,7 @@ struct EventsHubView: View {
                 .font(.subheadline)
                 .foregroundStyle(theme.textSecondary)
 
-                if daily.isCompleted {
-                    Label {
-                        if let time = daily.completionTime {
-                            Text(
-                                String(
-                                    format: String(localized: "events.daily.done", bundle: .module),
-                                    DurationFormatter.string(for: time),
-                                ),
-                            )
-                        } else {
-                            Text("events.daily.doneNoTime", bundle: .module)
-                        }
-                    } icon: {
-                        Image(systemName: "checkmark.seal.fill")
-                    }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(theme.success)
-                } else {
-                    PrimaryButton("events.daily.play", systemImage: "play.fill") {
-                        router.push(.game(GameLaunch(kind: .daily)))
-                    }
-                }
+                dailyStatus(daily, theme: theme)
 
                 Divider()
                 Text("events.standings.daily", bundle: .module)
@@ -113,6 +92,33 @@ struct EventsHubView: View {
                     standings: viewModel.dailyStandings,
                     authState: viewModel.authState,
                 )
+            }
+        }
+    }
+
+    /// Completed badge (with time when known) or the play button.
+    @ViewBuilder
+    private func dailyStatus(_ daily: DailyChallenge, theme: Theme) -> some View {
+        if daily.isCompleted {
+            Label {
+                if let time = daily.completionTime {
+                    Text(
+                        String(
+                            format: String(localized: "events.daily.done", bundle: .module),
+                            DurationFormatter.string(for: time),
+                        ),
+                    )
+                } else {
+                    Text("events.daily.doneNoTime", bundle: .module)
+                }
+            } icon: {
+                Image(systemName: "checkmark.seal.fill")
+            }
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(theme.success)
+        } else {
+            PrimaryButton("events.daily.play", systemImage: "play.fill") {
+                router.push(.game(GameLaunch(kind: .daily)))
             }
         }
     }

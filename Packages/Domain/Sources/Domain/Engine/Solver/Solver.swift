@@ -75,8 +75,8 @@ public struct Solver: Sendable {
             case frame(Frame)
         }
 
-        /// Inout so propagation mutates uniquely-owned buffers in place; a
-        /// by-value parameter would copy every solver array at each node.
+        // Inout so propagation mutates uniquely-owned buffers in place; a
+        // by-value parameter would copy every solver array at each node.
         func enter(_ grid: inout SolverGrid) -> Entry {
             guard grid.propagate() else { return .deadEnd }
             if grid.isSolved {

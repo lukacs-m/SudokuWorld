@@ -2,7 +2,7 @@
 public struct PaywallOfferings: Equatable, Sendable {
     public let products: [PaywallProduct]
 
-    public static let empty = PaywallOfferings(products: [])
+    public static let empty = Self(products: [])
 
     public init(products: [PaywallProduct]) {
         self.products = products

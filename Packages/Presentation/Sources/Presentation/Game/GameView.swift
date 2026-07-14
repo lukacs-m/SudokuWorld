@@ -200,6 +200,7 @@ struct GameView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "lightbulb")
+                        .accessibilityHidden(true)
                     Text("game.hint.button", bundle: .module)
                     if let remaining = viewModel.hintsRemaining {
                         Text("(\(remaining))")

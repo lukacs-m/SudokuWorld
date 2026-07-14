@@ -19,11 +19,14 @@ public struct UserNotificationsScheduler: NotificationScheduler {
         switch settings.authorizationStatus {
         case .authorized, .provisional, .ephemeral:
             return true
+
         case .denied:
             return false
+
         case .notDetermined:
             return await (try? center.requestAuthorization(options: [.alert, .sound, .badge]))
                 ?? false
+
         @unknown default:
             return false
         }
@@ -70,7 +73,7 @@ public struct UserNotificationsScheduler: NotificationScheduler {
         }
     }
 
-    public func cancelAllReminders() async {
+    public func cancelAllReminders() {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [Self.dailyID, Self.streakID])
     }

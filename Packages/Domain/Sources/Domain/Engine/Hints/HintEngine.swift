@@ -90,6 +90,7 @@ public struct HintEngine: Sendable {
             } else {
                 args = []
             }
+
         default:
             args = [.digits(step.focusDigits)]
         }

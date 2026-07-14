@@ -21,6 +21,7 @@ struct DailyChallengeCard: View {
                     Image(systemName: "calendar")
                         .font(.system(size: 32))
                         .foregroundStyle(theme.accent)
+                        .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
                             Text("home.daily.title", bundle: .module)
@@ -59,6 +60,7 @@ struct DailyChallengeCard: View {
             Text("home.daily.loading", bundle: .module)
                 .font(.subheadline)
                 .foregroundStyle(theme.textSecondary)
+
         case let .loaded(daily):
             HStack(spacing: 6) {
                 Text(verbatim: moduleString("variant.\(daily.puzzle.variant.slug)"))
@@ -71,6 +73,7 @@ struct DailyChallengeCard: View {
             }
             .font(.subheadline)
             .foregroundStyle(theme.textSecondary)
+
         case .empty, .failed:
             Text("home.daily.unavailable", bundle: .module)
                 .font(.subheadline)
@@ -85,6 +88,7 @@ struct DailyChallengeCard: View {
                 Image(systemName: "checkmark.seal.fill")
                     .font(.title2)
                     .foregroundStyle(theme.success)
+                    .accessibilityLabel(Text("events.daily.doneNoTime", bundle: .module))
                 if let time = daily.completionTime {
                     Text(DurationFormatter.string(for: time))
                         .font(.caption2.monospacedDigit())
@@ -94,6 +98,7 @@ struct DailyChallengeCard: View {
         } else {
             Image(systemName: "chevron.right")
                 .foregroundStyle(theme.textSecondary)
+                .accessibilityHidden(true)
         }
     }
 }

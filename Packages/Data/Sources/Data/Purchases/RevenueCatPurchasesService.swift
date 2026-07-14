@@ -11,7 +11,7 @@ import RevenueCat
 public struct RevenueCatPurchasesService: PurchasesService {
     public init() {}
 
-    public func configure() async {
+    public func configure() {
         guard !AppSecrets.revenueCatKeyIsPlaceholder else {
             Log.info("RevenueCat: placeholder API key — purchases disabled")
             return

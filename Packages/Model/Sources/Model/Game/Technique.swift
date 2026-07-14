@@ -2,22 +2,24 @@
 /// hard they are to spot. Grading derives a puzzle's difficulty from the
 /// hardest technique its solution path requires.
 public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
-    case nakedSingle
-    case hiddenSingle
-    case nakedPair
-    case hiddenPair
-    case cageArithmetic
-    case relationAnalysis
-    case arrowArithmetic
-    case outsideClueAnalysis
-    case pointingPair
-    case boxLineReduction
-    case nakedTriple
-    case hiddenTriple
-    case xWing
+    /// Raw values feed the `hint.technique.*` localization keys — keep them
+    /// stable so the string catalog stays aligned.
+    case nakedSingle = "nakedSingle"
+    case hiddenSingle = "hiddenSingle"
+    case nakedPair = "nakedPair"
+    case hiddenPair = "hiddenPair"
+    case cageArithmetic = "cageArithmetic"
+    case relationAnalysis = "relationAnalysis"
+    case arrowArithmetic = "arrowArithmetic"
+    case outsideClueAnalysis = "outsideClueAnalysis"
+    case pointingPair = "pointingPair"
+    case boxLineReduction = "boxLineReduction"
+    case nakedTriple = "nakedTriple"
+    case hiddenTriple = "hiddenTriple"
+    case xWing = "xWing"
     case swordfish
-    case xyWing
-    case xyChain
+    case xyWing = "xyWing"
+    case xyChain = "xyChain"
 
     /// Monotonic spotting-difficulty rank used by the grader.
     public var rank: Int {

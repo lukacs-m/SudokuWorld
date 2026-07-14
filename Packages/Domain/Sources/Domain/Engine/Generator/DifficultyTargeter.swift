@@ -11,6 +11,14 @@ enum DifficultyTargeter {
         let graded: Difficulty
     }
 
+    /// The immutable inputs one tuning run reads throughout.
+    private struct Environment {
+        let context: SolverContext
+        let solution: [Int]
+        let target: Difficulty
+        let grader: Grader
+    }
+
     static func tune(
         context: SolverContext,
         givens initialGivens: [Int?],
@@ -19,6 +27,12 @@ enum DifficultyTargeter {
         target: Difficulty,
         grader: Grader,
     ) -> Outcome? {
+        let environment = Environment(
+            context: context,
+            solution: solution,
+            target: target,
+            grader: grader,
+        )
         var givens = initialGivens
         var pool = removedUnits
         var lastAdded: [Int]?
@@ -47,14 +61,11 @@ enum DifficultyTargeter {
         // gap (e.g. hard-graded killer asked for master) is wasted grading.
         if graded < target, target.rank - graded.rank == 1, let unit = lastAdded {
             graded = repairOvershoot(
-                context: context,
+                in: environment,
                 givens: &givens,
                 pool: &pool,
                 overshotUnit: unit,
                 overshotGrade: graded,
-                solution: solution,
-                target: target,
-                grader: grader,
             )
         }
         return Outcome(givens: givens, graded: graded)
@@ -63,14 +74,11 @@ enum DifficultyTargeter {
     /// Bounded search for an alternative re-add that hits the target exactly.
     /// Falls back to the overshot grade when no swap works.
     private static func repairOvershoot(
-        context: SolverContext,
+        in environment: Environment,
         givens: inout [Int?],
         pool: inout [[Int]],
         overshotUnit: [Int],
         overshotGrade: Difficulty,
-        solution: [Int],
-        target: Difficulty,
-        grader: Grader,
     ) -> Difficulty {
         let attemptBudget = 12
         for cell in overshotUnit {
@@ -80,12 +88,15 @@ enum DifficultyTargeter {
         for poolIndex in pool.indices.reversed().prefix(attemptBudget) {
             let candidate = pool[poolIndex]
             for cell in candidate {
-                givens[cell] = solution[cell]
+                givens[cell] = environment.solution[cell]
             }
-            if grader.grade(context: context, givens: givens) == target {
+            if environment.grader.grade(
+                context: environment.context,
+                givens: givens,
+            ) == environment.target {
                 pool.remove(at: poolIndex)
                 pool.append(overshotUnit)
-                return target
+                return environment.target
             }
             for cell in candidate {
                 givens[cell] = nil
@@ -94,7 +105,7 @@ enum DifficultyTargeter {
 
         // No exact swap found — restore the overshooting unit and accept.
         for cell in overshotUnit {
-            givens[cell] = solution[cell]
+            givens[cell] = environment.solution[cell]
         }
         return overshotGrade
     }

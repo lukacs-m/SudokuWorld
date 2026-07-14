@@ -163,6 +163,7 @@ struct HomeView: View {
                 Image(systemName: systemImage)
                     .font(.title3)
                     .foregroundStyle(theme.accent)
+                    .accessibilityHidden(true)
                 Text(titleKey, bundle: .module)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(theme.textPrimary)

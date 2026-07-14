@@ -93,6 +93,7 @@ struct NewGameSheet: View {
                 if selected {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.bold))
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.horizontal, 14)

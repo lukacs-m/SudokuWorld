@@ -8,53 +8,59 @@ extension Techniques {
         let context = grid.context
         guard !context.outsideLines.isEmpty else { return nil }
 
-        for (clue, cells) in context.outsideLines {
-            switch clue.kind {
+        for line in context.outsideLines {
+            let step: SolveStep? = switch line.clue.kind {
             case .skyscraperCount:
-                if clue.value == 1, grid.values[cells[0]] == 0,
-                   let step = keepStep(
-                       grid: grid,
-                       cell: cells[0],
-                       range: context.size ... context.size,
-                       focus: cells,
-                   )
-                {
-                    return step
-                }
-                if clue.value == context.size {
-                    for (distance, cell) in cells.enumerated()
-                        where grid.values[cell] == 0
-                    {
-                        if let step = keepStep(
-                            grid: grid,
-                            cell: cell,
-                            range: (distance + 1) ... (distance + 1),
-                            focus: cells,
-                        ) {
-                            return step
-                        }
-                    }
-                }
-                for (distance, cell) in cells.enumerated() where grid.values[cell] == 0 {
-                    let cap = context.size - clue.value + 1 + distance
-                    guard cap < context.size else { break }
-                    if let step = keepStep(
-                        grid: grid,
-                        cell: cell,
-                        range: 1 ... cap,
-                        focus: cells,
-                    ) {
-                        return step
-                    }
-                }
+                skyscraperStep(grid: grid, clue: line.clue, cells: line.cells)
 
             case .sandwichSum:
-                if let step = sandwichStep(grid: grid, clue: clue, cells: cells) {
-                    return step
-                }
+                sandwichStep(grid: grid, clue: line.clue, cells: line.cells)
 
             case .diagonalSum:
-                continue // surfaced through arrowArithmetic's sum lines
+                nil // surfaced through arrowArithmetic's sum lines
+            }
+            if let step {
+                return step
+            }
+        }
+        return nil
+    }
+
+    private static func skyscraperStep(
+        grid: SolverGrid,
+        clue: OutsideClue,
+        cells: [Int],
+    ) -> SolveStep? {
+        let context = grid.context
+        // Exact specials: clue 1 pins the tallest to the edge; clue `size`
+        // forces the whole line ascending.
+        if clue.value == 1, grid.values[cells[0]] == 0,
+           let step = keepStep(
+               grid: grid,
+               cell: cells[0],
+               range: context.size ... context.size,
+               focus: cells,
+           )
+        {
+            return step
+        }
+        if clue.value == context.size {
+            for (distance, cell) in cells.enumerated() where grid.values[cell] == 0 {
+                if let step = keepStep(
+                    grid: grid,
+                    cell: cell,
+                    range: (distance + 1) ... (distance + 1),
+                    focus: cells,
+                ) {
+                    return step
+                }
+            }
+        }
+        for (distance, cell) in cells.enumerated() where grid.values[cell] == 0 {
+            let cap = context.size - clue.value + 1 + distance
+            guard cap < context.size else { break }
+            if let step = keepStep(grid: grid, cell: cell, range: 1 ... cap, focus: cells) {
+                return step
             }
         }
         return nil
@@ -100,11 +106,11 @@ extension Techniques {
                 : SolverContext.mask(for: grid.values[cells[index]]) & mask != 0
         }
         func feasible(_ a: Int, _ b: Int) -> Bool {
-            let k = abs(a - b) - 1
-            guard k > 0 else { return clue.value == 0 }
-            guard k <= size - 2 else { return false }
-            return clue.value >= k * (k + 3) / 2
-                && clue.value <= k * (2 * size - k - 1) / 2
+            let betweenCount = abs(a - b) - 1
+            guard betweenCount > 0 else { return clue.value == 0 }
+            guard betweenCount <= size - 2 else { return false }
+            return clue.value >= betweenCount * (betweenCount + 3) / 2
+                && clue.value <= betweenCount * (2 * size - betweenCount - 1) / 2
         }
 
         let oneMask = SolverContext.mask(for: 1)

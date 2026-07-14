@@ -89,111 +89,15 @@ struct SolverGrid {
         return updateCage(afterPlacing: digit, at: cell)
     }
 
-    /// Verifies any sandwich/skyscraper line this assignment completes.
-    /// Bound propagation for these clues is deliberately partial; this
-    /// place-time check is what keeps uniqueness counting exact.
-    private mutating func updateOutsideClues(afterPlacing _: Int, at cell: Int) -> Bool {
-        for lineIndex in context.outsideLinesForCell[cell] {
-            let (clue, cells) = context.outsideLines[lineIndex]
-            var lineValues: [Int] = []
-            lineValues.reserveCapacity(cells.count)
-            for lineCell in cells {
-                guard values[lineCell] != 0 else { break }
-                lineValues.append(values[lineCell])
-            }
-            guard lineValues.count == cells.count else { continue }
-            if !OutsideClues.satisfied(clue: clue, lineValues: lineValues, size: context.size) {
-                isContradicted = true
-                return false
-            }
-        }
-        return true
+    /// Flags the grid as contradicted. Exposed for the constraint passes in
+    /// `SolverGrid+Constraints.swift`; the setter itself stays private.
+    mutating func flagContradiction() {
+        isContradicted = true
     }
 
-    /// Verifies any sum line this assignment completes, and rejects early
-    /// when the already-placed shaft exceeds the largest possible target.
-    /// Runs inside `place` so backtracking and uniqueness counting stay
-    /// exact even where bound propagation is weak.
-    private mutating func updateSumLines(afterPlacing _: Int, at cell: Int) -> Bool {
-        for lineIndex in context.sumLinesForCell[cell] {
-            let line = context.sumLines[lineIndex]
-            var placedSum = 0
-            var openCells = 0
-            for shaftCell in line.cells {
-                if values[shaftCell] == 0 {
-                    openCells += 1
-                } else {
-                    placedSum += values[shaftCell]
-                }
-            }
-            let targetValue: Int? = switch line.target {
-            case let .fixed(total): total
-            case let .cell(target): values[target] == 0 ? nil : values[target]
-            }
-
-            if openCells == 0, let targetValue {
-                if placedSum != targetValue {
-                    isContradicted = true
-                    return false
-                }
-                continue
-            }
-            // Cheap bound: the placed part alone must not exceed the largest
-            // reachable target (open shaft cells contribute at least 1 each).
-            let maxTarget = switch line.target {
-            case let .fixed(total): total
-            case let .cell(target): values[target] == 0
-                ? maxCandidate(of: target)
-                : values[target]
-            }
-            if placedSum + openCells > maxTarget {
-                isContradicted = true
-                return false
-            }
-        }
-        return true
-    }
-
-    private func minCandidate(of cell: Int) -> Int {
-        values[cell] != 0 ? values[cell] : candidates[cell].trailingZeroBitCount + 1
-    }
-
-    private func maxCandidate(of cell: Int) -> Int {
-        values[cell] != 0
-            ? values[cell]
-            : DigitMask.bitWidth - candidates[cell].leadingZeroBitCount
-    }
-
-    /// Prunes relation partners after an assignment: with one endpoint
-    /// fixed, the partner keeps only digits satisfying the edge. This runs
-    /// inside `place` (not just the fixpoint passes) so plain backtracking —
-    /// filling, uniqueness counting — always honors relation constraints.
-    private mutating func updateRelations(afterPlacing digit: Int, at cell: Int) -> Bool {
-        for edgeIndex in context.relationsForCell[cell] {
-            let edge = context.relationEdges[edgeIndex]
-            let partner = edge.a == cell ? edge.b : edge.a
-            guard values[partner] == 0 else {
-                // Both endpoints fixed: verify directly.
-                let aValue = values[edge.a]
-                let bValue = values[edge.b]
-                if !edge.satisfied(a: aValue, b: bValue) {
-                    isContradicted = true
-                    return false
-                }
-                continue
-            }
-            let allowed = edge.allowedMask(
-                forA: edge.a == partner,
-                partnerCandidates: SolverContext.mask(for: digit),
-                size: context.size,
-            )
-            let removed = candidates[partner] & ~allowed
-            guard removed != 0 else { continue }
-            for digit in context.digits(in: removed) {
-                guard eliminate(digit, at: partner) else { return false }
-            }
-        }
-        return true
+    /// Records that propagation exercised a technique of the given rank.
+    mutating func recordPropagationRank(_ rank: Int) {
+        propagationHardestRank = max(propagationHardestRank, rank)
     }
 
     /// Removes a candidate. Returns false on contradiction (empty cell).
@@ -238,235 +142,30 @@ struct SolverGrid {
             if maxRank >= Technique.cageArithmetic.rank {
                 guard propagateCageCombinations(changed: &changed) else { return false }
             }
-            if maxRank >= Technique.relationAnalysis.rank {
-                guard propagateRelations(changed: &changed) else { return false }
-            }
-            if maxRank >= Technique.arrowArithmetic.rank {
-                guard propagateSumLines(changed: &changed) else { return false }
-            }
-            if maxRank >= Technique.outsideClueAnalysis.rank {
-                guard propagateOutsideClues(changed: &changed) else { return false }
+            guard propagateConstraintFamilies(maxRank: maxRank, changed: &changed) else {
+                return false
             }
         }
         return !isContradicted
     }
 
-    /// Partial deductions from edge clues. Skyscraper: the cell at distance
-    /// `d` from the clue can't exceed `size - clue + 1 + d`. Sandwich: a
-    /// crust digit (1 or size) can't sit where no partner position yields a
-    /// feasible between-sum. Sound but not complete — `updateOutsideClues`
-    /// covers exactness at the leaves.
-    private mutating func propagateOutsideClues(changed: inout Bool) -> Bool {
-        for (clue, cells) in context.outsideLines {
-            switch clue.kind {
-            case .skyscraperCount:
-                // Exact specials: clue 1 pins the tallest to the edge; clue
-                // `size` forces the whole line ascending.
-                if clue.value == 1, values[cells[0]] == 0 {
-                    guard prune(
-                        cell: cells[0],
-                        keepingRange: context.size ... context.size,
-                        rank: Technique.outsideClueAnalysis.rank,
-                        changed: &changed,
-                    ) else { return false }
-                }
-                if clue.value == context.size {
-                    for (distance, cell) in cells.enumerated() where values[cell] == 0 {
-                        guard prune(
-                            cell: cell,
-                            keepingRange: (distance + 1) ... (distance + 1),
-                            rank: Technique.outsideClueAnalysis.rank,
-                            changed: &changed,
-                        ) else { return false }
-                    }
-                }
-                for (distance, cell) in cells.enumerated() where values[cell] == 0 {
-                    let cap = context.size - clue.value + 1 + distance
-                    guard cap < context.size else { break }
-                    var keep: DigitMask = 0
-                    for digit in 1 ... cap {
-                        keep |= SolverContext.mask(for: digit)
-                    }
-                    let removed = candidates[cell] & ~keep
-                    guard removed != 0 else { continue }
-                    for digit in context.digits(in: removed) {
-                        guard eliminate(digit, at: cell) else { return false }
-                    }
-                    propagationHardestRank = max(
-                        propagationHardestRank,
-                        Technique.outsideClueAnalysis.rank,
-                    )
-                    changed = true
-                }
-
-            case .sandwichSum:
-                guard sandwichPrune(clue: clue, cells: cells, changed: &changed) else {
-                    return false
-                }
-
-            case .diagonalSum:
-                continue // handled as a fixed-target sum line
-            }
-        }
-        return !isContradicted
-    }
-
-    /// Eliminates crust digits (1 and size) from positions with no feasible
-    /// partner: the cells strictly between the two crusts must be able to
-    /// reach the clue with digits from 2...(size-1).
-    private mutating func sandwichPrune(
-        clue: OutsideClue,
-        cells: [Int],
+    /// The rank-gated passes of the non-house constraint families
+    /// (relations, sum lines, outside clues — see
+    /// `SolverGrid+Constraints.swift`).
+    private mutating func propagateConstraintFamilies(
+        maxRank: Int,
         changed: inout Bool,
     ) -> Bool {
-        let size = context.size
-        let oneMask = SolverContext.mask(for: 1)
-        let topMask = SolverContext.mask(for: size)
-
-        func mayHost(_ mask: DigitMask, at index: Int) -> Bool {
-            values[cells[index]] == 0
-                ? candidates[cells[index]] & mask != 0
-                : SolverContext.mask(for: values[cells[index]]) & mask != 0
+        if maxRank >= Technique.relationAnalysis.rank {
+            guard propagateRelations(changed: &changed) else { return false }
         }
-        /// A sandwich line is a whole row or column — one house — so the k
-        /// interior digits are distinct values from 2...(size-1).
-        func feasible(_ a: Int, _ b: Int) -> Bool {
-            let k = abs(a - b) - 1
-            guard k > 0 else { return clue.value == 0 }
-            guard k <= size - 2 else { return false }
-            let minSum = k * (k + 3) / 2 // 2 + 3 + … + (k+1)
-            let maxSum = k * (2 * size - k - 1) / 2 // (size-k) + … + (size-1)
-            return clue.value >= minSum && clue.value <= maxSum
+        if maxRank >= Technique.arrowArithmetic.rank {
+            guard propagateSumLines(changed: &changed) else { return false }
         }
-
-        for (mask, partnerMask) in [(oneMask, topMask), (topMask, oneMask)] {
-            for index in cells.indices where mayHost(mask, at: index) {
-                let hasPartner = cells.indices.contains { partner in
-                    partner != index && mayHost(partnerMask, at: partner)
-                        && feasible(index, partner)
-                }
-                if !hasPartner {
-                    guard values[cells[index]] == 0 else {
-                        isContradicted = true
-                        return false
-                    }
-                    let digit = mask == oneMask ? 1 : size
-                    guard eliminate(digit, at: cells[index]) else { return false }
-                    propagationHardestRank = max(
-                        propagationHardestRank,
-                        Technique.outsideClueAnalysis.rank,
-                    )
-                    changed = true
-                }
-            }
+        if maxRank >= Technique.outsideClueAnalysis.rank {
+            guard propagateOutsideClues(changed: &changed) else { return false }
         }
-        return !isContradicted
-    }
-
-    /// Interval propagation over sum lines: the target is boxed into the
-    /// shaft's reachable [min, max] sum, and each shaft cell into what the
-    /// target leaves after the other cells' extremes.
-    private mutating func propagateSumLines(changed: inout Bool) -> Bool {
-        for line in context.sumLines {
-            var shaftMin = 0
-            var shaftMax = 0
-            for cell in line.cells {
-                shaftMin += minCandidate(of: cell)
-                shaftMax += maxCandidate(of: cell)
-            }
-
-            let targetMin: Int
-            let targetMax: Int
-            switch line.target {
-            case let .fixed(total):
-                targetMin = total
-                targetMax = total
-                if shaftMin > total || shaftMax < total {
-                    isContradicted = true
-                    return false
-                }
-            case let .cell(target):
-                if values[target] == 0 {
-                    guard prune(
-                        cell: target,
-                        keepingRange: shaftMin ... max(shaftMin, shaftMax),
-                        changed: &changed,
-                    ) else { return false }
-                }
-                targetMin = minCandidate(of: target)
-                targetMax = maxCandidate(of: target)
-            }
-
-            for cell in line.cells where values[cell] == 0 {
-                let othersMin = shaftMin - minCandidate(of: cell)
-                let othersMax = shaftMax - maxCandidate(of: cell)
-                let low = targetMin - othersMax
-                let high = targetMax - othersMin
-                guard low <= high else {
-                    isContradicted = true
-                    return false
-                }
-                guard prune(cell: cell, keepingRange: low ... high, changed: &changed) else {
-                    return false
-                }
-            }
-        }
-        return !isContradicted
-    }
-
-    private mutating func prune(
-        cell: Int,
-        keepingRange range: ClosedRange<Int>,
-        rank: Int = Technique.arrowArithmetic.rank,
-        changed: inout Bool,
-    ) -> Bool {
-        let low = max(1, range.lowerBound)
-        let high = min(context.size, range.upperBound)
-        var keep: DigitMask = 0
-        if low <= high {
-            for digit in low ... high {
-                keep |= SolverContext.mask(for: digit)
-            }
-        }
-        let removed = candidates[cell] & ~keep
-        guard removed != 0 else { return true }
-        for digit in context.digits(in: removed) {
-            guard eliminate(digit, at: cell) else { return false }
-        }
-        propagationHardestRank = max(propagationHardestRank, rank)
-        changed = true
-        return !isContradicted
-    }
-
-    /// Arc consistency over relation edges: each endpoint keeps only digits
-    /// with at least one compatible partner candidate.
-    private mutating func propagateRelations(changed: inout Bool) -> Bool {
-        for edge in context.relationEdges {
-            for forA in [true, false] {
-                let cell = forA ? edge.a : edge.b
-                let partner = forA ? edge.b : edge.a
-                guard values[cell] == 0 else { continue }
-                let partnerMask = values[partner] == 0
-                    ? candidates[partner]
-                    : SolverContext.mask(for: values[partner])
-                let allowed = edge.allowedMask(
-                    forA: forA,
-                    partnerCandidates: partnerMask,
-                    size: context.size,
-                )
-                let removed = candidates[cell] & ~allowed
-                guard removed != 0 else { continue }
-                for digit in context.digits(in: removed) {
-                    guard eliminate(digit, at: cell) else { return false }
-                }
-                propagationHardestRank = max(
-                    propagationHardestRank,
-                    Technique.relationAnalysis.rank,
-                )
-                changed = true
-            }
-        }
-        return !isContradicted
+        return true
     }
 
     /// Places every cell whose candidates collapsed to a single digit.

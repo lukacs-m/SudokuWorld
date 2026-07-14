@@ -24,7 +24,7 @@ public struct SplitMix64: Sendable {
     /// The deterministic successor seed used when a generation attempt misses
     /// its difficulty target and the pipeline retries.
     public static func evolve(_ seed: UInt64) -> UInt64 {
-        var mix = SplitMix64(seed: seed)
+        var mix = Self(seed: seed)
         return mix.next()
     }
 }

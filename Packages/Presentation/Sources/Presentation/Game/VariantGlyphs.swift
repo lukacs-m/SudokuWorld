@@ -9,10 +9,13 @@ enum VariantGlyphs {
         case .hexadoku16:
             // Digits 1...16 display as hex 0...F.
             String(digit - 1, radix: 16).uppercased()
+
         case .wordoku:
             letter(digit, alphabet: "ABCDEFGHI")
+
         case .alphadoku25:
             letter(digit, alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXY")
+
         case .classic, .mini4, .mini6, .dodeka12, .killer, .diagonal, .windoku,
              .evenOdd, .samurai, .jigsaw, .argyle, .asterisk,
              .gattai2, .gattai3, .gattai8, .shogun, .sumo,
@@ -30,10 +33,13 @@ enum VariantGlyphs {
         switch argument {
         case let .digit(digit):
             glyph(digit, for: variant)
+
         case let .digits(digits):
             digits.map { glyph($0, for: variant) }.joined(separator: ", ")
+
         case let .row(row):
             "\(row)"
+
         case let .column(column):
             "\(column)"
         }

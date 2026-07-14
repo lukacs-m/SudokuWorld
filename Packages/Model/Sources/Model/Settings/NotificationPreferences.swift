@@ -8,7 +8,7 @@ public struct NotificationPreferences: Equatable, Sendable, Codable {
     /// Local hour (0-23) for the daily reminder.
     public var reminderHour: Int
 
-    public static let disabled = NotificationPreferences(
+    public static let disabled = Self(
         dailyReminderEnabled: false,
         streakReminderEnabled: false,
         reminderHour: 9,

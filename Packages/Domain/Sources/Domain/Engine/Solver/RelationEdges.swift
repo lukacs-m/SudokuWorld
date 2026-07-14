@@ -66,38 +66,53 @@ enum RelationExpansion {
         topology: GridTopology,
         includeNegatives: Bool = true,
     ) -> [RelationEdge] {
-        var edges: [RelationEdge] = relations.flatMap { clue -> [RelationEdge] in
-            switch clue.kind {
-            case .greaterThan: [RelationEdge(a: clue.a, b: clue.b, constraint: .greater)]
-            case .whiteDot, .consecutive:
-                [RelationEdge(a: clue.a, b: clue.b, constraint: .consecutive)]
-            case .blackDot: [RelationEdge(a: clue.a, b: clue.b, constraint: .ratio)]
-            case .xSum: [RelationEdge(a: clue.a, b: clue.b, constraint: .sum(10))]
-            case .vSum: [RelationEdge(a: clue.a, b: clue.b, constraint: .sum(5))]
-            }
+        var edges = relations.map(markEdge)
+        if includeNegatives {
+            edges += negativeEdges(variant: variant, relations: relations, topology: topology)
         }
+        return edges
+    }
 
-        // The negative convention: every orthogonal pair NOT covered by a
-        // mark carries the complementary constraints.
+    private static func markEdge(for clue: RelationClue) -> RelationEdge {
+        switch clue.kind {
+        case .greaterThan: RelationEdge(a: clue.a, b: clue.b, constraint: .greater)
+
+        case .whiteDot, .consecutive:
+            RelationEdge(a: clue.a, b: clue.b, constraint: .consecutive)
+
+        case .blackDot: RelationEdge(a: clue.a, b: clue.b, constraint: .ratio)
+
+        case .xSum: RelationEdge(a: clue.a, b: clue.b, constraint: .sum(10))
+
+        case .vSum: RelationEdge(a: clue.a, b: clue.b, constraint: .sum(5))
+        }
+    }
+
+    /// The negative convention: every orthogonal pair NOT covered by a mark
+    /// carries the complementary constraints.
+    private static func negativeEdges(
+        variant: SudokuVariant,
+        relations: [RelationClue],
+        topology: GridTopology,
+    ) -> [RelationEdge] {
         let negatives: [RelationEdge.Constraint] = switch variant {
-        case _ where !includeNegatives: []
         case .kropki: [.notConsecutive, .notRatio]
         case .xv: [.notSum(10), .notSum(5)]
-        case .consecutive: [.notConsecutive]
-        case .miracle: [.notConsecutive]
+        case .consecutive, .miracle: [.notConsecutive]
         default: []
         }
-        if !negatives.isEmpty {
-            var marked = Set<[Int]>()
-            for clue in relations {
-                marked.insert([min(clue.a, clue.b), max(clue.a, clue.b)])
-            }
-            for (a, b) in orthogonalPairs(in: topology)
-                where !marked.contains([min(a, b), max(a, b)])
-            {
-                for constraint in negatives {
-                    edges.append(RelationEdge(a: a, b: b, constraint: constraint))
-                }
+        guard !negatives.isEmpty else { return [] }
+
+        var marked = Set<[Int]>()
+        for clue in relations {
+            marked.insert([min(clue.a, clue.b), max(clue.a, clue.b)])
+        }
+        var edges: [RelationEdge] = []
+        for (a, b) in orthogonalPairs(in: topology)
+            where !marked.contains([min(a, b), max(a, b)])
+        {
+            for constraint in negatives {
+                edges.append(RelationEdge(a: a, b: b, constraint: constraint))
             }
         }
         return edges

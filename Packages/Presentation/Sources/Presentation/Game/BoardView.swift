@@ -59,192 +59,21 @@ struct BoardView: View {
         gutter: CGFloat,
     ) -> some View {
         // Snapshot observable state outside the canvas closure.
-        let selected = viewModel.selectedCell
-        let related = viewModel.relatedCells
-        let sameDigit = viewModel.sameDigitCells
-        let conflicts = viewModel.conflicts
-        let hintCells = Set(viewModel.presentedHint?.cells ?? [])
-        let settings = viewModel.settings
-
-        return Canvas { context, _ in
-            if gutter > 0 {
-                OutsideClueOverlay.draw(
-                    context,
-                    clues: session.puzzle.outsideClues,
-                    topology: topology,
-                    theme: theme,
-                    cellSize: cellSize,
-                    gutter: gutter,
-                )
-            }
-            var context = context
-            context.translateBy(x: gutter, y: gutter)
-            // Inactive positions (samurai corners) stay transparent; active
-            // cells get the base fill.
-            for index in 0 ..< topology.cellCount {
-                context.fill(
-                    Path(BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)),
-                    with: .color(theme.cellBackground),
-                )
-            }
-            BoardDecorations.drawShading(
-                context,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-            BoardDecorations.drawDiagonals(
-                context,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-            LineOverlay.draw(
-                context,
-                thermometers: session.puzzle.thermometers,
-                arrows: session.puzzle.arrows,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-
-            // Highlights, back to front: related, same digit, hint, selection.
-            for index in related {
-                fill(context, index, topology, cellSize, theme.relatedHighlight)
-            }
-            for index in sameDigit {
-                fill(context, index, topology, cellSize, theme.sameDigitHighlight)
-            }
-            for index in hintCells {
-                fill(context, index, topology, cellSize, theme.hintHighlight)
-            }
-            if settings.autoCheck {
-                for index in conflicts {
-                    fill(context, index, topology, cellSize, theme.conflict.opacity(0.18))
-                }
-            }
-            if let selected {
-                fill(context, selected, topology, cellSize, theme.selection)
-            }
-
-            BoardDecorations.drawParityMarks(
-                context,
-                parities: session.puzzle.parities,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-            CageOverlay.draw(
-                context,
-                cages: session.puzzle.cages,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-            drawDigits(
-                context,
-                session: session,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-                settings: settings,
-            )
-            BoardDecorations.drawGridLines(
-                context,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-            EdgeMarkOverlay.draw(
-                context,
-                relations: session.puzzle.relations,
-                topology: topology,
-                theme: theme,
-                cellSize: cellSize,
-            )
-        }
-    }
-
-    private func fill(
-        _ context: GraphicsContext,
-        _ index: Int,
-        _ topology: GridTopology,
-        _ cellSize: CGFloat,
-        _ color: Color,
-    ) {
-        context.fill(
-            Path(BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)),
-            with: .color(color),
+        let renderer = BoardRenderer(
+            session: session,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+            gutter: gutter,
+            selected: viewModel.selectedCell,
+            related: viewModel.relatedCells,
+            sameDigit: viewModel.sameDigitCells,
+            conflicts: viewModel.conflicts,
+            hintCells: Set(viewModel.presentedHint?.cells ?? []),
+            settings: viewModel.settings,
         )
-    }
-
-    private func drawDigits(
-        _ context: GraphicsContext,
-        session: GameSession,
-        topology: GridTopology,
-        theme: Theme,
-        cellSize: CGFloat,
-        settings: GameSettings,
-    ) {
-        let variant = session.puzzle.variant
-        let noteColumns = VariantGlyphs.noteColumns(forSize: topology.size)
-        let noteRows = (topology.size + noteColumns - 1) / noteColumns
-
-        for index in 0 ..< session.board.count {
-            // Fogged cells hide their contents — givens included.
-            if session.isFogged(index) {
-                let rect = BoardDecorations.cellRect(
-                    index,
-                    topology: topology,
-                    cellSize: cellSize,
-                )
-                context.fill(
-                    Path(rect),
-                    with: .color(theme.gridLineBold.opacity(0.22)),
-                )
-                continue
-            }
-            let cell = session.board[index]
-            let center = BoardDecorations.cellCenter(index, topology: topology, cellSize: cellSize)
-
-            if let value = cell.value {
-                let isWrong = !cell.isGiven && value != session.puzzle.solution[index]
-                let color: Color = if isWrong, settings.mistakeHighlighting {
-                    theme.conflict
-                } else if cell.isGiven {
-                    theme.givenText
-                } else {
-                    theme.playerText
-                }
-                let glyph = VariantGlyphs.glyph(value, for: variant)
-                // Two-character values (10–16 on big grids) need a smaller face.
-                let text = Text(glyph)
-                    .font(.system(
-                        size: cellSize * (glyph.count > 1 ? 0.44 : 0.55),
-                        weight: cell.isGiven ? .semibold : .regular,
-                        design: .rounded,
-                    ))
-                    .foregroundStyle(color)
-                context.draw(context.resolve(text), at: center, anchor: .center)
-            } else if !cell.notes.isEmpty {
-                let rect = BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)
-                for digit in cell.notes.digits where digit <= topology.size {
-                    let column = (digit - 1) % noteColumns
-                    let row = (digit - 1) / noteColumns
-                    let point = CGPoint(
-                        x: rect.minX + cellSize * (CGFloat(column) + 0.5) / CGFloat(noteColumns),
-                        y: rect.minY + cellSize * (CGFloat(row) + 0.5) / CGFloat(noteRows),
-                    )
-                    let glyph = VariantGlyphs.glyph(digit, for: variant)
-                    let text = Text(glyph)
-                        .font(.system(
-                            size: cellSize * (glyph.count > 1 ? 0.19 : 0.24),
-                            design: .rounded,
-                        ))
-                        .foregroundStyle(theme.noteText)
-                    context.draw(context.resolve(text), at: point, anchor: .center)
-                }
-            }
+        return Canvas { context, _ in
+            renderer.draw(context)
         }
     }
 
@@ -267,9 +96,200 @@ struct BoardView: View {
                     topology: topology,
                     fogged: session.isFogged(index),
                 ))
-                .accessibilityAddTraits(
-                    viewModel.selectedCell == index ? [.isButton, .isSelected] : .isButton,
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAddTraits(viewModel.selectedCell == index ? .isSelected : [])
+        }
+    }
+}
+
+/// Immutable snapshot of everything one frame of the board needs, with the
+/// drawing pass split into layers. Lives outside the view so the Canvas
+/// closure captures plain values, not observable state.
+private struct BoardRenderer {
+    let session: GameSession
+    let topology: GridTopology
+    let theme: Theme
+    let cellSize: CGFloat
+    let gutter: CGFloat
+    let selected: Int?
+    let related: Set<Int>
+    let sameDigit: Set<Int>
+    let conflicts: Set<Int>
+    let hintCells: Set<Int>
+    let settings: GameSettings
+
+    func draw(_ context: GraphicsContext) {
+        if gutter > 0 {
+            OutsideClueOverlay.draw(
+                context,
+                clues: session.puzzle.outsideClues,
+                topology: topology,
+                theme: theme,
+                cellSize: cellSize,
+                gutter: gutter,
+            )
+        }
+        var context = context
+        context.translateBy(x: gutter, y: gutter)
+        drawBase(context)
+        drawHighlights(context)
+        drawMarksAndDigits(context)
+    }
+
+    /// Base fills, shading, diagonals, and line shapes under everything.
+    /// Inactive positions (samurai corners) stay transparent; active cells
+    /// get the base fill.
+    private func drawBase(_ context: GraphicsContext) {
+        for index in 0 ..< topology.cellCount {
+            fill(context, index, theme.cellBackground)
+        }
+        BoardDecorations.drawShading(
+            context,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        BoardDecorations.drawDiagonals(
+            context,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        LineOverlay.draw(
+            context,
+            puzzle: session.puzzle,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+    }
+
+    /// Highlights, back to front: related, same digit, hint, selection.
+    private func drawHighlights(_ context: GraphicsContext) {
+        for index in related {
+            fill(context, index, theme.relatedHighlight)
+        }
+        for index in sameDigit {
+            fill(context, index, theme.sameDigitHighlight)
+        }
+        for index in hintCells {
+            fill(context, index, theme.hintHighlight)
+        }
+        if settings.autoCheck {
+            for index in conflicts {
+                fill(context, index, theme.conflict.opacity(0.18))
+            }
+        }
+        if let selected {
+            fill(context, selected, theme.selection)
+        }
+    }
+
+    private func drawMarksAndDigits(_ context: GraphicsContext) {
+        BoardDecorations.drawParityMarks(
+            context,
+            parities: session.puzzle.parities,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        CageOverlay.draw(
+            context,
+            cages: session.puzzle.cages,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        drawDigits(context)
+        BoardDecorations.drawGridLines(
+            context,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+        EdgeMarkOverlay.draw(
+            context,
+            relations: session.puzzle.relations,
+            topology: topology,
+            theme: theme,
+            cellSize: cellSize,
+        )
+    }
+
+    private func fill(_ context: GraphicsContext, _ index: Int, _ color: Color) {
+        context.fill(
+            Path(BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)),
+            with: .color(color),
+        )
+    }
+
+    // MARK: - Digits & notes
+
+    private func drawDigits(_ context: GraphicsContext) {
+        for index in 0 ..< session.board.count {
+            // Fogged cells hide their contents — givens included.
+            if session.isFogged(index) {
+                let rect = BoardDecorations.cellRect(
+                    index,
+                    topology: topology,
+                    cellSize: cellSize,
                 )
+                context.fill(
+                    Path(rect),
+                    with: .color(theme.gridLineBold.opacity(0.22)),
+                )
+                continue
+            }
+            let cell = session.board[index]
+            if let value = cell.value {
+                drawValue(context, value: value, cell: cell, index: index)
+            } else if !cell.notes.isEmpty {
+                drawNotes(context, cell: cell, index: index)
+            }
+        }
+    }
+
+    private func drawValue(_ context: GraphicsContext, value: Int, cell: BoardCell, index: Int) {
+        let center = BoardDecorations.cellCenter(index, topology: topology, cellSize: cellSize)
+        let isWrong = !cell.isGiven && value != session.puzzle.solution[index]
+        let color: Color = if isWrong, settings.mistakeHighlighting {
+            theme.conflict
+        } else if cell.isGiven {
+            theme.givenText
+        } else {
+            theme.playerText
+        }
+        let glyph = VariantGlyphs.glyph(value, for: session.puzzle.variant)
+        // Two-character values (10–16 on big grids) need a smaller face.
+        let text = Text(glyph)
+            .font(.system(
+                size: cellSize * (glyph.count > 1 ? 0.44 : 0.55),
+                weight: cell.isGiven ? .semibold : .regular,
+                design: .rounded,
+            ))
+            .foregroundStyle(color)
+        context.draw(context.resolve(text), at: center, anchor: .center)
+    }
+
+    private func drawNotes(_ context: GraphicsContext, cell: BoardCell, index: Int) {
+        let noteColumns = VariantGlyphs.noteColumns(forSize: topology.size)
+        let noteRows = (topology.size + noteColumns - 1) / noteColumns
+        let rect = BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)
+        for digit in cell.notes.digits where digit <= topology.size {
+            let column = (digit - 1) % noteColumns
+            let row = (digit - 1) / noteColumns
+            let point = CGPoint(
+                x: rect.minX + cellSize * (CGFloat(column) + 0.5) / CGFloat(noteColumns),
+                y: rect.minY + cellSize * (CGFloat(row) + 0.5) / CGFloat(noteRows),
+            )
+            let glyph = VariantGlyphs.glyph(digit, for: session.puzzle.variant)
+            let text = Text(glyph)
+                .font(.system(
+                    size: cellSize * (glyph.count > 1 ? 0.19 : 0.24),
+                    design: .rounded,
+                ))
+                .foregroundStyle(theme.noteText)
+            context.draw(context.resolve(text), at: point, anchor: .center)
         }
     }
 }
