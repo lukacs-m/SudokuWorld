@@ -37,13 +37,31 @@ enum OutsideClueOverlay {
         }
     }
 
-    private static func position(
+    static func position(
         for clue: OutsideClue,
         topology: GridTopology,
         cellSize: CGFloat,
         gutter: CGFloat,
     ) -> CGPoint {
         let mid = gutter / 2
+
+        if clue.kind == .diagonalSum {
+            // The label must lie on the diagonal's own line so its arrow
+            // reads unambiguously: step back from the corner where the
+            // diagonal enters the grid, against the reading direction.
+            let corner = entryCorner(
+                for: clue,
+                topology: topology,
+                cellSize: cellSize,
+                gutter: gutter,
+            )
+            let direction = diagonalDirection(for: clue.side)
+            return CGPoint(
+                x: corner.x - direction.dx * mid,
+                y: corner.y - direction.dy * mid,
+            )
+        }
+
         let along = gutter + (CGFloat(clue.offset) + 0.5) * cellSize
         let farX = gutter + CGFloat(topology.colCount) * cellSize + mid
         let farY = gutter + CGFloat(topology.rowCount) * cellSize + mid
@@ -52,6 +70,39 @@ enum OutsideClueOverlay {
         case .trailing: CGPoint(x: farX, y: along)
         case .top: CGPoint(x: along, y: mid)
         case .bottom: CGPoint(x: along, y: farY)
+        }
+    }
+
+    /// The grid corner where a little-killer diagonal enters: the line
+    /// through the cell centers of top ↘ (0, offset), trailing ↙
+    /// (offset, last), bottom ↖ (last, offset), leading ↗ (offset, 0),
+    /// extended half a cell back out of the grid.
+    private static func entryCorner(
+        for clue: OutsideClue,
+        topology: GridTopology,
+        cellSize: CGFloat,
+        gutter: CGFloat,
+    ) -> CGPoint {
+        let along = gutter + CGFloat(clue.offset) * cellSize
+        let alongAfter = gutter + CGFloat(clue.offset + 1) * cellSize
+        let farX = gutter + CGFloat(topology.colCount) * cellSize
+        let farY = gutter + CGFloat(topology.rowCount) * cellSize
+        return switch clue.side {
+        case .top: CGPoint(x: along, y: gutter)
+        case .trailing: CGPoint(x: farX, y: along)
+        case .bottom: CGPoint(x: alongAfter, y: farY)
+        case .leading: CGPoint(x: gutter, y: alongAfter)
+        }
+    }
+
+    /// Screen-space reading direction per side: top ↘, trailing ↙,
+    /// bottom ↖, leading ↗ (matching the engine).
+    private static func diagonalDirection(for side: OutsideClue.Side) -> CGVector {
+        switch side {
+        case .top: CGVector(dx: 1, dy: 1)
+        case .trailing: CGVector(dx: -1, dy: 1)
+        case .bottom: CGVector(dx: -1, dy: -1)
+        case .leading: CGVector(dx: 1, dy: -1)
         }
     }
 
@@ -64,12 +115,7 @@ enum OutsideClueOverlay {
         cellSize: CGFloat,
         theme: Theme,
     ) {
-        let direction = switch clue.side {
-        case .top: CGVector(dx: 1, dy: 1)
-        case .trailing: CGVector(dx: -1, dy: 1)
-        case .bottom: CGVector(dx: -1, dy: -1)
-        case .leading: CGVector(dx: 1, dy: -1)
-        }
+        let direction = diagonalDirection(for: clue.side)
         let start = CGPoint(
             x: anchor.x + direction.dx * cellSize * 0.22,
             y: anchor.y + direction.dy * cellSize * 0.22,
