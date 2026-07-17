@@ -3,7 +3,7 @@
 enum CageCombinations {
     /// The tightest possible sums for `count` distinct digits drawn from the
     /// `available` mask.
-    static func sumBounds(count: Int, available: UInt16, size: Int) -> (min: Int, max: Int) {
+    static func sumBounds(count: Int, available: DigitMask, size: Int) -> (min: Int, max: Int) {
         var ascending: [Int] = []
         for digit in 1 ... size where available & mask(digit) != 0 {
             ascending.append(digit)
@@ -19,12 +19,12 @@ enum CageCombinations {
     /// Union of digit masks over every combination of `count` distinct digits
     /// from `available` summing exactly to `sum`. Digits outside the result
     /// can be eliminated from all remaining cells of the cage.
-    static func usableDigits(count: Int, sum: Int, available: UInt16, size: Int) -> UInt16 {
+    static func usableDigits(count: Int, sum: Int, available: DigitMask, size: Int) -> DigitMask {
         var digits: [Int] = []
         for digit in 1 ... size where available & mask(digit) != 0 {
             digits.append(digit)
         }
-        var union: UInt16 = 0
+        var union: DigitMask = 0
         var chosen: [Int] = []
 
         func search(startIndex: Int, remainingCount: Int, remainingSum: Int) {
@@ -56,7 +56,7 @@ enum CageCombinations {
         return union
     }
 
-    private static func mask(_ digit: Int) -> UInt16 {
-        UInt16(1) << UInt16(digit - 1)
+    private static func mask(_ digit: Int) -> DigitMask {
+        DigitMask(1) << DigitMask(digit - 1)
     }
 }

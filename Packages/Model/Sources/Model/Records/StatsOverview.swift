@@ -84,7 +84,7 @@ public struct StatsOverview: Equatable, Sendable {
         totalPlayed > 0 ? Double(totalWon) / Double(totalPlayed) : 0
     }
 
-    public static let empty = StatsOverview(
+    public static let empty = Self(
         totalPlayed: 0,
         totalWon: 0,
         totalLost: 0,

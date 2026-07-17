@@ -13,8 +13,20 @@ public struct Grader: Sendable {
         givens: [Int?],
         cages: [Cage] = [],
         parities: [Int: CellParity] = [:],
+        relations: [RelationClue] = [],
+        thermometers: [[Int]] = [],
+        arrows: [Arrow] = [],
+        outsideClues: [OutsideClue] = [],
     ) -> Difficulty? {
-        let context = SolverContext(topology: topology, cages: cages, parities: parities)
+        let context = SolverContext(
+            topology: topology,
+            cages: cages,
+            parities: parities,
+            relations: relations,
+            thermometers: thermometers,
+            arrows: arrows,
+            outsideClues: outsideClues,
+        )
         return grade(context: context, givens: givens)
     }
 

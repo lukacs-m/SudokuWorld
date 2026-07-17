@@ -63,6 +63,7 @@ enum BoardDecorations {
             let path = switch parity {
             case .odd:
                 Path(ellipseIn: rect)
+
             case .even:
                 Path(roundedRect: rect, cornerRadius: cellSize * 0.12)
             }
@@ -126,6 +127,9 @@ enum BoardDecorations {
         context.stroke(bold, with: .color(theme.gridLineBold), lineWidth: 2)
     }
 
+    // One edge needs the full drawing context (endpoints, neighbor, box,
+    // topology, both paths); bundling them would just obscure the call sites.
+    // swiftlint:disable:next function_parameter_count
     private static func appendEdge(
         from start: CGPoint,
         to end: CGPoint,

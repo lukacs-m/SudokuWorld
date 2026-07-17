@@ -21,7 +21,7 @@ public actor GameKitGameCenterService: GameCenterService {
 
     // MARK: - Authentication
 
-    public func authenticate() async {
+    public func authenticate() {
         guard !handlerInstalled else { return }
         handlerInstalled = true
         setState(.authenticating)
@@ -48,7 +48,7 @@ public actor GameKitGameCenterService: GameCenterService {
         }
     }
 
-    public func currentAuthState() async -> GameCenterAuthState {
+    public func currentAuthState() -> GameCenterAuthState {
         state
     }
 

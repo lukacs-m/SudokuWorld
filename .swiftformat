@@ -26,6 +26,16 @@
 --disable redundantInternal
 --disable organizeDeclarations
 --disable sortDeclarations
+# Persisted Codable enums pin raw values explicitly (even when equal to the
+# case name) so renames can't silently break saves — never strip them.
+--disable redundantRawValues
+# SwiftLint's local_doc_comment rightly wants `//` on nested declarations;
+# don't auto-promote comments to `///`.
+--disable docComments
+# Keep explicit Sendable on internal types — it's a compiler-checked guarantee,
+# not noise. Pinned explicitly because the rule's default flipped between
+# SwiftFormat 0.61 (on) and 0.62 (off), which made CI and local disagree.
+--disable redundantSendable
 
 # --- Excluded paths -------------------------------------------------------
 # Skip build artifacts, test files, package manifests, and Xcode templates

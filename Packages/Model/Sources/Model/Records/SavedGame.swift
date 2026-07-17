@@ -16,6 +16,9 @@ public struct SavedGame: Equatable, Sendable, Codable {
     public let usedReveal: Bool
     public let startedAt: Date
     public let updatedAt: Date
+    /// Fog-of-war reveal state; nil for other variants (and for saves that
+    /// predate the field — optional keeps synthesized decoding compatible).
+    public let revealedCells: [Int]?
 
     public init(
         context: GameContext,
@@ -30,6 +33,7 @@ public struct SavedGame: Equatable, Sendable, Codable {
         usedReveal: Bool,
         startedAt: Date,
         updatedAt: Date,
+        revealedCells: [Int]? = nil,
     ) {
         self.context = context
         self.mode = mode
@@ -43,5 +47,6 @@ public struct SavedGame: Equatable, Sendable, Codable {
         self.usedReveal = usedReveal
         self.startedAt = startedAt
         self.updatedAt = updatedAt
+        self.revealedCells = revealedCells
     }
 }

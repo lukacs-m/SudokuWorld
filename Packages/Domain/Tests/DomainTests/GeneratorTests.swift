@@ -10,7 +10,7 @@ struct GeneratorTests {
     private static let seed: UInt64 = 0xC0FF_EE00_5EED
 
     private func validate(_ puzzle: PuzzleDefinition) {
-        let topology = TopologyFactory.topology(for: puzzle.variant)
+        let topology = TopologyFactory.topology(for: puzzle)
         #expect(puzzle.givens.count == topology.cellCount)
         #expect(puzzle.solution.count == topology.cellCount)
 
@@ -30,6 +30,10 @@ struct GeneratorTests {
             givens: puzzle.givens,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
+            thermometers: puzzle.thermometers,
+            arrows: puzzle.arrows,
+            outsideClues: puzzle.outsideClues,
         )
         #expect(solver.solutionCount(limit: 2) == 1)
         #expect(solver.solve() == puzzle.solution)
@@ -40,6 +44,10 @@ struct GeneratorTests {
             givens: puzzle.givens,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
+            thermometers: puzzle.thermometers,
+            arrows: puzzle.arrows,
+            outsideClues: puzzle.outsideClues,
         )
         #expect(graded == puzzle.gradedDifficulty)
     }
@@ -53,6 +61,35 @@ struct GeneratorTests {
         (SudokuVariant.windoku, Difficulty.easy),
         (SudokuVariant.evenOdd, Difficulty.easy),
         (SudokuVariant.evenOdd, Difficulty.expert),
+        (SudokuVariant.mini4, Difficulty.easy),
+        (SudokuVariant.dodeka12, Difficulty.easy),
+        (SudokuVariant.hexadoku16, Difficulty.easy),
+        (SudokuVariant.wordoku, Difficulty.expert),
+        (SudokuVariant.jigsaw, Difficulty.easy),
+        (SudokuVariant.jigsaw, Difficulty.expert),
+        (SudokuVariant.argyle, Difficulty.easy),
+        (SudokuVariant.asterisk, Difficulty.easy),
+        (SudokuVariant.gattai2, Difficulty.easy),
+        (SudokuVariant.gattai3, Difficulty.medium),
+        (SudokuVariant.alphadoku25, Difficulty.beginner),
+        (SudokuVariant.antiKnight, Difficulty.easy),
+        (SudokuVariant.antiKing, Difficulty.medium),
+        (SudokuVariant.greaterThan, Difficulty.easy),
+        (SudokuVariant.kropki, Difficulty.easy),
+        (SudokuVariant.kropki, Difficulty.expert),
+        (SudokuVariant.xv, Difficulty.easy),
+        (SudokuVariant.consecutive, Difficulty.medium),
+        (SudokuVariant.miracle, Difficulty.easy),
+        (SudokuVariant.thermo, Difficulty.easy),
+        (SudokuVariant.arrow, Difficulty.easy),
+        (SudokuVariant.arrow, Difficulty.hard),
+        (SudokuVariant.sandwich, Difficulty.easy),
+        (SudokuVariant.skyscraper, Difficulty.easy),
+        (SudokuVariant.littleKiller, Difficulty.easy),
+        (SudokuVariant.fogOfWar, Difficulty.medium),
+        (SudokuVariant.killerGT, Difficulty.easy),
+        (SudokuVariant.killerGT, Difficulty.hard),
+        (SudokuVariant.tredoku, Difficulty.easy),
     ])
     func generatesValidPuzzles(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(
@@ -201,6 +238,10 @@ struct GeneratorTests {
         (SudokuVariant.samurai, Difficulty.master),
         (SudokuVariant.killer, Difficulty.master),
         (SudokuVariant.classic, Difficulty.master),
+        (SudokuVariant.dodeka12, Difficulty.master),
+        (SudokuVariant.hexadoku16, Difficulty.master),
+        (SudokuVariant.sumo, Difficulty.beginner),
+        (SudokuVariant.shogun, Difficulty.easy),
     ])
     func worstCaseTargetsFinishWithinBudget(variant: SudokuVariant, difficulty: Difficulty) {
         let puzzle = generator.generateNow(

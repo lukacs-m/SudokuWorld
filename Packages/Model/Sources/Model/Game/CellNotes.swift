@@ -1,17 +1,19 @@
-/// A compact set of pencil-mark digits (1...16) backed by a bitmask.
+/// A compact set of pencil-mark digits (1...32) backed by a bitmask.
+/// UInt32 admits alphadoku's 25 digits; old saves encoded the previous
+/// UInt16 raw value as a JSON number, which decodes into UInt32 unchanged.
 public struct CellNotes: Hashable, Sendable, Codable {
-    public private(set) var rawValue: UInt16
+    public private(set) var rawValue: UInt32
 
     public init() {
         rawValue = 0
     }
 
-    public init(rawValue: UInt16) {
+    public init(rawValue: UInt32) {
         self.rawValue = rawValue
     }
 
     public init(_ digits: some Sequence<Int>) {
-        rawValue = digits.reduce(into: UInt16(0)) { partial, digit in
+        rawValue = digits.reduce(into: UInt32(0)) { partial, digit in
             partial |= Self.mask(for: digit)
         }
     }
@@ -26,7 +28,7 @@ public struct CellNotes: Hashable, Sendable, Codable {
 
     /// The noted digits in ascending order.
     public var digits: [Int] {
-        (1 ... 16).filter { contains($0) }
+        (1 ... 32).filter { contains($0) }
     }
 
     public func contains(_ digit: Int) -> Bool {
@@ -49,8 +51,8 @@ public struct CellNotes: Hashable, Sendable, Codable {
         rawValue = 0
     }
 
-    private static func mask(for digit: Int) -> UInt16 {
-        guard digit >= 1, digit <= 16 else { return 0 }
-        return UInt16(1) << UInt16(digit - 1)
+    private static func mask(for digit: Int) -> UInt32 {
+        guard digit >= 1, digit <= 32 else { return 0 }
+        return UInt32(1) << UInt32(digit - 1)
     }
 }

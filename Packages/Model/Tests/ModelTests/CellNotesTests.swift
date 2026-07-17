@@ -45,10 +45,24 @@ struct CellNotesTests {
         #expect(notes.digits == [1, 2, 16])
     }
 
+    @Test func digitsBeyondSixteenFitTheWidenedMask() {
+        let notes = CellNotes([17, 20, 25])
+        #expect(notes.digits == [17, 20, 25])
+        #expect(notes.contains(25))
+    }
+
+    /// Saves written before the UInt16 → UInt32 widening stored the raw
+    /// value as a JSON number; it must decode into the wider type as-is.
+    @Test func legacySixteenBitRawValueDecodes() throws {
+        let legacy = Data(#"{"rawValue": 65535}"#.utf8)
+        let notes = try JSONDecoder().decode(CellNotes.self, from: legacy)
+        #expect(notes.digits == Array(1 ... 16))
+    }
+
     @Test func outOfRangeDigitsAreIgnored() {
         var notes = CellNotes()
         notes.insert(0)
-        notes.insert(17)
+        notes.insert(33)
         #expect(notes.isEmpty)
     }
 

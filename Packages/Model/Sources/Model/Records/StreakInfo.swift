@@ -7,7 +7,7 @@ public struct StreakInfo: Equatable, Sendable, Codable {
     public let currentWinStreak: Int
     public let bestWinStreak: Int
 
-    public static let zero = StreakInfo(
+    public static let zero = Self(
         currentDailyStreak: 0,
         bestDailyStreak: 0,
         currentWinStreak: 0,

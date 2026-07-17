@@ -16,7 +16,7 @@ public struct InterstitialPolicy: Equatable, Sendable {
     public let gamesBetweenInterstitials: Int
     public let cooldownSeconds: TimeInterval
 
-    public static let standard = InterstitialPolicy(
+    public static let standard = Self(
         gamesBetweenInterstitials: 3,
         cooldownSeconds: 180,
     )

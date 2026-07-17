@@ -24,6 +24,12 @@ public struct GameSession: Equatable, Sendable {
     /// Set while the clock is running.
     public private(set) var lastResume: Date?
 
+    /// Fog-of-war reveal state: cells the player can see. Starts as a few
+    /// seeded windows; every correct placement lifts the fog around itself.
+    /// Reveals never revert — not even through undo. Empty for other
+    /// variants.
+    public private(set) var revealedCells: Set<Int>
+
     private let detector: ConflictDetector
 
     // MARK: - Lifecycle
@@ -43,6 +49,7 @@ public struct GameSession: Equatable, Sendable {
         isLost = false
         accumulated = 0
         lastResume = startedAt
+        revealedCells = Self.initialFog(for: puzzle)
         detector = ConflictDetector(puzzle: puzzle)
     }
 
@@ -61,7 +68,67 @@ public struct GameSession: Equatable, Sendable {
         isLost = false
         accumulated = saved.elapsed
         lastResume = nil
+        if let restored = saved.revealedCells {
+            revealedCells = Set(restored)
+        } else {
+            // Saves that predate the field: re-derive deterministically —
+            // the seeded windows plus the fog lifted by every correct
+            // placement already on the board.
+            var reveals = Self.initialFog(for: saved.puzzle)
+            if saved.puzzle.variant == .fogOfWar {
+                for index in 0 ..< saved.board.count
+                    where !saved.board[index].isGiven
+                    && saved.board[index].value == saved.puzzle.solution[index]
+                {
+                    reveals.formUnion(Self.fogNeighborhood(of: index, puzzle: saved.puzzle))
+                }
+            }
+            revealedCells = reveals
+        }
         detector = ConflictDetector(puzzle: puzzle)
+    }
+
+    // MARK: - Fog of war
+
+    /// Whether a cell is still hidden by fog.
+    public func isFogged(_ index: Int) -> Bool {
+        puzzle.variant == .fogOfWar && !revealedCells.contains(index)
+    }
+
+    /// Three seeded 3×3 windows give the player a foothold.
+    static func initialFog(for puzzle: PuzzleDefinition) -> Set<Int> {
+        guard puzzle.variant == .fogOfWar else { return [] }
+        let size = Int(Double(puzzle.solution.count).squareRoot())
+        var rng = SplitMix64(seed: puzzle.seed)
+        var revealed = Set<Int>()
+        for _ in 0 ..< 3 {
+            let originRow = Int(rng.next() % UInt64(size - 2))
+            let originCol = Int(rng.next() % UInt64(size - 2))
+            for row in originRow ..< (originRow + 3) {
+                for col in originCol ..< (originCol + 3) {
+                    revealed.insert(row * size + col)
+                }
+            }
+        }
+        return revealed
+    }
+
+    /// The 3×3 neighborhood a correct placement reveals.
+    static func fogNeighborhood(of index: Int, puzzle: PuzzleDefinition) -> Set<Int> {
+        let size = Int(Double(puzzle.solution.count).squareRoot())
+        let row = index / size
+        let col = index % size
+        var cells = Set<Int>()
+        for rowDelta in -1 ... 1 {
+            for colDelta in -1 ... 1 {
+                let neighborRow = row + rowDelta
+                let neighborCol = col + colDelta
+                guard neighborRow >= 0, neighborRow < size,
+                      neighborCol >= 0, neighborCol < size else { continue }
+                cells.insert(neighborRow * size + neighborCol)
+            }
+        }
+        return cells
     }
 
     // MARK: - State
@@ -120,6 +187,9 @@ public struct GameSession: Equatable, Sendable {
                 return .hardcoreLoss
             }
             return .mistake(total: mistakes)
+        }
+        if puzzle.variant == .fogOfWar {
+            revealedCells.formUnion(Self.fogNeighborhood(of: index, puzzle: puzzle))
         }
         if isSolved {
             return .solved
@@ -256,6 +326,7 @@ public struct GameSession: Equatable, Sendable {
             usedReveal: usedReveal,
             startedAt: startedAt,
             updatedAt: now,
+            revealedCells: puzzle.variant == .fogOfWar ? revealedCells.sorted() : nil,
         )
     }
 }

@@ -55,6 +55,7 @@ struct InterstitialOverlayView: View {
                 Image(systemName: "square.grid.3x3.fill")
                     .font(.system(size: 44))
                     .foregroundStyle(theme.accent)
+                    .accessibilityHidden(true)
 
                 Text(localized(creative.headline))
                     .font(.title2.weight(.bold))

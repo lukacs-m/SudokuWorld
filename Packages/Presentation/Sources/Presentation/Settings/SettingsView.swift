@@ -151,12 +151,14 @@ struct SettingsView: View {
                     Image(systemName: "person.crop.circle.badge.checkmark")
                         .foregroundStyle(theme.success)
                 }
+
             case .authenticating:
                 HStack {
                     ProgressView()
                     Text("settings.gameCenter.connecting", bundle: .module)
                         .foregroundStyle(theme.textSecondary)
                 }
+
             default:
                 Button {
                     Task { await viewModel.signInToGameCenter() }

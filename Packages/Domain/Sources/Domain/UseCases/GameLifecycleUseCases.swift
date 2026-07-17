@@ -35,6 +35,7 @@ public struct StartGame: StartGameUseCase {
         case let .daily(dateKey):
             // The shared worldwide seed — every player gets the same board.
             EventSeeds.dailySeed(dateKey: dateKey)
+
         case .regular, .weekly:
             Self.entropySeed(from: now)
         }

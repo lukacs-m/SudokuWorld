@@ -12,6 +12,19 @@ struct GameCenterIDsTests {
         #expect(Set(ids).count == 84)
     }
 
+    /// The matrix must stay pinned to the curated seven that exist in
+    /// App Store Connect — new variants must NOT silently mint board IDs.
+    @Test func matrixCoversOnlyCuratedVariants() {
+        #expect(GameCenterIDs.leaderboardVariants.map(\.slug) == [
+            "classic", "mini6", "killer", "diagonal", "windoku", "evenodd", "samurai",
+        ])
+        for variant in SudokuVariant.allCases
+            where !GameCenterIDs.leaderboardVariants.contains(variant) {
+            let ids = GameCenterIDs.matrixLeaderboardIDs
+            #expect(!ids.contains { $0.contains(".\(variant.slug).") })
+        }
+    }
+
     @Test func allBoardsIncludeAggregates() {
         let ids = GameCenterIDs.allLeaderboardIDs
         #expect(ids.count == 88)
@@ -47,6 +60,14 @@ struct GameCenterIDsTests {
     @Test func slugsAreCanonical() {
         #expect(SudokuVariant.allCases.map(\.slug) == [
             "classic", "mini6", "killer", "diagonal", "windoku", "evenodd", "samurai",
+            "mini4", "dodeka12", "hexadoku16", "wordoku",
+            "jigsaw", "argyle", "asterisk",
+            "gattai2", "gattai3", "gattai8", "shogun", "sumo",
+            "alphadoku25", "antiknight", "antiking",
+            "greaterthan", "kropki", "xv", "consecutive", "miracle",
+            "thermo", "arrow",
+            "sandwich", "skyscraper", "littlekiller",
+            "fogofwar", "killergt", "tredoku",
         ])
         #expect(Difficulty.allCases.map(\.slug) == [
             "beginner", "easy", "medium", "hard", "expert", "master",

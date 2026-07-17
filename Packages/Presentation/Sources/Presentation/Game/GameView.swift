@@ -49,6 +49,7 @@ struct GameView: View {
             if let hint = viewModel.presentedHint {
                 HintSheetView(
                     hint: hint,
+                    variant: viewModel.session?.puzzle.variant ?? .classic,
                     onApply: { viewModel.applyPresentedHint() },
                     onReveal: { Task { await viewModel.requestReveal() } },
                     onDismiss: { viewModel.dismissHint() },
@@ -199,6 +200,7 @@ struct GameView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "lightbulb")
+                        .accessibilityHidden(true)
                     Text("game.hint.button", bundle: .module)
                     if let remaining = viewModel.hintsRemaining {
                         Text("(\(remaining))")

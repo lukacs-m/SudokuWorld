@@ -89,12 +89,13 @@ public struct StatsAggregator: Sendable {
             let day = calendar.startOfDay(for: record.finishedAt)
             counts[day, default: 0] += 1
         }
-        return (0 ..< windowDays).compactMap { offset in
+        let descending: [StatsOverview.DailyCount] = (0 ..< windowDays).compactMap { offset in
             guard let day = calendar.date(byAdding: .day, value: -offset, to: startOfToday) else {
                 return nil
             }
             return StatsOverview.DailyCount(day: day, count: counts[day] ?? 0)
-        }.reversed()
+        }
+        return descending.reversed()
     }
 
     private func winRateByDifficulty(records: [GameRecord]) -> [StatsOverview.DifficultyWinRate] {

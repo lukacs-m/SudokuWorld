@@ -21,7 +21,7 @@ public actor SwiftDataSavedGameRepository: SavedGameRepository {
         self.container = container
     }
 
-    public func save(_ game: SavedGame) async throws {
+    public func save(_ game: SavedGame) throws {
         let key = game.context.contextKey
         let payload = try PersistenceMappers.encode(game)
         if let existing = try fetchEntity(contextKey: key) {
@@ -37,12 +37,12 @@ public actor SwiftDataSavedGameRepository: SavedGameRepository {
         try saveContext()
     }
 
-    public func load(context gameContext: GameContext) async throws -> SavedGame? {
+    public func load(context gameContext: GameContext) throws -> SavedGame? {
         guard let entity = try fetchEntity(contextKey: gameContext.contextKey) else { return nil }
         return try PersistenceMappers.decode(SavedGame.self, from: entity.payload)
     }
 
-    public func delete(context gameContext: GameContext) async throws {
+    public func delete(context gameContext: GameContext) throws {
         guard let entity = try fetchEntity(contextKey: gameContext.contextKey) else { return }
         context.delete(entity)
         try saveContext()

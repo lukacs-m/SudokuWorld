@@ -178,18 +178,23 @@ public struct CompleteGame: CompleteGameUseCase {
         weeklyCumulative: Int?,
     ) async {
         let centiseconds = Int(record.duration * 100)
-        await gameCenter.submitScore(
-            centiseconds,
-            leaderboardID: GameCenterIDs.leaderboard(.time, record.variant, record.difficulty),
-        )
+        // Matrix boards exist only for the curated variants; everything else
+        // still counts toward the aggregates below.
+        if GameCenterIDs.leaderboardVariants.contains(record.variant) {
+            await gameCenter.submitScore(
+                centiseconds,
+                leaderboardID: GameCenterIDs.leaderboard(.time, record.variant, record.difficulty),
+            )
 
-        let cellWins = records.count {
-            $0.outcome == .won && $0.variant == record.variant && $0.difficulty == record.difficulty
+            let cellWins = records.count {
+                $0.outcome == .won && $0.variant == record.variant
+                    && $0.difficulty == record.difficulty
+            }
+            await gameCenter.submitScore(
+                cellWins,
+                leaderboardID: GameCenterIDs.leaderboard(.wins, record.variant, record.difficulty),
+            )
         }
-        await gameCenter.submitScore(
-            cellWins,
-            leaderboardID: GameCenterIDs.leaderboard(.wins, record.variant, record.difficulty),
-        )
         await gameCenter.submitScore(totalWins, leaderboardID: GameCenterIDs.winsAll)
         if bestDailyStreak > 0 {
             await gameCenter.submitScore(bestDailyStreak, leaderboardID: GameCenterIDs.bestStreak)

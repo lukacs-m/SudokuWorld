@@ -1,6 +1,7 @@
-/// The seven playable rule sets. Raw values are the canonical slugs used in
+/// The playable rule sets. Raw values are the canonical slugs used in
 /// Game Center identifiers and persistence — renaming a case must never change
-/// its slug (a unit test pins the full identifier matrix).
+/// its slug (a unit test pins the full slug table). Every case is fully
+/// playable: a new case only lands together with its engine support.
 public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case classic
     case mini6
@@ -9,15 +10,56 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
     case windoku
     case evenOdd = "evenodd"
     case samurai
+    case mini4
+    case dodeka12
+    case hexadoku16
+    case wordoku
+    case jigsaw
+    case argyle
+    case asterisk
+    case gattai2
+    case gattai3
+    case gattai8
+    case shogun
+    case sumo
+    case alphadoku25
+    case antiKnight = "antiknight"
+    case antiKing = "antiking"
+    case greaterThan = "greaterthan"
+    case kropki
+    case xv
+    case consecutive
+    case miracle
+    case thermo
+    case arrow
+    case sandwich
+    case skyscraper
+    case littleKiller = "littlekiller"
+    case fogOfWar = "fogofwar"
+    case killerGT = "killergt"
+    case tredoku
 
     /// Stable identifier used in leaderboard IDs and persistence.
     public var slug: String {
         rawValue
     }
 
+    /// The catalog section this variant is displayed under.
+    public var group: SudokuVariantGroup {
+        switch self {
+        case .mini4, .mini6, .classic, .dodeka12, .hexadoku16, .alphadoku25: .gridSizes
+        case .killer, .diagonal, .windoku, .jigsaw, .argyle, .asterisk: .extraRegions
+        case .greaterThan, .kropki, .xv, .consecutive, .thermo, .arrow,
+             .sandwich, .skyscraper, .littleKiller: .relationClues
+        case .antiKnight, .antiKing, .miracle: .chess
+        case .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo: .multiGrid
+        case .evenOdd, .wordoku, .fogOfWar, .killerGT, .tredoku: .twists
+        }
+    }
+
     /// Killer puzzles replace most givens with cage-sum constraints.
     public var usesCages: Bool {
-        self == .killer
+        self == .killer || self == .killerGT
     }
 
     /// Even-Odd puzzles constrain marked cells to a parity.

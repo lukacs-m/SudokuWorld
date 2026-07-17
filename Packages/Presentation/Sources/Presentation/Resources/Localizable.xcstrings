@@ -4,6 +4,9 @@
     "·" : {
 
     },
+    "›" : {
+
+    },
     "(%lld)" : {
 
     },
@@ -24,6 +27,15 @@
       }
     },
     "%lld%%" : {
+
+    },
+    "✦" : {
+
+    },
+    "15" : {
+
+    },
+    "21" : {
 
     },
     "a11y.cell.cage" : {
@@ -74,18 +86,35 @@
         }
       }
     },
-    "a11y.cell.given" : {
+    "a11y.cell.fogged" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "given %d"
+            "value" : "hidden by fog"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "chiffre imposé %d"
+            "value" : "cachée par le brouillard"
+          }
+        }
+      }
+    },
+    "a11y.cell.given" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "given %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chiffre imposé %@"
           }
         }
       }
@@ -143,13 +172,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "value %d"
+            "value" : "value %@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "valeur %d"
+            "value" : "valeur %@"
           }
         }
       }
@@ -159,13 +188,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Digit %1$d, %2$d remaining"
+            "value" : "Digit %1$@, %2$d remaining"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chiffre %1$d, %2$d restants"
+            "value" : "Chiffre %1$@, %2$d restants"
           }
         }
       }
@@ -728,6 +757,40 @@
     },
     "Average" : {
 
+    },
+    "badge.new" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau"
+          }
+        }
+      }
+    },
+    "badge.popular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Popular"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Populaire"
+          }
+        }
+      }
     },
     "common.back" : {
       "localizations" : {
@@ -1648,6 +1711,23 @@
         }
       }
     },
+    "hint.technique.arrowArithmetic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The sum along the highlighted line rules out %1$@ here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La somme le long de la ligne en évidence exclut %1$@ ici."
+          }
+        }
+      }
+    },
     "hint.technique.boxLineReduction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1784,6 +1864,23 @@
         }
       }
     },
+    "hint.technique.outsideClueAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The clue at the edge of the highlighted line rules out %1$@ here."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'indice au bord de la ligne en évidence exclut %1$@ ici."
+          }
+        }
+      }
+    },
     "hint.technique.pointingPair" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1801,19 +1898,19 @@
         }
       }
     },
-    "hint.technique.xWing" : {
-      "extractionState" : "stale",
+    "hint.technique.relationAnalysis" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Digit %@ forms an X-wing on the highlighted corners — it can be removed from the other cells of the covering lines."
+            "value" : "The mark between the highlighted cells rules out %1$@ here."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le chiffre %@ forme un X-wing sur les coins surlignés — il peut être retiré des autres cases des lignes couvrantes."
+            "value" : "La marque entre les cases en évidence exclut %1$@ ici."
           }
         }
       }
@@ -1835,19 +1932,19 @@
         }
       }
     },
-    "hint.technique.xyWing" : {
+    "hint.technique.xWing" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The highlighted pivot and its two pincers force %@ out of every cell that sees both pincers."
+            "value" : "Digit %@ forms an X-wing on the highlighted corners — it can be removed from the other cells of the covering lines."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le pivot surligné et ses deux pinces excluent %@ de toute case voyant les deux pinces."
+            "value" : "Le chiffre %@ forme un X-wing sur les coins surlignés — il peut être retiré des autres cases des lignes couvrantes."
           }
         }
       }
@@ -1865,6 +1962,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Une chaîne de cases appariées prouve qu'une de ses extrémités vaut %1$@ — les cases voyant les deux extrémités ne peuvent pas valoir %1$@."
+          }
+        }
+      }
+    },
+    "hint.technique.xyWing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The highlighted pivot and its two pincers force %@ out of every cell that sees both pincers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pivot surligné et ses deux pinces excluent %@ de toute case voyant les deux pinces."
           }
         }
       }
@@ -2146,6 +2260,7 @@
       }
     },
     "newGame.variant" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2506,6 +2621,108 @@
     },
     "Rate" : {
 
+    },
+    "section.chess" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chess moves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacements d'échecs"
+          }
+        }
+      }
+    },
+    "section.extraregions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extra regions"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Régions supplémentaires"
+          }
+        }
+      }
+    },
+    "section.gridsizes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid sizes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailles de grille"
+          }
+        }
+      }
+    },
+    "section.multigrid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multi-grid"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multi-grilles"
+          }
+        }
+      }
+    },
+    "section.relationclues" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relationship clues"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indices relationnels"
+          }
+        }
+      }
+    },
+    "section.twists" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other twists"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres variantes"
+          }
+        }
+      }
     },
     "settings.autoCheck" : {
       "localizations" : {
@@ -3179,6 +3396,23 @@
         }
       }
     },
+    "technique.arrowArithmetic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrow arithmetic"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arithmétique de flèche"
+          }
+        }
+      }
+    },
     "technique.boxLineReduction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3315,6 +3549,23 @@
         }
       }
     },
+    "technique.outsideClueAnalysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edge clue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indice de bord"
+          }
+        }
+      }
+    },
     "technique.pointingPair" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3332,19 +3583,19 @@
         }
       }
     },
-    "technique.xWing" : {
-      "extractionState" : "stale",
+    "technique.relationAnalysis" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "X-Wing"
+            "value" : "Relation mark"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "X-Wing"
+            "value" : "Marque relationnelle"
           }
         }
       }
@@ -3366,19 +3617,19 @@
         }
       }
     },
-    "technique.xyWing" : {
+    "technique.xWing" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "XY-Wing"
+            "value" : "X-Wing"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "XY-Wing"
+            "value" : "X-Wing"
           }
         }
       }
@@ -3396,6 +3647,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chaîne XY"
+          }
+        }
+      }
+    },
+    "technique.xyWing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XY-Wing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XY-Wing"
           }
         }
       }
@@ -3502,11 +3770,218 @@
         }
       }
     },
+    "V" : {
+
+    },
     "Variant" : {
 
     },
     "variant.%@" : {
 
+    },
+    "variant.alphadoku25" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphadoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alphadoku"
+          }
+        }
+      }
+    },
+    "variant.alphadoku25.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25×25, letters A–Y."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25×25, lettres A–Y."
+          }
+        }
+      }
+    },
+    "variant.antiking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-King"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-roi"
+          }
+        }
+      }
+    },
+    "variant.antiking.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touching cells differ."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cases voisines diffèrent."
+          }
+        }
+      }
+    },
+    "variant.antiknight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-cavalier"
+          }
+        }
+      }
+    },
+    "variant.antiknight.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight moves can't repeat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les sauts de cavalier diffèrent."
+          }
+        }
+      }
+    },
+    "variant.argyle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argyle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argyle"
+          }
+        }
+      }
+    },
+    "variant.argyle.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diamond lattice diagonals."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonales en losange."
+          }
+        }
+      }
+    },
+    "variant.arrow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrow"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flèche"
+          }
+        }
+      }
+    },
+    "variant.arrow.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shafts sum to circles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les flèches somment au cercle."
+          }
+        }
+      }
+    },
+    "variant.asterisk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asterisk"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astérisque"
+          }
+        }
+      }
+    },
+    "variant.asterisk.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One extra starred region."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une région étoilée en plus."
+          }
+        }
+      }
     },
     "variant.classic" : {
       "extractionState" : "stale",
@@ -3525,19 +4000,121 @@
         }
       }
     },
+    "variant.classic.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One rule. 9×9."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une règle. 9×9."
+          }
+        }
+      }
+    },
+    "variant.consecutive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consecutive"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consécutif"
+          }
+        }
+      }
+    },
+    "variant.consecutive.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bars join neighbors."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des barres lient les voisins."
+          }
+        }
+      }
+    },
     "variant.diagonal" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diagonal"
+            "value" : "Diagonal X"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diagonal"
+            "value" : "Diagonale X"
+          }
+        }
+      }
+    },
+    "variant.diagonal.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both diagonals count."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux diagonales comptent."
+          }
+        }
+      }
+    },
+    "variant.dodeka12" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodeka"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodeka"
+          }
+        }
+      }
+    },
+    "variant.dodeka12.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12×12, 3×4 boxes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12×12, blocs 3×4."
           }
         }
       }
@@ -3559,6 +4136,261 @@
         }
       }
     },
+    "variant.evenodd.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Even and odd cells."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cases paires et impaires."
+          }
+        }
+      }
+    },
+    "variant.fogofwar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fog of War"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brouillard"
+          }
+        }
+      }
+    },
+    "variant.fogofwar.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reveal the board as you solve."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révélez la grille en jouant."
+          }
+        }
+      }
+    },
+    "variant.gattai2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-2"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-2"
+          }
+        }
+      }
+    },
+    "variant.gattai2.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two linked grids."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux grilles liées."
+          }
+        }
+      }
+    },
+    "variant.gattai3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-3"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-3"
+          }
+        }
+      }
+    },
+    "variant.gattai3.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three grids in a chain."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois grilles en chaîne."
+          }
+        }
+      }
+    },
+    "variant.gattai8" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-8"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gattai-8"
+          }
+        }
+      }
+    },
+    "variant.gattai8.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eight interlocked grids."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huit grilles imbriquées."
+          }
+        }
+      }
+    },
+    "variant.greaterthan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Greater-Than"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparaison"
+          }
+        }
+      }
+    },
+    "variant.greaterthan.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inequalities inside boxes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inégalités dans les blocs."
+          }
+        }
+      }
+    },
+    "variant.hexadoku16" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hexadoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hexadoku"
+          }
+        }
+      }
+    },
+    "variant.hexadoku16.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16×16 with 0–F."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16×16 avec 0–F."
+          }
+        }
+      }
+    },
+    "variant.jigsaw" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jigsaw"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irrégulier"
+          }
+        }
+      }
+    },
+    "variant.jigsaw.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irregular regions."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Régions irrégulières."
+          }
+        }
+      }
+    },
     "variant.killer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3572,6 +4404,159 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Killer"
+          }
+        }
+      }
+    },
+    "variant.killer.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages & sums."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages et sommes."
+          }
+        }
+      }
+    },
+    "variant.killergt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Killer GT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Killer GT"
+          }
+        }
+      }
+    },
+    "variant.killergt.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages plus inequalities."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cages et inégalités."
+          }
+        }
+      }
+    },
+    "variant.kropki" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kropki"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kropki"
+          }
+        }
+      }
+    },
+    "variant.kropki.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dots mark pairs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des points marquent les paires."
+          }
+        }
+      }
+    },
+    "variant.littlekiller" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Little Killer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Little Killer"
+          }
+        }
+      }
+    },
+    "variant.littlekiller.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagonal sums outside."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommes diagonales en marge."
+          }
+        }
+      }
+    },
+    "variant.mini4" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini 4×4"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mini 4×4"
+          }
+        }
+      }
+    },
+    "variant.mini4.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiny warm-up grid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petite grille d'échauffement."
           }
         }
       }
@@ -3593,6 +4578,57 @@
         }
       }
     },
+    "variant.mini6.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick 6×6 grid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grille 6×6 rapide."
+          }
+        }
+      }
+    },
+    "variant.miracle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miracle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miracle"
+          }
+        }
+      }
+    },
+    "variant.miracle.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three rules, few clues."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois règles, peu d'indices."
+          }
+        }
+      }
+    },
     "variant.samurai" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3610,22 +4646,331 @@
         }
       }
     },
+    "variant.samurai.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Five overlapping grids."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cinq grilles imbriquées."
+          }
+        }
+      }
+    },
+    "variant.sandwich" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sandwich"
+          }
+        }
+      }
+    },
+    "variant.sandwich.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sums between 1 and 9."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommes entre 1 et 9."
+          }
+        }
+      }
+    },
+    "variant.shogun" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shogun"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shogun"
+          }
+        }
+      }
+    },
+    "variant.shogun.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eleven grids across."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onze grilles en largeur."
+          }
+        }
+      }
+    },
+    "variant.skyscraper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skyscraper"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratte-ciel"
+          }
+        }
+      }
+    },
+    "variant.skyscraper.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edge counts of visible digits."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiffres visibles depuis le bord."
+          }
+        }
+      }
+    },
+    "variant.sumo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sumo"
+          }
+        }
+      }
+    },
+    "variant.sumo.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thirteen-grid colossus."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un colosse de treize grilles."
+          }
+        }
+      }
+    },
+    "variant.thermo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermo"
+          }
+        }
+      }
+    },
+    "variant.thermo.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digits climb the bulbs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les chiffres montent du bulbe."
+          }
+        }
+      }
+    },
+    "variant.tredoku" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tredoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tredoku"
+          }
+        }
+      }
+    },
+    "variant.tredoku.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three faces of a corner."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois faces d'un coin."
+          }
+        }
+      }
+    },
     "variant.windoku" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Windoku"
+            "value" : "Hyper"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Windoku"
+            "value" : "Hyper"
           }
         }
       }
+    },
+    "variant.windoku.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Four extra zones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quatre zones en plus."
+          }
+        }
+      }
+    },
+    "variant.wordoku" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordoku"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordoku"
+          }
+        }
+      }
+    },
+    "variant.wordoku.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letters, not numbers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des lettres, pas des chiffres."
+          }
+        }
+      }
+    },
+    "variant.xv" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XV"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "XV"
+          }
+        }
+      }
+    },
+    "variant.xv.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X sums 10, V sums 5."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X somme 10, V somme 5."
+          }
+        }
+      }
+    },
+    "X" : {
+
     }
   },
   "version" : "1.0"

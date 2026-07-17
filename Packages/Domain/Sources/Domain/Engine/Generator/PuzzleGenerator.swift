@@ -16,9 +16,14 @@ public struct PuzzleGenerator: Sendable {
     public init() {}
 
     /// Total attempts: generous for 9×9-class grids, tight for samurai-size
-    /// boards where every attempt is ~5× more expensive.
+    /// boards where every attempt is ~5× more expensive, tighter still for
+    /// shogun/sumo-size layouts.
     static func attemptBudget(cellCount: Int) -> Int {
-        cellCount > 200 ? 3 : 40
+        switch cellCount {
+        case ...200: 40
+        case ...600: 3
+        default: 2
+        }
     }
 
     /// Generates on the global concurrent executor. `@concurrent` matters:
@@ -33,6 +38,16 @@ public struct PuzzleGenerator: Sendable {
         generateNow(variant: variant, difficulty: difficulty, seed: seed)
     }
 
+    /// Everything shared by the attempts of one generation run.
+    struct Plan {
+        let topology: GridTopology
+        let fillContext: SolverContext
+        let variant: SudokuVariant
+        let difficulty: Difficulty
+        let seed: UInt64
+        let grader: Grader
+    }
+
     /// Synchronous core — exposed for tests and for callers already off-main.
     public func generateNow(
         variant: SudokuVariant,
@@ -40,41 +55,34 @@ public struct PuzzleGenerator: Sendable {
         seed: UInt64,
     ) -> PuzzleDefinition {
         let topology = TopologyFactory.topology(for: variant)
-        let fillContext = SolverContext(topology: topology)
-        let grader = Grader()
+        // Variants that derive marks (kropki/XV/…) fill unconstrained: the
+        // marks are read off the finished solution, so "no mark yet" must
+        // not be treated as the negative convention. Miracle's rules are
+        // global and DO constrain the fill.
+        let plan = Plan(
+            topology: topology,
+            fillContext: SolverContext(
+                topology: topology,
+                expandsNegativeConvention: !Self.derivesRelationMarks(variant),
+            ),
+            variant: variant,
+            difficulty: difficulty,
+            seed: seed,
+            grader: Grader(),
+        )
 
         let maxAttempts = Self.attemptBudget(cellCount: topology.cellCount)
-        // Settle phases per tier. Beginner–medium hunt their exact grade
-        // through the whole budget (attempts are cheap and hits reliable,
-        // thanks to hardening). Hard and expert are the thin bands — a dig
-        // often jumps from "pairs suffice" straight to "needs chains" — so
-        // they get a real hunt before settling on a neighbor. Master hits
-        // reliably (chain-requiring boards are common at minimal depth) and
-        // settles fast. Large grids settle fastest — their attempts are ~5×
-        // the cost.
-        let (exactPhase, nearPhase): (Int, Int) = if topology.cellCount > 200 {
-            (max(1, maxAttempts / 3), max(2, (maxAttempts * 2) / 3))
-        } else if difficulty == .hard || difficulty == .expert {
-            (4, 8)
-        } else if difficulty == .master {
-            (2, 4)
-        } else {
-            (maxAttempts, maxAttempts)
-        }
+        let (exactPhase, nearPhase) = Self.settlePhases(
+            difficulty: difficulty,
+            cellCount: topology.cellCount,
+            maxAttempts: maxAttempts,
+        )
 
         var attemptSeed = seed
         var best: (puzzle: PuzzleDefinition, distance: Int)?
 
         for attemptIndex in 0 ..< maxAttempts {
-            if let candidate = attempt(
-                topology: topology,
-                fillContext: fillContext,
-                variant: variant,
-                difficulty: difficulty,
-                seed: seed,
-                attemptSeed: attemptSeed,
-                grader: grader,
-            ) {
+            if let candidate = attempt(plan: plan, attemptSeed: attemptSeed) {
                 let distance = abs(candidate.gradedDifficulty.rank - difficulty.rank)
                 if distance == 0 {
                     return candidate
@@ -100,13 +108,44 @@ public struct PuzzleGenerator: Sendable {
         if let best {
             return best.puzzle
         }
-        return lastResortPuzzle(
-            topology: topology,
-            fillContext: fillContext,
-            variant: variant,
-            difficulty: difficulty,
-            seed: seed,
-        )
+        return lastResortPuzzle(plan: plan)
+    }
+
+    /// Settle phases per tier: after `exact` attempts a neighboring grade is
+    /// acceptable, after `near` a two-off grade. Beginner–medium hunt their
+    /// exact grade through the whole budget (attempts are cheap and hits
+    /// reliable, thanks to hardening). Hard and expert are the thin bands —
+    /// a dig often jumps from "pairs suffice" straight to "needs chains" —
+    /// so they get a real hunt before settling on a neighbor. Master hits
+    /// reliably and settles fast. Large grids settle fastest — their
+    /// attempts are ~5× the cost.
+    static func settlePhases(
+        difficulty: Difficulty,
+        cellCount: Int,
+        maxAttempts: Int,
+    ) -> (exact: Int, near: Int) {
+        if cellCount > 200 {
+            (max(1, maxAttempts / 3), max(2, (maxAttempts * 2) / 3))
+        } else if difficulty == .hard || difficulty == .expert {
+            (4, 8)
+        } else if difficulty == .master {
+            (2, 4)
+        } else {
+            (maxAttempts, maxAttempts)
+        }
+    }
+}
+
+// MARK: - Attempt internals
+
+extension PuzzleGenerator {
+    /// Variants whose relation marks are derived from the finished solution
+    /// (as opposed to miracle, whose rules exist before any solution).
+    static func derivesRelationMarks(_ variant: SudokuVariant) -> Bool {
+        switch variant {
+        case .greaterThan, .kropki, .xv, .consecutive: true
+        default: false
+        }
     }
 
     /// The fewest clues a puzzle of this difficulty may keep, as a fraction of
@@ -142,79 +181,256 @@ public struct PuzzleGenerator: Sendable {
 
     // MARK: - Single attempt
 
-    private func attempt(
-        topology: GridTopology,
-        fillContext: SolverContext,
-        variant: SudokuVariant,
-        difficulty: Difficulty,
-        seed: UInt64,
-        attemptSeed: UInt64,
-        grader: Grader,
-    ) -> PuzzleDefinition? {
+    /// Everything one variant layers on top of the bare solution.
+    private struct Artifacts {
+        var outcome: DifficultyTargeter.Outcome?
+        var cages: [Cage] = []
+        var parities: [Int: CellParity] = [:]
+        var relations: [RelationClue] = []
+        var thermometers: [[Int]] = []
+        var arrows: [Arrow] = []
+        var outsideClues: [OutsideClue] = []
+    }
+
+    private func attempt(plan: Plan, attemptSeed: UInt64) -> PuzzleDefinition? {
         var rng = Xoshiro256StarStar(seed: attemptSeed)
+
+        // Jigsaw regions are per-puzzle structure: each attempt draws a new
+        // partition, so a hard-to-fill layout just costs one retry.
+        var topology = plan.topology
+        var fillContext = plan.fillContext
+        var irregularBoxes: [Int]?
+        if plan.variant == .jigsaw {
+            let boxes = RegionPartitioner.partition(size: topology.size, rng: &rng)
+            irregularBoxes = boxes
+            topology = JigsawTopology.build(boxes: boxes)
+            fillContext = SolverContext(topology: topology)
+        }
+
         guard let solution = GridFiller.fill(context: fillContext, rng: &rng) else {
             return nil
         }
+        let artifacts = makeArtifacts(
+            plan: plan,
+            topology: topology,
+            solution: solution,
+            rng: &rng,
+        )
+        guard let outcome = artifacts.outcome else { return nil }
 
-        let outcome: DifficultyTargeter.Outcome?
-        var cages: [Cage] = []
-        var parities: [Int: CellParity] = [:]
+        return PuzzleDefinition(
+            id: Self.deterministicID(
+                seed: plan.seed,
+                variant: plan.variant,
+                difficulty: plan.difficulty,
+            ),
+            variant: plan.variant,
+            requestedDifficulty: plan.difficulty,
+            gradedDifficulty: outcome.graded,
+            seed: plan.seed,
+            givens: outcome.givens,
+            solution: solution,
+            cages: artifacts.cages,
+            parities: artifacts.parities,
+            irregularBoxes: irregularBoxes,
+            relations: artifacts.relations,
+            thermometers: artifacts.thermometers,
+            arrows: artifacts.arrows,
+            outsideClues: artifacts.outsideClues,
+        )
+    }
 
-        switch variant {
-        case .killer:
-            cages = CagePartitioner.partition(
+    /// Applies the variant's extras (cages, marks, lines, clues) and carves
+    /// the givens accordingly.
+    private func makeArtifacts(
+        plan: Plan,
+        topology: GridTopology,
+        solution: [Int],
+        rng: inout Xoshiro256StarStar,
+    ) -> Artifacts {
+        var artifacts = Artifacts()
+        let floorScale = deriveMarks(
+            into: &artifacts,
+            plan: plan,
+            topology: topology,
+            solution: solution,
+            rng: &rng,
+        )
+
+        // Killer boards grow their clues from zero instead of carving down.
+        if plan.variant.usesCages {
+            artifacts.outcome = killerGivens(
                 topology: topology,
+                cages: artifacts.cages,
+                relations: artifacts.relations,
                 solution: solution,
-                difficulty: difficulty,
+                target: plan.difficulty,
+                grader: plan.grader,
                 rng: &rng,
             )
-            outcome = killerGivens(
+            return artifacts
+        }
+
+        let context = SolverContext(
+            topology: topology,
+            parities: artifacts.parities,
+            relations: artifacts.relations,
+            thermometers: artifacts.thermometers,
+            arrows: artifacts.arrows,
+            outsideClues: artifacts.outsideClues,
+        )
+        artifacts.outcome = carveAndTune(
+            context: context,
+            solution: solution,
+            difficulty: plan.difficulty,
+            grader: plan.grader,
+            rng: &rng,
+            givensFloorScale: floorScale,
+        )
+        return artifacts
+    }
+
+    /// Derives the variant's visible marks into `artifacts` and returns the
+    /// givens-floor scale: variants whose information lives in their marks
+    /// carve much sparser than the classic density.
+    private func deriveMarks(
+        into artifacts: inout Artifacts,
+        plan: Plan,
+        topology: GridTopology,
+        solution: [Int],
+        rng: inout Xoshiro256StarStar,
+    ) -> Double {
+        switch plan.variant {
+        case .sandwich, .skyscraper, .littleKiller:
+            artifacts.outsideClues = Self.outsideClues(
+                variant: plan.variant,
                 topology: topology,
-                cages: cages,
                 solution: solution,
-                target: difficulty,
-                grader: grader,
+                difficulty: plan.difficulty,
                 rng: &rng,
             )
+            return 0.55
+
+        case .thermo:
+            artifacts.thermometers = LinePlacer.thermometers(
+                topology: topology,
+                solution: solution,
+                difficulty: plan.difficulty,
+                rng: &rng,
+            )
+            return 0.55
+
+        case .arrow:
+            artifacts.arrows = LinePlacer.arrows(
+                topology: topology,
+                solution: solution,
+                difficulty: plan.difficulty,
+                rng: &rng,
+            )
+            return 0.55
+
+        case .greaterThan, .kropki, .xv, .consecutive, .miracle:
+            artifacts.relations = RelationMarks.derive(
+                variant: plan.variant,
+                topology: topology,
+                solution: solution,
+                rng: &rng,
+            )
+            return 0.3
+
+        case .killer, .killerGT:
+            artifacts.cages = CagePartitioner.partition(
+                topology: topology,
+                solution: solution,
+                difficulty: plan.difficulty,
+                rng: &rng,
+            )
+            if plan.variant == .killerGT {
+                // The combo: inequality marks on every orthogonally adjacent
+                // in-cage pair, read from the larger value.
+                artifacts.relations = Self.inCageInequalities(
+                    cages: artifacts.cages,
+                    topology: topology,
+                    solution: solution,
+                )
+            }
+            return 1
 
         case .evenOdd:
-            parities = parityMarks(
+            artifacts.parities = parityMarks(
                 topology: topology,
                 solution: solution,
-                difficulty: difficulty,
+                difficulty: plan.difficulty,
                 rng: &rng,
             )
-            let context = SolverContext(topology: topology, parities: parities)
-            outcome = carveAndTune(
-                context: context,
+            return 1
+
+        default:
+            return 1
+        }
+    }
+
+    /// Clue sets read off the finished solution. Sandwich shows every row
+    /// (left) and column (top) sum, skyscraper all four edges, and little
+    /// killer a seeded handful of diagonals.
+    private static func outsideClues(
+        variant: SudokuVariant,
+        topology: GridTopology,
+        solution: [Int],
+        difficulty: Difficulty,
+        rng: inout Xoshiro256StarStar,
+    ) -> [OutsideClue] {
+        let size = topology.size
+        switch variant {
+        case .sandwich:
+            let spots = (0 ..< size).map { (OutsideClue.Side.leading, $0) }
+                + (0 ..< size).map { (OutsideClue.Side.top, $0) }
+            return OutsideClues.derive(
+                kind: .sandwichSum,
+                clues: spots,
+                topology: topology,
                 solution: solution,
-                difficulty: difficulty,
-                grader: grader,
-                rng: &rng,
+            )
+
+        case .skyscraper:
+            let spots = (0 ..< size).flatMap { offset in
+                [
+                    (OutsideClue.Side.leading, offset),
+                    (OutsideClue.Side.trailing, offset),
+                    (OutsideClue.Side.top, offset),
+                    (OutsideClue.Side.bottom, offset),
+                ]
+            }
+            return OutsideClues.derive(
+                kind: .skyscraperCount,
+                clues: spots,
+                topology: topology,
+                solution: solution,
+            )
+
+        case .littleKiller:
+            let count = switch difficulty {
+            case .beginner, .easy: 10
+            case .medium, .hard: 8
+            case .expert, .master: 7
+            }
+            var spots: [(OutsideClue.Side, Int)] = []
+            for side in [OutsideClue.Side.top, .trailing, .bottom, .leading] {
+                for offset in 1 ..< size {
+                    spots.append((side, offset))
+                }
+            }
+            spots.shuffle(using: &rng)
+            return OutsideClues.derive(
+                kind: .diagonalSum,
+                clues: Array(spots.prefix(count)),
+                topology: topology,
+                solution: solution,
             )
 
         default:
-            outcome = carveAndTune(
-                context: fillContext,
-                solution: solution,
-                difficulty: difficulty,
-                grader: grader,
-                rng: &rng,
-            )
+            return []
         }
-
-        guard let outcome else { return nil }
-        return PuzzleDefinition(
-            id: Self.deterministicID(seed: seed, variant: variant, difficulty: difficulty),
-            variant: variant,
-            requestedDifficulty: difficulty,
-            gradedDifficulty: outcome.graded,
-            seed: seed,
-            givens: outcome.givens,
-            solution: solution,
-            cages: cages,
-            parities: parities,
-        )
     }
 
     private func carveAndTune(
@@ -223,28 +439,49 @@ public struct PuzzleGenerator: Sendable {
         difficulty: Difficulty,
         grader: Grader,
         rng: inout Xoshiro256StarStar,
+        givensFloorScale: Double = 1,
     ) -> DifficultyTargeter.Outcome? {
         // Symmetry is an aesthetic for approachable boards; expert/master
         // digs need the freedom of single-cell removals to reach the deep,
         // technique-heavy configurations their grades require.
-        let carved = GivensCarver.carve(
+        let request = GivensCarver.Request(
             context: context,
             solution: solution,
             target: difficulty,
-            minimumGivens: Self.minimumGivens(
+            minimumGivens: Int(Double(Self.minimumGivens(
                 for: difficulty,
                 cellCount: context.cellCount,
-            ),
-            hardeningFloor: Self.hardeningFloor(
+            )) * givensFloorScale),
+            hardeningFloor: Int(Double(Self.hardeningFloor(
                 for: difficulty,
                 cellCount: context.cellCount,
-            ),
+            )) * givensFloorScale),
             symmetric: difficulty <= .hard,
-            rng: &rng,
-            grader: grader,
         )
+        let carved = GivensCarver.carve(request, grader: grader, rng: &rng)
         guard let graded = carved.graded else { return nil }
         return DifficultyTargeter.Outcome(givens: carved.givens, graded: graded)
+    }
+
+    /// Inequality marks between orthogonally adjacent cells of one cage,
+    /// oriented from the larger solution value.
+    static func inCageInequalities(
+        cages: [Cage],
+        topology: GridTopology,
+        solution: [Int],
+    ) -> [RelationClue] {
+        var cageIndex = [Int](repeating: -1, count: topology.cellCount)
+        for (index, cage) in cages.enumerated() {
+            for cell in cage.cells {
+                cageIndex[cell] = index
+            }
+        }
+        return RelationExpansion.orthogonalPairs(in: topology).compactMap { a, b in
+            guard cageIndex[a] >= 0, cageIndex[a] == cageIndex[b] else { return nil }
+            return solution[a] > solution[b]
+                ? RelationClue(a: a, b: b, kind: .greaterThan)
+                : RelationClue(a: b, b: a, kind: .greaterThan)
+        }
     }
 
     /// Killer puzzles start with no givens at all; clues are added one at a
@@ -254,12 +491,13 @@ public struct PuzzleGenerator: Sendable {
     private func killerGivens(
         topology: GridTopology,
         cages: [Cage],
+        relations: [RelationClue] = [],
         solution: [Int],
         target: Difficulty,
         grader: Grader,
         rng: inout Xoshiro256StarStar,
     ) -> DifficultyTargeter.Outcome? {
-        let context = SolverContext(topology: topology, cages: cages)
+        let context = SolverContext(topology: topology, cages: cages, relations: relations)
         var givens = [Int?](repeating: nil, count: topology.cellCount)
         var addQueue = Array(0 ..< topology.cellCount).shuffled(using: &rng)
 
@@ -329,30 +567,28 @@ public struct PuzzleGenerator: Sendable {
 
     /// Unreachable in practice (an attempt always yields some tunable puzzle);
     /// keeps the API total without force-unwraps.
-    private func lastResortPuzzle(
-        topology: GridTopology,
-        fillContext: SolverContext,
-        variant: SudokuVariant,
-        difficulty: Difficulty,
-        seed: UInt64,
-    ) -> PuzzleDefinition {
-        var rng = Xoshiro256StarStar(seed: seed)
-        let solution = GridFiller.fill(context: fillContext, rng: &rng)
-            ?? Array(repeating: 1, count: topology.cellCount)
+    private func lastResortPuzzle(plan: Plan) -> PuzzleDefinition {
+        var rng = Xoshiro256StarStar(seed: plan.seed)
+        let solution = GridFiller.fill(context: plan.fillContext, rng: &rng)
+            ?? Array(repeating: 1, count: plan.topology.cellCount)
         var givens: [Int?] = solution
         // Leave a token challenge: blank one cell per house where possible.
-        for house in topology.houses {
+        for house in plan.topology.houses {
             if let cell = house.first(where: { givens[$0] != nil }) {
                 givens[cell] = nil
             }
         }
-        let graded = Grader().grade(topology: topology, givens: givens) ?? .beginner
+        let graded = plan.grader.grade(topology: plan.topology, givens: givens) ?? .beginner
         return PuzzleDefinition(
-            id: Self.deterministicID(seed: seed, variant: variant, difficulty: difficulty),
-            variant: variant,
-            requestedDifficulty: difficulty,
+            id: Self.deterministicID(
+                seed: plan.seed,
+                variant: plan.variant,
+                difficulty: plan.difficulty,
+            ),
+            variant: plan.variant,
+            requestedDifficulty: plan.difficulty,
             gradedDifficulty: graded,
-            seed: seed,
+            seed: plan.seed,
             givens: givens,
             solution: solution,
         )

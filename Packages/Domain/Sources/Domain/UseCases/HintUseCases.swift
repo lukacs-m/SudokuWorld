@@ -12,7 +12,7 @@ public struct GetHint: GetHintUseCase {
 
     public init() {}
 
-    public func callAsFunction(board: Board, puzzle: PuzzleDefinition) async -> Hint? {
+    public func callAsFunction(board: Board, puzzle: PuzzleDefinition) -> Hint? {
         engine.nextHint(board: board, puzzle: puzzle)
     }
 }
@@ -31,7 +31,7 @@ public struct RevealCell: RevealCellUseCase {
         board: Board,
         puzzle: PuzzleDefinition,
         preferredCell: Int?,
-    ) async -> Hint? {
+    ) -> Hint? {
         engine.revealHint(preferredCell: preferredCell, board: board, puzzle: puzzle)
     }
 }

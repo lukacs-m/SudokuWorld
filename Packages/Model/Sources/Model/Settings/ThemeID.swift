@@ -2,7 +2,8 @@
 /// the identifier lives here so settings and entitlement gating stay in the
 /// lower layers.
 public enum ThemeID: String, CaseIterable, Equatable, Sendable, Codable {
-    case classicBlue
+    /// Raw values are persisted in settings — they must never change.
+    case classicBlue = "classicBlue"
     case slate
     case forest
     case midnight

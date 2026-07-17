@@ -16,27 +16,27 @@ public actor UserDefaultsSettingsRepository: SettingsRepository {
         defaults = suiteName.flatMap { UserDefaults(suiteName: $0) } ?? .standard
     }
 
-    public func gameSettings() async -> GameSettings {
+    public func gameSettings() -> GameSettings {
         guard let data = defaults.data(forKey: Keys.gameSettings),
               let settings = try? JSONDecoder().decode(GameSettings.self, from: data)
         else { return .standard }
         return settings
     }
 
-    public func setGameSettings(_ settings: GameSettings) async {
+    public func setGameSettings(_ settings: GameSettings) {
         if let data = try? JSONEncoder().encode(settings) {
             defaults.set(data, forKey: Keys.gameSettings)
         }
     }
 
-    public func notificationPreferences() async -> NotificationPreferences {
+    public func notificationPreferences() -> NotificationPreferences {
         guard let data = defaults.data(forKey: Keys.notifications),
               let preferences = try? JSONDecoder().decode(NotificationPreferences.self, from: data)
         else { return .disabled }
         return preferences
     }
 
-    public func setNotificationPreferences(_ preferences: NotificationPreferences) async {
+    public func setNotificationPreferences(_ preferences: NotificationPreferences) {
         if let data = try? JSONEncoder().encode(preferences) {
             defaults.set(data, forKey: Keys.notifications)
         }

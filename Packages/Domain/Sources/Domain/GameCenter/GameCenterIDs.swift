@@ -33,9 +33,18 @@ public enum GameCenterIDs {
     /// Weekly tournament, recurring; score = cumulative points.
     public static let weekly = "\(prefix).lb.weekly"
 
-    /// The 7 variants × 6 difficulties × 2 metrics = 84 matrix boards.
+    /// The curated variants that get per-difficulty matrix boards in
+    /// App Store Connect. Deliberately NOT `allCases`: every variant here
+    /// costs 12 real boards (6 difficulties × 2 metrics), so new variants
+    /// stay out until explicitly promoted. Wins on non-curated variants
+    /// still count toward the aggregate boards below.
+    public static let leaderboardVariants: [SudokuVariant] = [
+        .classic, .mini6, .killer, .diagonal, .windoku, .evenOdd, .samurai,
+    ]
+
+    /// The 7 curated variants × 6 difficulties × 2 metrics = 84 matrix boards.
     public static var matrixLeaderboardIDs: [String] {
-        SudokuVariant.allCases.flatMap { variant in
+        leaderboardVariants.flatMap { variant in
             Difficulty.allCases.flatMap { difficulty in
                 Metric.allCases.map { metric in
                     leaderboard(metric, variant, difficulty)

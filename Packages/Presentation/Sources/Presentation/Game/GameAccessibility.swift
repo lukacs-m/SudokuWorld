@@ -9,6 +9,7 @@ enum GameAccessibility {
         board: Board,
         puzzle: PuzzleDefinition,
         topology: GridTopology,
+        fogged: Bool = false,
     ) -> String {
         let position = topology.position(of: index)
         var parts: [String] = [
@@ -18,18 +19,24 @@ enum GameAccessibility {
                 position.col + 1,
             ),
         ]
+        if fogged {
+            parts.append(String(localized: "a11y.cell.fogged", bundle: .module))
+            return parts.joined(separator: ", ")
+        }
 
         let cell = board[index]
         if let value = cell.value {
             let key: String.LocalizationValue = cell.isGiven ? "a11y.cell.given" : "a11y.cell.value"
             parts.append(String(
                 format: String(localized: key, bundle: .module),
-                value,
+                VariantGlyphs.glyph(value, for: puzzle.variant),
             ))
         } else if cell.notes.isEmpty {
             parts.append(String(localized: "a11y.cell.empty", bundle: .module))
         } else {
-            let digits = cell.notes.digits.map(String.init).joined(separator: ", ")
+            let digits = cell.notes.digits
+                .map { VariantGlyphs.glyph($0, for: puzzle.variant) }
+                .joined(separator: ", ")
             parts.append(String(
                 format: String(localized: "a11y.cell.notes", bundle: .module),
                 digits,
@@ -51,18 +58,26 @@ enum GameAccessibility {
         return parts.joined(separator: ", ")
     }
 
-    /// Resolves a hint's explanation text from its key and arguments.
-    static func hintExplanation(_ hint: Hint) -> String {
-        let template = String(
-            localized: String.LocalizationValue(hint.explanationKey),
-            bundle: .module,
+    /// Resolves a hint's explanation text from its key and arguments,
+    /// rendering digits through the variant's glyph set.
+    static func hintExplanation(_ hint: Hint, variant: SudokuVariant) -> String {
+        expand(
+            template: moduleString(hint.explanationKey),
+            arguments: hint.explanationArguments.map {
+                VariantGlyphs.text($0, variant: variant)
+            },
         )
+    }
+
+    /// Substitutes positional `%n$@` placeholders (and a bare `%@` for
+    /// single-argument templates). Split out so tests can exercise it without
+    /// the string catalog, which CLI test hosts cannot resolve.
+    static func expand(template: String, arguments: [String]) -> String {
         var result = template
-        for (offset, argument) in hint.explanationArgs.enumerated() {
+        for (offset, argument) in arguments.enumerated() {
             result = result.replacingOccurrences(of: "%\(offset + 1)$@", with: argument)
         }
-        // Single-argument templates may use a bare %@.
-        if let first = hint.explanationArgs.first {
+        if let first = arguments.first {
             result = result.replacingOccurrences(of: "%@", with: first)
         }
         return result

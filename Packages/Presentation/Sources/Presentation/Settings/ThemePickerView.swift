@@ -43,6 +43,7 @@ struct ThemePickerView: View {
                     if locked {
                         Image(systemName: "lock.fill")
                             .font(.caption)
+                            .accessibilityHidden(true)
                             .foregroundStyle(.white)
                             .padding(4)
                             .background(.black.opacity(0.5), in: Circle())

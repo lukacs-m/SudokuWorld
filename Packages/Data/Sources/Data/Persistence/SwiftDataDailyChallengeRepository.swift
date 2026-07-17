@@ -20,7 +20,7 @@ public actor SwiftDataDailyChallengeRepository: DailyChallengeRepository {
 
     // MARK: - Daily completions
 
-    public func completedDateKeys() async throws -> Set<String> {
+    public func completedDateKeys() throws -> Set<String> {
         let descriptor = FetchDescriptor<DailyCompletionEntity>()
         do {
             return try Set(context.fetch(descriptor).map(\.dateKey))
@@ -29,11 +29,11 @@ public actor SwiftDataDailyChallengeRepository: DailyChallengeRepository {
         }
     }
 
-    public func completionTime(dateKey: String) async throws -> TimeInterval? {
+    public func completionTime(dateKey: String) throws -> TimeInterval? {
         try fetchCompletion(dateKey: dateKey)?.durationSeconds
     }
 
-    public func markCompleted(dateKey: String, duration: TimeInterval, at date: Date) async throws {
+    public func markCompleted(dateKey: String, duration: TimeInterval, at date: Date) throws {
         if let existing = try fetchCompletion(dateKey: dateKey) {
             // Keep the best time for the day.
             existing.durationSeconds = min(existing.durationSeconds, duration)
@@ -49,7 +49,7 @@ public actor SwiftDataDailyChallengeRepository: DailyChallengeRepository {
 
     // MARK: - Weekly tournament
 
-    public func tournamentScore(weekKey: String) async throws -> TournamentScore? {
+    public func tournamentScore(weekKey: String) throws -> TournamentScore? {
         guard let entity = try fetchScore(weekKey: weekKey) else { return nil }
         return TournamentScore(
             weekKey: entity.weekKey,
@@ -59,7 +59,7 @@ public actor SwiftDataDailyChallengeRepository: DailyChallengeRepository {
         )
     }
 
-    public func saveTournamentScore(_ score: TournamentScore) async throws {
+    public func saveTournamentScore(_ score: TournamentScore) throws {
         if let entity = try fetchScore(weekKey: score.weekKey) {
             entity.points = score.points
             entity.gamesCounted = score.gamesCounted

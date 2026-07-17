@@ -44,6 +44,7 @@ struct PaywallView: View {
             Image(systemName: "crown.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(theme.accent)
+                .accessibilityHidden(true)
             Text("paywall.title", bundle: .module)
                 .font(.title.weight(.bold))
                 .foregroundStyle(theme.textPrimary)
@@ -89,6 +90,7 @@ struct PaywallView: View {
                 Image(systemName: "checkmark.seal.fill")
                     .font(.system(size: 36))
                     .foregroundStyle(theme.success)
+                    .accessibilityHidden(true)
                 Text("paywall.active", bundle: .module)
                     .font(.headline)
                     .foregroundStyle(theme.textPrimary)
@@ -108,6 +110,7 @@ struct PaywallView: View {
                     Image(systemName: "cart.badge.questionmark")
                         .font(.title)
                         .foregroundStyle(theme.textSecondary)
+                        .accessibilityHidden(true)
                     Text("paywall.unavailable", bundle: .module)
                         .font(.subheadline)
                         .foregroundStyle(theme.textSecondary)
@@ -177,6 +180,7 @@ struct PaywallView: View {
                 localized: String.LocalizationValue("paywall.period.\(period)"),
                 bundle: .module,
             )
+
         case .lifetime:
             String(localized: "paywall.lifetime", bundle: .module)
         }

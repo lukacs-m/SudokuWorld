@@ -8,7 +8,7 @@ struct SolverGrid {
     /// 0 = unsolved.
     private(set) var values: [Int]
     /// Candidate digits per cell; 0 for solved cells.
-    private(set) var candidates: [UInt16]
+    private(set) var candidates: [DigitMask]
     private(set) var unsolvedCount: Int
     private(set) var isContradicted: Bool
     /// Hardest technique rank exercised by `propagate()` so far (-1 = none):
@@ -18,22 +18,22 @@ struct SolverGrid {
     /// Digits already placed in each house, maintained incrementally by
     /// `place` — the finders consult this constantly, and recomputing it by
     /// scanning house cells dominated solve time.
-    private var housePlaced: [UInt16]
+    private var housePlaced: [DigitMask]
 
     private var cageRemainingSum: [Int]
     private var cageRemainingCount: [Int]
-    private var cageUsedMask: [UInt16]
+    private var cageUsedMask: [DigitMask]
 
     init(context: SolverContext, givens: [Int?]) {
         self.context = context
         values = [Int](repeating: 0, count: context.cellCount)
         unsolvedCount = context.cellCount
         isContradicted = false
-        housePlaced = [UInt16](repeating: 0, count: context.houses.count)
+        housePlaced = [DigitMask](repeating: 0, count: context.houses.count)
 
-        var initial = [UInt16](repeating: context.fullMask, count: context.cellCount)
+        var initial = [DigitMask](repeating: context.fullMask, count: context.cellCount)
         for (cell, parity) in context.parities {
-            var mask: UInt16 = 0
+            var mask: DigitMask = 0
             for digit in 1 ... context.size where parity.accepts(digit) {
                 mask |= SolverContext.mask(for: digit)
             }
@@ -43,7 +43,7 @@ struct SolverGrid {
 
         cageRemainingSum = context.cages.map(\.sum)
         cageRemainingCount = context.cages.map(\.cells.count)
-        cageUsedMask = [UInt16](repeating: 0, count: context.cages.count)
+        cageUsedMask = [DigitMask](repeating: 0, count: context.cages.count)
 
         for (cell, given) in givens.enumerated() {
             guard let given else { continue }
@@ -83,7 +83,21 @@ struct SolverGrid {
         for peer in context.peers[cell] {
             guard eliminate(digit, at: peer) else { return false }
         }
+        guard updateRelations(afterPlacing: digit, at: cell) else { return false }
+        guard updateSumLines(afterPlacing: digit, at: cell) else { return false }
+        guard updateOutsideClues(afterPlacing: digit, at: cell) else { return false }
         return updateCage(afterPlacing: digit, at: cell)
+    }
+
+    /// Flags the grid as contradicted. Exposed for the constraint passes in
+    /// `SolverGrid+Constraints.swift`; the setter itself stays private.
+    mutating func flagContradiction() {
+        isContradicted = true
+    }
+
+    /// Records that propagation exercised a technique of the given rank.
+    mutating func recordPropagationRank(_ rank: Int) {
+        propagationHardestRank = max(propagationHardestRank, rank)
     }
 
     /// Removes a candidate. Returns false on contradiction (empty cell).
@@ -128,8 +142,30 @@ struct SolverGrid {
             if maxRank >= Technique.cageArithmetic.rank {
                 guard propagateCageCombinations(changed: &changed) else { return false }
             }
+            guard propagateConstraintFamilies(maxRank: maxRank, changed: &changed) else {
+                return false
+            }
         }
         return !isContradicted
+    }
+
+    /// The rank-gated passes of the non-house constraint families
+    /// (relations, sum lines, outside clues — see
+    /// `SolverGrid+Constraints.swift`).
+    private mutating func propagateConstraintFamilies(
+        maxRank: Int,
+        changed: inout Bool,
+    ) -> Bool {
+        if maxRank >= Technique.relationAnalysis.rank {
+            guard propagateRelations(changed: &changed) else { return false }
+        }
+        if maxRank >= Technique.arrowArithmetic.rank {
+            guard propagateSumLines(changed: &changed) else { return false }
+        }
+        if maxRank >= Technique.outsideClueAnalysis.rank {
+            guard propagateOutsideClues(changed: &changed) else { return false }
+        }
+        return true
     }
 
     /// Places every cell whose candidates collapsed to a single digit.
@@ -243,7 +279,7 @@ struct SolverGrid {
     }
 
     /// Digits already placed in a house (cached, updated on placement).
-    func housePlacements(_ houseIndex: Int) -> UInt16 {
+    func housePlacements(_ houseIndex: Int) -> DigitMask {
         housePlaced[houseIndex]
     }
 
@@ -252,7 +288,7 @@ struct SolverGrid {
     struct CageState {
         let remainingSum: Int
         let remainingCount: Int
-        let usedMask: UInt16
+        let usedMask: DigitMask
     }
 
     func cageState(_ index: Int) -> CageState {

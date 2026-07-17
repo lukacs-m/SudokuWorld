@@ -13,7 +13,7 @@ public struct GameSettings: Equatable, Sendable, Codable {
     public var hardcoreByDefault: Bool
     public var theme: ThemeID
 
-    public static let standard = GameSettings(
+    public static let standard = Self(
         inputMode: .cellFirst,
         autoCleanNotes: true,
         mistakeHighlighting: true,

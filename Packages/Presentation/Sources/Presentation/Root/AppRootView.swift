@@ -37,12 +37,16 @@ public struct AppRootView: View {
         switch route {
         case let .game(launch):
             GameView(launch: launch)
+
         case .stats:
             StatsView()
+
         case .events:
             EventsHubView()
+
         case .settings:
             SettingsView()
+
         case .debug:
             #if DEBUG
                 DebugMenuView()

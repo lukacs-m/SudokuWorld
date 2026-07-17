@@ -11,7 +11,7 @@ public struct HintEngine: Sendable {
     /// priority: the first one found becomes a corrective reveal hint.
     /// Returns nil only when the board is already complete.
     public func nextHint(board: Board, puzzle: PuzzleDefinition) -> Hint? {
-        let topology = TopologyFactory.topology(for: puzzle.variant)
+        let topology = TopologyFactory.topology(for: puzzle)
 
         for index in 0 ..< board.count {
             let cell = board[index]
@@ -22,7 +22,7 @@ public struct HintEngine: Sendable {
                     cells: [index],
                     placement: Hint.Placement(index: index, digit: puzzle.solution[index]),
                     explanationKey: "hint.mistake",
-                    explanationArgs: ["\(position.row + 1)", "\(position.col + 1)"],
+                    explanationArguments: [.row(position.row + 1), .column(position.col + 1)],
                 )
             }
         }
@@ -32,6 +32,10 @@ public struct HintEngine: Sendable {
             topology: topology,
             cages: puzzle.cages,
             parities: puzzle.parities,
+            relations: puzzle.relations,
+            thermometers: puzzle.thermometers,
+            arrows: puzzle.arrows,
+            outsideClues: puzzle.outsideClues,
         )
         let grid = SolverGrid(context: context, givens: board.values)
         if !grid.isContradicted, let step = TechniqueLadder.nextStep(in: grid) {
@@ -50,7 +54,7 @@ public struct HintEngine: Sendable {
             return cell.value != puzzle.solution[index]
         }
 
-        var target: Int? = if let preferredCell, preferredCell < board.count,
+        let target: Int? = if let preferredCell, preferredCell < board.count,
                               isRevealable(preferredCell)
         {
             preferredCell
@@ -60,28 +64,35 @@ public struct HintEngine: Sendable {
         guard let index = target else { return nil }
 
         let digit = puzzle.solution[index]
-        let position = TopologyFactory.topology(for: puzzle.variant).position(of: index)
+        let position = TopologyFactory.topology(for: puzzle).position(of: index)
         return Hint(
             kind: .reveal,
             cells: [index],
             placement: Hint.Placement(index: index, digit: digit),
             explanationKey: "hint.reveal",
-            explanationArgs: ["\(digit)", "\(position.row + 1)", "\(position.col + 1)"],
+            explanationArguments: [
+                .digit(digit), .row(position.row + 1), .column(position.col + 1),
+            ],
         )
     }
 
     private func hint(from step: SolveStep, topology: GridTopology) -> Hint {
-        let args: [String]
+        let args: [Hint.Argument]
         switch step.technique {
         case .nakedSingle, .hiddenSingle:
             if let placement = step.placements.first {
                 let position = topology.position(of: placement.cell)
-                args = ["\(placement.digit)", "\(position.row + 1)", "\(position.col + 1)"]
+                args = [
+                    .digit(placement.digit),
+                    .row(position.row + 1),
+                    .column(position.col + 1),
+                ]
             } else {
                 args = []
             }
+
         default:
-            args = [step.focusDigits.map(String.init).joined(separator: ", ")]
+            args = [.digits(step.focusDigits)]
         }
 
         return Hint(
@@ -94,7 +105,7 @@ public struct HintEngine: Sendable {
                 Hint.Elimination(index: $0.cell, digit: $0.digit)
             },
             explanationKey: "hint.technique.\(step.technique.rawValue)",
-            explanationArgs: args,
+            explanationArguments: args,
         )
     }
 }
