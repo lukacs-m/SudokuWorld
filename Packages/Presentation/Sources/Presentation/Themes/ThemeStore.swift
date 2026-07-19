@@ -10,7 +10,8 @@ public import SwiftUI
 @MainActor
 @Observable
 public final class ThemeStore {
-    public private(set) var themeID: ThemeID = .classicBlue
+    public private(set) var themeID: ThemeID = .warmPaper
+    public private(set) var appearance: AppearancePreference = .system
 
     @ObservationIgnored
     @Injected(\.settingsRepository) private var settingsRepository
@@ -22,9 +23,20 @@ public final class ThemeStore {
         ThemePalettes.palette(for: themeID, scheme: scheme)
     }
 
+    /// The scheme override to apply at the root (`nil` follows the system).
+    public var preferredColorScheme: ColorScheme? {
+        switch appearance {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
+
     /// Loads the persisted selection (call once at launch).
     public func load() async {
-        themeID = await settingsRepository.gameSettings().theme
+        let settings = await settingsRepository.gameSettings()
+        themeID = settings.theme
+        appearance = settings.appearance ?? .system
     }
 
     public func select(_ id: ThemeID) {
@@ -33,6 +45,16 @@ public final class ThemeStore {
         Task { [settingsRepository] in
             var settings = await settingsRepository.gameSettings()
             settings.theme = id
+            await settingsRepository.setGameSettings(settings)
+        }
+    }
+
+    public func selectAppearance(_ preference: AppearancePreference) {
+        guard preference != appearance else { return }
+        appearance = preference
+        Task { [settingsRepository] in
+            var settings = await settingsRepository.gameSettings()
+            settings.appearance = preference
             await settingsRepository.setGameSettings(settings)
         }
     }

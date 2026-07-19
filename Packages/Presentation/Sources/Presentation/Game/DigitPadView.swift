@@ -33,6 +33,14 @@ struct DigitPadView: View {
                 viewModel.undoTapped()
             }
             toolButton(
+                "game.tool.redo",
+                systemImage: "arrow.uturn.forward",
+                enabled: viewModel.session?.canRedo ?? false,
+                theme: theme,
+            ) {
+                viewModel.redoTapped()
+            }
+            toolButton(
                 "game.tool.erase",
                 systemImage: "eraser",
                 enabled: viewModel.selectedCell != nil,
@@ -41,13 +49,15 @@ struct DigitPadView: View {
                 viewModel.eraseTapped()
             }
             noteToggle(theme: theme)
-            toolButton(
-                "game.tool.redo",
-                systemImage: "arrow.uturn.forward",
-                enabled: viewModel.session?.canRedo ?? false,
-                theme: theme,
-            ) {
-                viewModel.redoTapped()
+            if viewModel.session?.mode.allowsHints == true {
+                toolButton(
+                    "game.hint.button",
+                    systemImage: "lightbulb",
+                    enabled: viewModel.canRequestHint,
+                    theme: theme,
+                ) {
+                    Task { await viewModel.requestHint() }
+                }
             }
         }
     }

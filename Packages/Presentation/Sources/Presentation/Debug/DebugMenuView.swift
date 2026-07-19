@@ -59,11 +59,11 @@
                 Section("Quick play (medium)") {
                     ForEach(SudokuVariant.allCases, id: \.self) { variant in
                         Button("Play \(variant.slug)") {
-                            router.push(.game(GameLaunch(kind: .new(
+                            router.play(GameLaunch(kind: .new(
                                 variant: variant,
                                 difficulty: .medium,
                                 mode: .normal,
-                            ))))
+                            )))
                         }
                     }
                     Text(

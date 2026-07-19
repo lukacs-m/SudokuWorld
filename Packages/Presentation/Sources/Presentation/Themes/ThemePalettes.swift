@@ -10,7 +10,7 @@ public enum ThemePalettes {
 
     private static func lightPalette(for id: ThemeID) -> Theme {
         switch id {
-        case .classicBlue: classicBlueLight
+        case .warmPaper: warmPaperLight
         case .slate: slateLight
         case .forest: forestLight
         case .midnight: midnight // deliberately always-dark
@@ -21,7 +21,7 @@ public enum ThemePalettes {
 
     private static func darkPalette(for id: ThemeID) -> Theme {
         switch id {
-        case .classicBlue: classicBlueDark
+        case .warmPaper: warmPaperDark
         case .slate: slateDark
         case .forest: forestDark
         case .midnight: midnight
@@ -32,50 +32,51 @@ public enum ThemePalettes {
 
     // MARK: - Free themes
 
-    private static let classicBlueLight = Theme(
-        id: .classicBlue,
-        accent: Color(red: 0.20, green: 0.45, blue: 0.95),
-        screenBackground: Color(red: 0.95, green: 0.96, blue: 0.99),
+    // Warm Paper: off-white paper, warm ink, muted sage accent, gold hints.
+    private static let warmPaperLight = Theme(
+        id: .warmPaper,
+        accent: Color(red: 0.431, green: 0.557, blue: 0.486),
+        screenBackground: Color(red: 0.965, green: 0.953, blue: 0.925),
         cardBackground: .white,
         boardBackground: .white,
         cellBackground: .white,
-        cellBackgroundAlternate: Color(red: 0.93, green: 0.95, blue: 0.99),
-        gridLine: Color(red: 0.75, green: 0.79, blue: 0.86),
-        gridLineBold: Color(red: 0.25, green: 0.30, blue: 0.40),
-        givenText: Color(red: 0.10, green: 0.13, blue: 0.20),
-        playerText: Color(red: 0.20, green: 0.45, blue: 0.95),
-        noteText: Color(red: 0.45, green: 0.50, blue: 0.60),
-        selection: Color(red: 0.20, green: 0.45, blue: 0.95).opacity(0.30),
-        relatedHighlight: Color(red: 0.20, green: 0.45, blue: 0.95).opacity(0.10),
-        sameDigitHighlight: Color(red: 0.20, green: 0.45, blue: 0.95).opacity(0.18),
-        conflict: Color(red: 0.90, green: 0.25, blue: 0.25),
-        hintHighlight: Color(red: 1.00, green: 0.80, blue: 0.25).opacity(0.40),
-        success: Color(red: 0.18, green: 0.65, blue: 0.40),
-        textPrimary: Color(red: 0.10, green: 0.13, blue: 0.20),
-        textSecondary: Color(red: 0.45, green: 0.50, blue: 0.60),
+        cellBackgroundAlternate: Color(red: 0.937, green: 0.922, blue: 0.882),
+        gridLine: Color(red: 0.851, green: 0.831, blue: 0.780),
+        gridLineBold: Color(red: 0.333, green: 0.314, blue: 0.247),
+        givenText: Color(red: 0.137, green: 0.129, blue: 0.110),
+        playerText: Color(red: 0.431, green: 0.557, blue: 0.486),
+        noteText: Color(red: 0.541, green: 0.522, blue: 0.467),
+        selection: Color(red: 0.431, green: 0.557, blue: 0.486).opacity(0.30),
+        relatedHighlight: Color(red: 0.431, green: 0.557, blue: 0.486).opacity(0.10),
+        sameDigitHighlight: Color(red: 0.431, green: 0.557, blue: 0.486).opacity(0.18),
+        conflict: Color(red: 0.757, green: 0.373, blue: 0.286),
+        hintHighlight: Color(red: 0.753, green: 0.600, blue: 0.294).opacity(0.35),
+        success: Color(red: 0.310, green: 0.478, blue: 0.384),
+        textPrimary: Color(red: 0.137, green: 0.129, blue: 0.110),
+        textSecondary: Color(red: 0.541, green: 0.522, blue: 0.467),
     )
 
-    private static let classicBlueDark = Theme(
-        id: .classicBlue,
-        accent: Color(red: 0.42, green: 0.62, blue: 1.00),
-        screenBackground: Color(red: 0.07, green: 0.08, blue: 0.11),
-        cardBackground: Color(red: 0.12, green: 0.14, blue: 0.18),
-        boardBackground: Color(red: 0.12, green: 0.14, blue: 0.18),
-        cellBackground: Color(red: 0.12, green: 0.14, blue: 0.18),
-        cellBackgroundAlternate: Color(red: 0.16, green: 0.19, blue: 0.25),
-        gridLine: Color(red: 0.28, green: 0.32, blue: 0.40),
-        gridLineBold: Color(red: 0.55, green: 0.62, blue: 0.75),
-        givenText: Color(red: 0.92, green: 0.94, blue: 0.98),
-        playerText: Color(red: 0.42, green: 0.62, blue: 1.00),
-        noteText: Color(red: 0.55, green: 0.60, blue: 0.70),
-        selection: Color(red: 0.42, green: 0.62, blue: 1.00).opacity(0.35),
-        relatedHighlight: Color(red: 0.42, green: 0.62, blue: 1.00).opacity(0.12),
-        sameDigitHighlight: Color(red: 0.42, green: 0.62, blue: 1.00).opacity(0.22),
-        conflict: Color(red: 1.00, green: 0.45, blue: 0.45),
-        hintHighlight: Color(red: 1.00, green: 0.80, blue: 0.30).opacity(0.35),
-        success: Color(red: 0.30, green: 0.80, blue: 0.55),
-        textPrimary: Color(red: 0.92, green: 0.94, blue: 0.98),
-        textSecondary: Color(red: 0.60, green: 0.65, blue: 0.73),
+    private static let warmPaperDark = Theme(
+        id: .warmPaper,
+        accent: Color(red: 0.525, green: 0.659, blue: 0.588),
+        screenBackground: Color(red: 0.102, green: 0.094, blue: 0.075),
+        cardBackground: Color(red: 0.129, green: 0.122, blue: 0.090),
+        boardBackground: Color(red: 0.129, green: 0.122, blue: 0.090),
+        cellBackground: Color(red: 0.129, green: 0.122, blue: 0.090),
+        cellBackgroundAlternate: Color(red: 0.165, green: 0.157, blue: 0.125),
+        gridLine: Color(red: 0.302, green: 0.290, blue: 0.247),
+        gridLineBold: Color(red: 0.639, green: 0.620, blue: 0.561),
+        givenText: Color(red: 0.925, green: 0.910, blue: 0.871),
+        playerText: Color(red: 0.525, green: 0.659, blue: 0.588),
+        noteText: Color(red: 0.639, green: 0.620, blue: 0.561),
+        selection: Color(red: 0.525, green: 0.659, blue: 0.588).opacity(0.35),
+        relatedHighlight: Color(red: 0.525, green: 0.659, blue: 0.588).opacity(0.12),
+        sameDigitHighlight: Color(red: 0.525, green: 0.659, blue: 0.588).opacity(0.22),
+        conflict: Color(red: 0.851, green: 0.482, blue: 0.388),
+        hintHighlight: Color(red: 0.831, green: 0.686, blue: 0.416).opacity(0.35),
+        success: Color(red: 0.463, green: 0.635, blue: 0.537),
+        textPrimary: Color(red: 0.925, green: 0.910, blue: 0.871),
+        textSecondary: Color(red: 0.639, green: 0.620, blue: 0.561),
     )
 
     private static let slateLight = Theme(

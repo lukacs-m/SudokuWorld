@@ -1,15 +1,19 @@
+import Foundation
 import Model
 import SwiftUI
 
-/// New game configuration: a sectioned catalog of variant cards, difficulty,
-/// and hardcore mode. Which variants appear is `VariantCatalog`'s call.
+/// New game configuration as the mock's two-step flow: variant catalog first,
+/// then difficulty (with personal bests) and hardcore mode. Each step pins
+/// its call to action above the bottom edge so it never needs scrolling.
 struct NewGameSheet: View {
     let hardcoreDefault: Bool
     let onStart: (SudokuVariant, Difficulty, GameMode) -> Void
 
+    @State private var viewModel = NewGameViewModel()
     @State private var variant: SudokuVariant = .classic
     @State private var difficulty: Difficulty = .easy
     @State private var hardcore: Bool
+    @State private var showDifficulty = false
 
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
@@ -27,68 +31,134 @@ struct NewGameSheet: View {
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    ForEach(VariantCatalog.sections, id: \.group) { section in
-                        VariantSectionView(
-                            group: section.group,
-                            variants: section.variants,
-                            selection: $variant,
-                            theme: theme,
-                        )
-                    }
-
-                    Text("newGame.difficulty", bundle: .module)
-                        .font(.headline)
-                    VStack(spacing: 6) {
-                        ForEach(Difficulty.allCases, id: \.self) { candidate in
-                            difficultyRow(candidate, theme: theme)
-                        }
-                    }
-
-                    Toggle(isOn: $hardcore) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("newGame.hardcore", bundle: .module)
-                                .font(.subheadline.weight(.medium))
-                            Text("newGame.hardcore.detail", bundle: .module)
-                                .font(.caption)
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                    }
-                    .tint(theme.accent)
-
-                    PrimaryButton("newGame.start", systemImage: "play.fill") {
-                        dismiss()
-                        onStart(variant, difficulty, hardcore ? .hardcore : .normal)
-                    }
-                }
-                .padding(20)
-            }
-            .background(theme.screenBackground)
-            .navigationTitle(Text("newGame.title", bundle: .module))
-            #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-            #endif
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("common.cancel", bundle: .module)
-                        }
-                    }
+            variantStep(theme: theme)
+                .navigationDestination(isPresented: $showDifficulty) {
+                    difficultyStep(theme: theme)
                 }
         }
+        .task { await viewModel.load() }
+        #if os(iOS)
+            .presentationCornerRadius(24)
+        #endif
+    }
+
+    // MARK: - Step 1 · variant
+
+    private func variantStep(theme: Theme) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("home.newGame.subtitle", bundle: .module)
+                    .font(.subheadline)
+                    .foregroundStyle(theme.textSecondary)
+                ForEach(VariantCatalog.sections, id: \.group) { section in
+                    VariantSectionView(
+                        group: section.group,
+                        variants: section.variants,
+                        selection: $variant,
+                        theme: theme,
+                    )
+                }
+            }
+            .padding(20)
+        }
+        .background(theme.screenBackground)
+        .safeAreaInset(edge: .bottom) {
+            floatingBar(theme: theme) {
+                PrimaryButton(
+                    verbatim: String(
+                        format: String(localized: "newGame.continueWith", bundle: .module),
+                        moduleString("variant.\(variant.slug)"),
+                    ),
+                ) {
+                    showDifficulty = true
+                }
+            }
+        }
+        .navigationTitle(Text("newGame.title", bundle: .module))
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("common.cancel", bundle: .module)
+                    }
+                }
+            }
+    }
+
+    // MARK: - Step 2 · difficulty
+
+    private func difficultyStep(theme: Theme) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("newGame.difficulty.subtitle", bundle: .module)
+                    .font(.subheadline)
+                    .foregroundStyle(theme.textSecondary)
+                VStack(spacing: 8) {
+                    ForEach(Difficulty.allCases, id: \.self) { candidate in
+                        difficultyRow(candidate, theme: theme)
+                    }
+                }
+
+                Toggle(isOn: $hardcore) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("newGame.hardcore", bundle: .module)
+                            .font(.subheadline.weight(.medium))
+                        Text("newGame.hardcore.detail", bundle: .module)
+                            .font(.caption)
+                            .foregroundStyle(theme.textSecondary)
+                    }
+                }
+                .tint(theme.accent)
+            }
+            .padding(20)
+        }
+        .background(theme.screenBackground)
+        .safeAreaInset(edge: .bottom) {
+            floatingBar(theme: theme) {
+                PrimaryButton(
+                    verbatim: String(
+                        format: String(localized: "newGame.startWith", bundle: .module),
+                        moduleString("difficulty.\(difficulty.slug)"),
+                    ),
+                    systemImage: "play.fill",
+                ) {
+                    dismiss()
+                    onStart(variant, difficulty, hardcore ? .hardcore : .normal)
+                }
+            }
+        }
+        .navigationTitle(Text("newGame.difficulty", bundle: .module))
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 
     private func difficultyRow(_ candidate: Difficulty, theme: Theme) -> some View {
         let selected = candidate == difficulty
+        let best = viewModel.bestTime(variant: variant, difficulty: candidate)
         return Button {
             difficulty = candidate
         } label: {
             HStack {
-                Text(verbatim: moduleString("difficulty.\(candidate.slug)"))
-                    .font(.subheadline.weight(selected ? .semibold : .regular))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: moduleString("difficulty.\(candidate.slug)"))
+                        .font(.headline.weight(selected ? .semibold : .regular))
+                    if let best {
+                        Text(
+                            String(
+                                format: String(localized: "newGame.bestTime", bundle: .module),
+                                DurationFormatter.string(for: best),
+                            ),
+                        )
+                        .monospacedDigit()
+                        .font(.caption)
+                        .foregroundStyle(theme.textSecondary)
+                    }
+                }
                 Spacer()
                 if selected {
                     Image(systemName: "checkmark")
@@ -96,17 +166,34 @@ struct NewGameSheet: View {
                         .accessibilityHidden(true)
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
             .background(
-                selected ? theme.accent.opacity(0.12) : theme.cellBackgroundAlternate.opacity(0.4),
-                in: RoundedRectangle(cornerRadius: 10),
+                selected ? theme.accent.opacity(0.12) : theme.cardBackground,
+                in: RoundedRectangle(cornerRadius: 14),
             )
-            .contentShape(RoundedRectangle(cornerRadius: 10))
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
         .foregroundStyle(selected ? theme.accent : theme.textPrimary)
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    /// Pins a call to action above the bottom edge; content scrolls beneath
+    /// through a soft fade, so the button never has to be scrolled to.
+    private func floatingBar(theme: Theme, @ViewBuilder content: () -> some View) -> some View {
+        content()
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            .background {
+                LinearGradient(
+                    colors: [theme.screenBackground.opacity(0), theme.screenBackground],
+                    startPoint: .top,
+                    endPoint: .bottom,
+                )
+                .ignoresSafeArea()
+            }
     }
 }
 
@@ -119,10 +206,7 @@ struct VariantSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(verbatim: moduleString("section.\(group.slug)").localizedUppercase)
-                .font(.footnote.weight(.semibold))
-                .tracking(1.1)
-                .foregroundStyle(theme.textSecondary)
+            SectionLabel(verbatim: moduleString("section.\(group.slug)"))
             LazyVGrid(
                 columns: [
                     GridItem(.flexible(), spacing: 10),

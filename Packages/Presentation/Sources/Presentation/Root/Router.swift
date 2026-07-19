@@ -1,3 +1,4 @@
+public import Foundation
 public import Model
 public import Observation
 
@@ -21,32 +22,45 @@ public struct GameLaunch: Hashable, Sendable {
     }
 }
 
-/// Navigation destinations pushed onto the root stack.
-public enum Route: Hashable, Sendable {
-    case game(GameLaunch)
-    case stats
+/// The four root tabs.
+public enum AppTab: Hashable, Sendable {
+    case home
     case events
+    case stats
     case settings
-    case debug
+}
+
+/// A presented game. The fresh `id` per presentation guarantees the cover
+/// rebuilds even when the same configuration is launched twice in a row.
+public struct GamePresentation: Identifiable, Hashable, Sendable {
+    public let id: UUID
+    public let launch: GameLaunch
+
+    public init(launch: GameLaunch) {
+        id = UUID()
+        self.launch = launch
+    }
 }
 
 /// The single navigation authority, injected through the environment.
 @MainActor
 @Observable
 public final class Router {
-    public var path: [Route] = []
+    public var selectedTab: AppTab = .home
+    public var game: GamePresentation?
 
     public init() {}
 
-    public func push(_ route: Route) {
-        path.append(route)
+    public func play(_ launch: GameLaunch) {
+        game = GamePresentation(launch: launch)
     }
 
-    public func pop() {
-        _ = path.popLast()
+    public func dismissGame() {
+        game = nil
     }
 
-    public func popToRoot() {
-        path.removeAll()
+    public func goHome() {
+        game = nil
+        selectedTab = .home
     }
 }

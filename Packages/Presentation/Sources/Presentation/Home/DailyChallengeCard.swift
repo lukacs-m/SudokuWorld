@@ -22,11 +22,9 @@ struct DailyChallengeCard: View {
                         .font(.system(size: 32))
                         .foregroundStyle(theme.accent)
                         .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 5) {
                         HStack(spacing: 8) {
-                            Text("home.daily.title", bundle: .module)
-                                .font(.headline)
-                                .foregroundStyle(theme.textPrimary)
+                            SectionLabel("home.daily.title")
                             if dailyStreak > 0 {
                                 Label {
                                     Text("\(dailyStreak)")
@@ -35,7 +33,7 @@ struct DailyChallengeCard: View {
                                     Image(systemName: "flame.fill")
                                 }
                                 .font(.caption.weight(.bold))
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(Color(red: 0.753, green: 0.600, blue: 0.294))
                                 .accessibilityLabel(String(
                                     format: String(localized: "a11y.streak", bundle: .module),
                                     dailyStreak,

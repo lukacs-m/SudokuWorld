@@ -1,3 +1,4 @@
+import Common
 import DI
 import Domain
 import Foundation
@@ -11,49 +12,81 @@ public struct AppRootView: View {
     @State private var router = Router()
     @State private var themeStore = ThemeStore()
     @State private var launched = false
+    @Environment(\.colorScheme) private var colorScheme
 
     public init() {}
 
     public var body: some View {
-        NavigationStack(path: $router.path) {
-            HomeView()
-                .navigationDestination(for: Route.self) { route in
-                    destination(for: route)
+        TabView(selection: $router.selectedTab) {
+            Tab(value: AppTab.home) {
+                NavigationStack { HomeView() }
+            } label: {
+                Label {
+                    Text("tab.home", bundle: .module)
+                } icon: {
+                    Image(systemName: "house")
                 }
+            }
+            Tab(value: AppTab.events) {
+                NavigationStack { EventsHubView() }
+            } label: {
+                Label {
+                    Text("home.events", bundle: .module)
+                } icon: {
+                    Image(systemName: "trophy")
+                }
+            }
+            Tab(value: AppTab.stats) {
+                NavigationStack { StatsView() }
+            } label: {
+                Label {
+                    Text("home.stats", bundle: .module)
+                } icon: {
+                    Image(systemName: "chart.bar")
+                }
+            }
+            Tab(value: AppTab.settings) {
+                NavigationStack { SettingsView() }
+            } label: {
+                Label {
+                    Text("home.settings", bundle: .module)
+                } icon: {
+                    Image(systemName: "gearshape")
+                }
+            }
         }
-        .environment(router)
-        .environment(themeStore)
-        .tint(themeStore.theme(for: .light).accent)
-        .task {
-            guard !launched else { return }
-            launched = true
-            await themeStore.load()
-            await LaunchTasks.run()
+        #if os(iOS)
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .fullScreenCover(item: $router.game) { presentation in
+            NavigationStack { GameView(launch: presentation.launch) }
         }
-    }
-
-    @ViewBuilder
-    private func destination(for route: Route) -> some View {
-        switch route {
-        case let .game(launch):
-            GameView(launch: launch)
-
-        case .stats:
-            StatsView()
-
-        case .events:
-            EventsHubView()
-
-        case .settings:
-            SettingsView()
-
-        case .debug:
-            #if DEBUG
-                DebugMenuView()
-            #else
-                EmptyView()
-            #endif
-        }
+        #else
+                // fullScreenCover doesn't exist on macOS (test builds only).
+        .sheet(item: $router.game) { presentation in
+                    NavigationStack { GameView(launch: presentation.launch) }
+                }
+        #endif
+                .environment(router)
+                .environment(themeStore)
+                .tint(themeStore.theme(for: colorScheme).accent)
+                .preferredColorScheme(themeStore.preferredColorScheme)
+                .task {
+                    guard !launched else { return }
+                    launched = true
+                    #if DEBUG
+                        switch LaunchHooks.initialTab {
+                        case "events": router.selectedTab = .events
+                        case "stats": router.selectedTab = .stats
+                        case "settings": router.selectedTab = .settings
+                        default: break
+                        }
+                        if LaunchHooks.seedStats {
+                            await DebugSeeder.seed()
+                        }
+                    #endif
+                    await themeStore.load()
+                    await LaunchTasks.run()
+                }
     }
 }
 

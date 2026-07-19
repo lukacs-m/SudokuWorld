@@ -51,26 +51,14 @@ struct StatsChartsView: View {
 
             if !overview.timesByDifficulty.isEmpty {
                 chartCard("stats.chart.times", theme: theme) {
-                    Chart(overview.timesByDifficulty) { entry in
-                        if let average = entry.average {
-                            BarMark(
-                                x: .value("Difficulty", localizedDifficulty(entry.difficulty)),
-                                y: .value("Average", average / 60),
-                            )
-                            .foregroundStyle(theme.accent.opacity(0.4))
-                            .position(by: .value("Kind", "avg"))
-                        }
-                        if let fastest = entry.fastest {
-                            BarMark(
-                                x: .value("Difficulty", localizedDifficulty(entry.difficulty)),
-                                y: .value("Fastest", fastest / 60),
-                            )
-                            .foregroundStyle(theme.accent)
-                            .position(by: .value("Kind", "best"))
+                    VStack(spacing: 0) {
+                        ForEach(overview.timesByDifficulty) { entry in
+                            timesRow(entry, theme: theme)
+                            if entry.id != overview.timesByDifficulty.last?.id {
+                                Divider()
+                            }
                         }
                     }
-                    .chartYAxisLabel(String(localized: "stats.chart.minutes", bundle: .module))
-                    .frame(height: 160)
                 }
             }
 
@@ -96,27 +84,54 @@ struct StatsChartsView: View {
 
     private func chartCard(
         _ titleKey: LocalizedStringKey,
-        theme: Theme,
+        theme _: Theme,
         @ViewBuilder chart: () -> some View,
     ) -> some View {
         CardView {
             VStack(alignment: .leading, spacing: 12) {
-                Text(titleKey, bundle: .module)
-                    .font(.headline)
-                    .foregroundStyle(theme.textPrimary)
+                SectionLabel(titleKey)
                 chart()
             }
         }
     }
 
+    /// The mock's best-times row: difficulty left, best bold with average
+    /// underneath on the right.
+    private func timesRow(_ entry: StatsOverview.DifficultyTimes, theme: Theme) -> some View {
+        HStack {
+            Text(verbatim: localizedDifficulty(entry.difficulty))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(theme.textPrimary)
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                if let fastest = entry.fastest {
+                    Text(DurationFormatter.string(for: fastest))
+                        .font(.headline)
+                        .fontDesign(.rounded)
+                        .monospacedDigit()
+                        .foregroundStyle(theme.textPrimary)
+                }
+                if let average = entry.average {
+                    Text(
+                        String(
+                            format: String(localized: "stats.times.average", bundle: .module),
+                            DurationFormatter.string(for: average),
+                        ),
+                    )
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(theme.textSecondary)
+                }
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
     private func localizedDifficulty(_ difficulty: Difficulty) -> String {
-        String(
-            localized: String.LocalizationValue("difficulty.\(difficulty.slug)"),
-            bundle: .module,
-        )
+        moduleString("difficulty.\(difficulty.slug)")
     }
 
     private func localizedVariant(_ variant: SudokuVariant) -> String {
-        String(localized: String.LocalizationValue("variant.\(variant.slug)"), bundle: .module)
+        moduleString("variant.\(variant.slug)")
     }
 }

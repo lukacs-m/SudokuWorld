@@ -63,14 +63,14 @@ struct GameView: View {
         ) {
             Button {
                 viewModel.saveAndExit()
-                router.pop()
+                router.dismissGame()
             } label: {
                 Text("game.exit.save", bundle: .module)
             }
             Button(role: .destructive) {
                 Task {
                     await viewModel.abandon()
-                    router.pop()
+                    router.dismissGame()
                 }
             } label: {
                 Text("game.exit.abandon", bundle: .module)
@@ -115,7 +115,7 @@ struct GameView: View {
                 Text("game.failed.message", bundle: .module)
             } actions: {
                 Button {
-                    router.pop()
+                    router.dismissGame()
                 } label: {
                     Text("game.finished.home", bundle: .module)
                 }
@@ -130,93 +130,41 @@ struct GameView: View {
                 Spacer(minLength: 0)
                 DigitPadView(viewModel: viewModel)
                     .padding(.horizontal, 12)
-                hintBar(theme: theme)
             }
             .padding(.vertical, 8)
         }
     }
 
-    private func header(theme: Theme) -> some View {
-        HStack {
-            if let session = viewModel.session {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: moduleString("variant.\(session.puzzle.variant.slug)"))
-                        .font(.headline)
-                    Text(verbatim: moduleString(
-                        "difficulty.\(session.puzzle.requestedDifficulty.slug)",
-                    ))
-                    .font(.caption)
-                    .foregroundStyle(theme.textSecondary)
-                }
-
-                Spacer()
-
-                if let limit = session.mode.maxMistakes {
-                    Label {
-                        Text("\(session.mistakes)/\(limit)")
-                            .monospacedDigit()
-                    } icon: {
-                        Image(systemName: "heart.fill")
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(session.mistakes > 0 ? theme.conflict : theme.textSecondary)
-                    .accessibilityLabel(String(
-                        format: String(localized: "a11y.mistakes", bundle: .module),
-                        session.mistakes,
-                        limit,
-                    ))
-                } else if session.mistakes > 0 {
-                    Label {
-                        Text("\(session.mistakes)")
-                            .monospacedDigit()
-                    } icon: {
-                        Image(systemName: "xmark.circle")
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(theme.textSecondary)
-                }
-
-                if viewModel.settings.timerVisible {
-                    timerLabel(theme: theme, session: session)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-
-    private func timerLabel(theme: Theme, session: GameSession) -> some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
-            Text(DurationFormatter.string(for: session.elapsed(at: context.date)))
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(theme.textSecondary)
-        }
-    }
-
+    /// The mock's Time / Mistakes / Hints tile row.
     @ViewBuilder
-    private func hintBar(theme: Theme) -> some View {
-        if let session = viewModel.session, session.mode.allowsHints {
-            Button {
-                Task { await viewModel.requestHint() }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "lightbulb")
-                        .accessibilityHidden(true)
-                    Text("game.hint.button", bundle: .module)
-                    if let remaining = viewModel.hintsRemaining {
-                        Text("(\(remaining))")
-                            .monospacedDigit()
+    private func header(theme: Theme) -> some View {
+        if let session = viewModel.session {
+            HStack(spacing: 10) {
+                if viewModel.settings.timerVisible {
+                    TimelineView(.periodic(from: .now, by: 1)) { context in
+                        StatTile(
+                            "game.finished.time",
+                            value: DurationFormatter.string(for: session.elapsed(at: context.date)),
+                        )
                     }
                 }
-                .font(.subheadline.weight(.medium))
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(theme.cellBackgroundAlternate.opacity(0.6), in: Capsule())
-                .contentShape(Capsule())
+                if let limit = session.mode.maxMistakes {
+                    StatTile(
+                        "game.finished.mistakes",
+                        value: "\(session.mistakes)/\(limit)",
+                        valueColor: session.mistakes > 0 ? theme.conflict : nil,
+                    )
+                } else {
+                    StatTile("game.finished.mistakes", value: "\(session.mistakes)")
+                }
+                if session.mode.allowsHints {
+                    StatTile(
+                        "game.finished.hints",
+                        value: viewModel.hintsRemaining.map(String.init) ?? "∞",
+                    )
+                }
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(viewModel.canRequestHint ? theme.accent : theme.textSecondary
-                .opacity(0.5))
-            .disabled(!viewModel.canRequestHint)
+            .padding(.horizontal, 16)
         }
     }
 
@@ -230,12 +178,12 @@ struct GameView: View {
                 onResume: { viewModel.resumeTapped() },
                 onSaveAndExit: {
                     viewModel.saveAndExit()
-                    router.pop()
+                    router.dismissGame()
                 },
                 onAbandon: {
                     Task {
                         await viewModel.abandon()
-                        router.pop()
+                        router.dismissGame()
                     }
                 },
             )
@@ -254,11 +202,11 @@ struct GameView: View {
                 CompletionView(
                     summary: summary,
                     onNewGame: {
-                        let launch = newGameLaunch()
-                        router.pop()
-                        router.push(.game(launch))
+                        // Fresh presentation token, so the cover rebuilds even
+                        // for an identical configuration.
+                        router.play(newGameLaunch())
                     },
-                    onHome: { router.popToRoot() },
+                    onHome: { router.goHome() },
                 )
             }
         }
@@ -280,7 +228,7 @@ struct GameView: View {
         ToolbarItem(placement: .navigation) {
             Button {
                 if case .finished = viewModel.phase {
-                    router.pop()
+                    router.dismissGame()
                 } else {
                     showExitDialog = true
                 }
@@ -288,6 +236,19 @@ struct GameView: View {
                 Image(systemName: "chevron.backward")
             }
             .accessibilityLabel(Text("common.back", bundle: .module))
+        }
+        ToolbarItem(placement: .principal) {
+            if let session = viewModel.session {
+                VStack(spacing: 0) {
+                    Text(verbatim: moduleString("variant.\(session.puzzle.variant.slug)"))
+                        .font(.headline)
+                    Text(verbatim: moduleString(
+                        "difficulty.\(session.puzzle.requestedDifficulty.slug)",
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
         }
         ToolbarItem(placement: .primaryAction) {
             if viewModel.phase == .playing {

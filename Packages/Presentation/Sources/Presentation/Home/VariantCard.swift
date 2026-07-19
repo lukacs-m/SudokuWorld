@@ -2,7 +2,7 @@ import Model
 import SwiftUI
 
 /// One catalog card: illustrated tile top-left, optional badge top-right,
-/// serif title, one-line subtitle. Selection tints the card with the theme
+/// title, one-line subtitle. Selection tints the card with the theme
 /// accent.
 struct VariantCard: View {
     let variant: SudokuVariant
@@ -23,7 +23,7 @@ struct VariantCard: View {
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: moduleString("variant.\(variant.slug)"))
-                        .font(.system(.headline, design: .serif, weight: .semibold))
+                        .font(.headline.weight(.semibold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     Text(verbatim: moduleString("variant.\(variant.slug).subtitle"))
@@ -37,16 +37,16 @@ struct VariantCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 selected ? theme.accent.opacity(0.14) : theme.cardBackground,
-                in: RoundedRectangle(cornerRadius: 16),
+                in: RoundedRectangle(cornerRadius: 18),
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(
                         selected ? theme.accent : theme.gridLine.opacity(0.35),
                         lineWidth: selected ? 1.5 : 1,
                     ),
             )
-            .contentShape(RoundedRectangle(cornerRadius: 16))
+            .contentShape(RoundedRectangle(cornerRadius: 18))
         }
         .buttonStyle(.plain)
         .foregroundStyle(theme.textPrimary)

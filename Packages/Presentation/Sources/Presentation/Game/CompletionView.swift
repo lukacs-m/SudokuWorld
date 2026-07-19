@@ -78,6 +78,9 @@ struct CompletionView: View {
                 PrimaryButton("game.finished.newGame", systemImage: "plus") {
                     onNewGame()
                 }
+                if won {
+                    shareLink(theme: theme)
+                }
                 Button {
                     onHome()
                 } label: {
@@ -93,8 +96,32 @@ struct CompletionView: View {
         }
         .padding(28)
         .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 24))
-        .shadow(radius: 24)
+        .shadow(color: .black.opacity(0.18), radius: 30, y: 10)
         .padding(24)
         .transition(.scale(scale: 0.8).combined(with: .opacity))
+    }
+
+    /// Ghost-styled native share for won games.
+    private func shareLink(theme: Theme) -> some View {
+        ShareLink(item: String(
+            format: String(localized: "game.share.text", bundle: .module),
+            DurationFormatter.string(for: summary.duration),
+        )) {
+            HStack(spacing: 8) {
+                Image(systemName: "square.and.arrow.up")
+                    .accessibilityHidden(true)
+                Text("game.finished.share", bundle: .module)
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(theme.gridLine),
+            )
+            .foregroundStyle(theme.textPrimary)
+            .contentShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
     }
 }

@@ -7,9 +7,6 @@
     "›" : {
 
     },
-    "(%lld)" : {
-
-    },
     "#%lld" : {
 
     },
@@ -200,6 +197,7 @@
       }
     },
     "a11y.mistakes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -878,9 +876,6 @@
     "Difficulty" : {
 
     },
-    "difficulty.%@" : {
-
-    },
     "difficulty.beginner" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -983,6 +978,22 @@
         }
       }
     },
+    "events.daily.completedTile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réussite"
+          }
+        }
+      }
+    },
     "events.daily.done" : {
       "localizations" : {
         "en" : {
@@ -1031,6 +1042,38 @@
         }
       }
     },
+    "events.daily.streakTile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day streak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jours de suite"
+          }
+        }
+      }
+    },
+    "events.daily.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A fresh puzzle every day at midnight."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle grille chaque jour à minuit."
+          }
+        }
+      }
+    },
     "events.daily.title" : {
       "localizations" : {
         "en" : {
@@ -1043,6 +1086,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défi du jour"
+          }
+        }
+      }
+    },
+    "events.daily.today" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd'hui"
           }
         }
       }
@@ -1434,6 +1493,22 @@
         }
       }
     },
+    "game.finished.share" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share result"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager le résultat"
+          }
+        }
+      }
+    },
     "game.finished.time" : {
       "localizations" : {
         "en" : {
@@ -1558,6 +1633,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pause"
+          }
+        }
+      }
+    },
+    "game.share.text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I solved a sudoku in %@ with SudokuWorld!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'ai résolu un sudoku en %@ avec SudokuWorld !"
           }
         }
       }
@@ -1983,6 +2074,38 @@
         }
       }
     },
+    "home.continue.progress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d%% · %2$@ elapsed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d %% · %2$@ de jeu"
+          }
+        }
+      }
+    },
+    "home.continue.resume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre la partie"
+          }
+        }
+      }
+    },
     "home.continue.title" : {
       "localizations" : {
         "en" : {
@@ -2080,6 +2203,70 @@
         }
       }
     },
+    "home.greeting.afternoon" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good afternoon."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bon après-midi."
+          }
+        }
+      }
+    },
+    "home.greeting.evening" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good evening."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonsoir."
+          }
+        }
+      }
+    },
+    "home.greeting.morning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good morning."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonjour."
+          }
+        }
+      }
+    },
+    "home.greeting.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready to focus?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à vous concentrer ?"
+          }
+        }
+      }
+    },
     "home.newGame" : {
       "localizations" : {
         "en" : {
@@ -2092,6 +2279,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouvelle partie"
+          }
+        }
+      }
+    },
+    "home.newGame.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick your kind of puzzle."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez votre type de grille."
           }
         }
       }
@@ -2145,6 +2348,7 @@
       }
     },
     "home.welcome" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2179,6 +2383,38 @@
     "Kind" : {
 
     },
+    "newGame.bestTime" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record %@"
+          }
+        }
+      }
+    },
+    "newGame.continueWith" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue with %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer avec %@"
+          }
+        }
+      }
+    },
     "newGame.difficulty" : {
       "localizations" : {
         "en" : {
@@ -2191,6 +2427,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Difficulté"
+          }
+        }
+      }
+    },
+    "newGame.difficulty.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how deep you want to go."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez la profondeur du défi."
           }
         }
       }
@@ -2239,6 +2491,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Commencer"
+          }
+        }
+      }
+    },
+    "newGame.startWith" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencer · %@"
           }
         }
       }
@@ -2451,9 +2719,6 @@
           }
         }
       }
-    },
-    "paywall.period.%@" : {
-
     },
     "paywall.period.day" : {
       "extractionState" : "stale",
@@ -2720,6 +2985,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autres variantes"
+          }
+        }
+      }
+    },
+    "settings.appearance" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apparence"
+          }
+        }
+      }
+    },
+    "settings.appearance.dark" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sombre"
+          }
+        }
+      }
+    },
+    "settings.appearance.light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clair"
+          }
+        }
+      }
+    },
+    "settings.appearance.system" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Système"
           }
         }
       }
@@ -3108,6 +3437,22 @@
         }
       }
     },
+    "settings.version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        }
+      }
+    },
     "stats.byVariant" : {
       "localizations" : {
         "en" : {
@@ -3161,13 +3506,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Best vs average time"
+            "value" : "Best times"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meilleur temps vs moyenne"
+            "value" : "Meilleurs temps"
           }
         }
       }
@@ -3284,6 +3629,22 @@
         }
       }
     },
+    "stats.streak.bestCount" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best ever · %d"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record · %d"
+          }
+        }
+      }
+    },
     "stats.streak.bestDaily" : {
       "localizations" : {
         "en" : {
@@ -3296,6 +3657,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Meilleure série"
+          }
+        }
+      }
+    },
+    "stats.streak.bestDays" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best ever · %d days"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record · %d jours"
           }
         }
       }
@@ -3348,6 +3725,22 @@
         }
       }
     },
+    "stats.times.average" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avg %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moy. %@"
+          }
+        }
+      }
+    },
     "stats.title" : {
       "localizations" : {
         "en" : {
@@ -3392,6 +3785,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gagnées"
+          }
+        }
+      }
+    },
+    "tab.home" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accueil"
           }
         }
       }
@@ -3686,18 +4095,18 @@
       }
     },
     "theme.classicBlue" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Classic Blue"
+            "value" : "Warm Paper"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bleu classique"
+            "value" : "Papier chaud"
           }
         }
       }
@@ -3774,9 +4183,6 @@
 
     },
     "Variant" : {
-
-    },
-    "variant.%@" : {
 
     },
     "variant.alphadoku25" : {
