@@ -1,3 +1,4 @@
+import Common
 import Foundation
 import Model
 import SwiftUI
@@ -14,6 +15,7 @@ struct NewGameSheet: View {
     @State private var difficulty: Difficulty = .easy
     @State private var hardcore: Bool
     @State private var showDifficulty = false
+    @State private var showRules = false
 
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
@@ -37,8 +39,18 @@ struct NewGameSheet: View {
                 }
         }
         .task { await viewModel.load() }
+        .onAppear {
+            #if DEBUG
+                if let slug = LaunchHooks.rulesVariant,
+                   let hooked = SudokuVariant(rawValue: slug)
+                {
+                    variant = hooked
+                    showRules = true
+                }
+            #endif
+        }
         #if os(iOS)
-            .presentationCornerRadius(24)
+        .presentationCornerRadius(24)
         #endif
     }
 
@@ -86,6 +98,17 @@ struct NewGameSheet: View {
                         Text("common.cancel", bundle: .module)
                     }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showRules = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .accessibilityLabel(Text("rules.title", bundle: .module))
+                }
+            }
+            .sheet(isPresented: $showRules) {
+                VariantRulesView(variant: variant)
             }
     }
 

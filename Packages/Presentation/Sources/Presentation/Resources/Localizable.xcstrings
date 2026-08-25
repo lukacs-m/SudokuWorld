@@ -2879,6 +2879,1855 @@
     "Rate" : {
 
     },
+    "rules.alphadoku25.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 5×5 box missing five letters: cross-check each against its five rows and columns — usually one letter has a single legal cell."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloc 5×5 où manquent cinq lettres : croisez chacune avec ses cinq lignes et colonnes — souvent une lettre n'a qu'une case légale."
+          }
+        }
+      }
+    },
+    "rules.alphadoku25.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The giant: a 25×25 grid where every row, column, and 5×5 box contains the letters A–Y exactly once. An expedition rather than a sprint."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le géant : une grille 25×25 où chaque ligne, colonne et bloc 5×5 contient les lettres A à Y exactement une fois. Une expédition plus qu'un sprint."
+          }
+        }
+      }
+    },
+    "rules.alphadoku25.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Save mid-solve — expeditions take several sittings.\n• Scan for nearly-complete rows and boxes first.\n• The remaining-count under each letter shows what's still in play."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Sauvegardez en cours de route — une expédition se joue en plusieurs fois.\n• Cherchez d'abord les lignes et blocs presque complets.\n• Le compteur sous chaque lettre montre ce qui reste en jeu."
+          }
+        }
+      }
+    },
+    "rules.antiking.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A digit excludes itself from all eight surrounding cells. Where two same digits already sit near a box, the box's remaining copy is often squeezed into a single corner."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un chiffre s'exclut des huit cases qui l'entourent. Quand deux chiffres identiques encadrent déjà un bloc, la copie restante du bloc est souvent acculée dans un coin."
+          }
+        }
+      }
+    },
+    "rules.antiking.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus the anti-king constraint: two touching cells — including diagonally — may never hold the same digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus la contrainte anti-roi : deux cases qui se touchent — même en diagonale — ne peuvent contenir le même chiffre."
+          }
+        }
+      }
+    },
+    "rules.antiking.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Diagonal touches are the ones classic habits miss — double-check corners.\n• The 3×3 area around a digit is a dead zone for that digit.\n• Combine with box scanning: dead zones often leave exactly one legal cell."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Ce sont les contacts diagonaux que les habitudes classiques oublient — vérifiez les coins.\n• La zone 3×3 autour d'un chiffre lui est interdite.\n• Combinez avec le balayage des blocs : les zones mortes ne laissent souvent qu'une case légale."
+          }
+        }
+      }
+    },
+    "rules.antiknight.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each cell has up to eight knight neighbours — a digit placed centrally eliminates itself from all of them, on top of its row, column and box."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque case a jusqu'à huit voisines au saut de cavalier — un chiffre placé au centre s'élimine de toutes, en plus de sa ligne, sa colonne et son bloc."
+          }
+        }
+      }
+    },
+    "rules.antiknight.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus the anti-knight constraint: two cells a chess knight's move apart may never hold the same digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus la contrainte anti-cavalier : deux cases à un saut de cavalier d'échecs l'une de l'autre ne peuvent contenir le même chiffre."
+          }
+        }
+      }
+    },
+    "rules.antiknight.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Visualise the L-shaped jumps before every placement.\n• Central cells carry the most knight pressure; deduce there first.\n• Two identical digits close together often leave only one knight-legal cell for the third."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Visualisez les sauts en L avant chaque placement.\n• Les cases centrales subissent la plus forte pression ; déduisez-y d'abord.\n• Deux chiffres identiques rapprochés ne laissent souvent qu'une case légale au troisième."
+          }
+        }
+      }
+    },
+    "rules.argyle.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cell where two marked diagonals cross is constrained by both — plus its row, column and box: five houses at once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une case au croisement de deux diagonales marquées est contrainte par les deux — plus sa ligne, sa colonne et son bloc : cinq zones à la fois."
+          }
+        }
+      }
+    },
+    "rules.argyle.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus the argyle pattern: along every marked lattice diagonal, no digit may repeat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus le motif argyle : sur chaque diagonale marquée du losange, aucun chiffre ne peut se répéter."
+          }
+        }
+      }
+    },
+    "rules.argyle.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Crossing points of the lattice are the most constrained cells — start there.\n• Short diagonals still forbid repeats; don't overlook them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les croisements du motif sont les cases les plus contraintes — commencez là.\n• Les diagonales courtes interdisent aussi les répétitions ; ne les négligez pas."
+          }
+        }
+      }
+    },
+    "rules.arrow.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A circle of 3 over a two-cell shaft must be 1+2. A three-cell shaft needs a circle of at least 6 (1+2+3) — small circles choke their shafts hard."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un cercle de 3 sur une tige de deux cases impose 1+2. Une tige de trois cases exige un cercle d'au moins 6 (1+2+3) — les petits cercles étranglent leur tige."
+          }
+        }
+      }
+    },
+    "rules.arrow.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus arrows: the digits along each arrow's shaft add up to the digit in its circle."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus des flèches : les chiffres le long de la tige totalisent le chiffre du cercle."
+          }
+        }
+      }
+    },
+    "rules.arrow.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Shaft digits are small; circle digits are large.\n• A shaft of n cells forces the circle ≥ 1+2+…+n.\n• Repeats on a shaft are allowed only where sudoku rules permit them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les chiffres de tige sont petits ; ceux des cercles, grands.\n• Une tige de n cases force le cercle à valoir au moins 1+2+…+n.\n• Les répétitions sur une tige ne sont possibles que là où les règles sudoku l'autorisent."
+          }
+        }
+      }
+    },
+    "rules.asterisk.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The asterisk has one cell per box (and its centre in the middle box) — a digit placed on a starred cell removes that digit from the eight other starred cells."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'astérisque prend une case par bloc (et son centre au milieu) — un chiffre placé sur une case étoilée l'élimine des huit autres cases étoilées."
+          }
+        }
+      }
+    },
+    "rules.asterisk.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus one extra region: the nine starred cells form an asterisk that must also contain 1–9 exactly once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus une région supplémentaire : les neuf cases étoilées forment un astérisque qui doit aussi contenir 1 à 9 exactement une fois."
+          }
+        }
+      }
+    },
+    "rules.asterisk.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Treat the asterisk as a tenth box when scanning.\n• Its centre cell doubles with the central box — extra constrained."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Traitez l'astérisque comme un dixième bloc lors du balayage.\n• Sa case centrale se combine au bloc central — doublement contrainte."
+          }
+        }
+      }
+    },
+    "rules.classic.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If a row already shows 1–8, its last empty cell must be 9. If a box is missing only 4 and 7, and one of its empty cells sits in a column that already contains a 4, that cell is the 7."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si une ligne contient déjà 1 à 8, sa dernière case vide est forcément 9. Si un bloc n'attend plus que 4 et 7, et qu'une de ses cases vides est dans une colonne contenant déjà un 4, cette case reçoit le 7."
+          }
+        }
+      }
+    },
+    "rules.classic.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill the 9×9 grid so every row, every column, and every 3×3 box contains the digits 1–9 exactly once. Some digits are given; deduce the rest. Every puzzle has exactly one solution reachable by logic alone."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplissez la grille 9×9 pour que chaque ligne, chaque colonne et chaque bloc 3×3 contiennent les chiffres 1 à 9 exactement une fois. Certains chiffres sont donnés ; déduisez les autres. Chaque grille possède une solution unique, atteignable par pure logique."
+          }
+        }
+      }
+    },
+    "rules.classic.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Scan one digit at a time across rows, columns and boxes.\n• Use notes for candidates — auto-clean removes them as you place digits.\n• Prefer cells with a single remaining candidate over guessing."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Balayez la grille un chiffre à la fois, par ligne, colonne et bloc.\n• Utilisez les notes pour les candidats — le nettoyage automatique les met à jour.\n• Cherchez les cases à candidat unique plutôt que de deviner."
+          }
+        }
+      }
+    },
+    "rules.consecutive.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 1 next to an unmarked edge can't touch a 2 there. Long chains of bars form runs like 4-5-6-5 — walk them up and down from any solved cell."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un 1 contre un bord non marqué ne peut y toucher un 2. De longues chaînes de barres forment des suites du type 4-5-6-5 — parcourez-les à partir de toute case résolue."
+          }
+        }
+      }
+    },
+    "rules.consecutive.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, with bars between neighbouring cells whose digits are consecutive. Every consecutive pair is marked — no bar means the two digits differ by at least 2."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, avec des barres entre cases voisines dont les chiffres sont consécutifs. Toutes les paires consécutives sont marquées — sans barre, les deux chiffres diffèrent d'au moins 2."
+          }
+        }
+      }
+    },
+    "rules.consecutive.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The negative rule does most of the work: unmarked neighbours differ by 2+.\n• One solved cell resolves whole bar chains — look for anchors.\n• 1s and 9s on a bar have a single neighbour value (2 or 8)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• La règle négative fait l'essentiel : des voisins non marqués diffèrent d'au moins 2.\n• Une seule case résolue propage toute une chaîne — cherchez les ancrages.\n• Un 1 ou un 9 sur une barre n'a qu'une valeur voisine possible (2 ou 8)."
+          }
+        }
+      }
+    },
+    "rules.diagonal.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The centre cell belongs to both diagonals — a digit placed there is excluded from both entire diagonals at once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La case centrale appartient aux deux diagonales — un chiffre placé là est exclu des deux diagonales entières à la fois."
+          }
+        }
+      }
+    },
+    "rules.diagonal.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus both main diagonals: each of the two long diagonals must also contain 1–9 exactly once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus les deux grandes diagonales : chacune doit aussi contenir 1 à 9 exactement une fois."
+          }
+        }
+      }
+    },
+    "rules.diagonal.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Treat each diagonal as a tenth and eleventh 'row' when scanning.\n• The centre cell is the most constrained — start near it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Traitez chaque diagonale comme une ligne supplémentaire lors du balayage.\n• La case centrale est la plus contrainte — commencez près d'elle."
+          }
+        }
+      }
+    },
+    "rules.dodeka12.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A row missing 10, 11 and 12: if two of its empty cells sit in boxes that already contain 10, the third cell takes the 10."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une ligne où manquent 10, 11 et 12 : si deux de ses cases vides sont dans des blocs contenant déjà 10, la troisième reçoit le 10."
+          }
+        }
+      }
+    },
+    "rules.dodeka12.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 12×12 grid: every row, column, and 3×4 box contains the digits 1–12 exactly once. More digits, longer deductions, same single-solution logic."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 12×12 : chaque ligne, colonne et bloc 3×4 contient les nombres 1 à 12 exactement une fois. Plus de valeurs, des déductions plus longues, la même logique de solution unique."
+          }
+        }
+      }
+    },
+    "rules.dodeka12.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Boxes are 3 rows × 4 columns — mind the rectangle.\n• Notes matter more as the digit range grows.\n• Two-digit numbers scale down; the remaining-count under each pad digit helps track them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les blocs font 3 lignes × 4 colonnes — attention au rectangle.\n• Les notes comptent d'autant plus que la plage de valeurs grandit.\n• Le compteur sous chaque chiffre du pavé aide à suivre les nombres restants."
+          }
+        }
+      }
+    },
+    "rules.evenodd.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A square-marked cell in a row that already shows 2, 4 and 6 must be 8 — parity plus the row solves it outright."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une case au carré dans une ligne montrant déjà 2, 4 et 6 est forcément 8 — la parité plus la ligne la résolvent d'un coup."
+          }
+        }
+      }
+    },
+    "rules.evenodd.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, with parity marks: cells outlined with a rounded square must hold an even digit, cells outlined with a circle must hold an odd digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, avec des marques de parité : les cases au carré arrondi contiennent un chiffre pair, celles au cercle un chiffre impair."
+          }
+        }
+      }
+    },
+    "rules.evenodd.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Parity halves a cell's candidates before you even look around.\n• Only four even digits exist (2, 4, 6, 8) — marked squares run out fast.\n• Check parity marks when a row seems stuck; they often break ties."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• La parité divise les candidats par deux avant même de regarder autour.\n• Il n'existe que quatre chiffres pairs (2, 4, 6, 8) — les carrés s'épuisent vite.\n• Consultez les marques quand une ligne semble bloquée ; elles départagent souvent."
+          }
+        }
+      }
+    },
+    "rules.fogofwar.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solve what you can see: a visible row missing one digit is still a gift — placing it may reveal a whole new region to work in."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résolvez ce qui est visible : une ligne à laquelle il ne manque qu'un chiffre reste un cadeau — le placer peut révéler toute une nouvelle zone."
+          }
+        }
+      }
+    },
+    "rules.fogofwar.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules under fog: only the area around the given digits starts visible. Placing a correct digit lifts the fog around it, gradually revealing the rest of the board."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques sous le brouillard : seule la zone autour des chiffres donnés est visible au départ. Chaque chiffre correct dissipe le brouillard autour de lui, révélant peu à peu la grille."
+          }
+        }
+      }
+    },
+    "rules.fogofwar.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Every correct placement is also a torch — prioritise moves near the fog line.\n• Standard eliminations still apply to hidden cells; the rules don't change, only your view.\n• Wrong guesses don't lift fog — accuracy is the lantern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Chaque placement correct est aussi une torche — privilégiez les coups près de la lisière du brouillard.\n• Les éliminations classiques s'appliquent aussi aux cases cachées ; seules votre vue change, pas les règles.\n• Les erreurs ne dissipent rien — la précision est la lanterne."
+          }
+        }
+      }
+    },
+    "rules.gattai2.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress in the left grid narrows the shared box, which immediately narrows the right grid — deductions flow across the bridge in both directions."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un progrès dans la grille de gauche resserre le bloc partagé, ce qui resserre aussitôt la grille de droite — les déductions traversent le pont dans les deux sens."
+          }
+        }
+      }
+    },
+    "rules.gattai2.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two 9×9 grids overlapping in one shared box region. Each grid follows classic rules; the shared cells must satisfy both at once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux grilles 9×9 se chevauchant sur un bloc partagé. Chaque grille suit les règles classiques ; les cases communes doivent satisfaire les deux à la fois."
+          }
+        }
+      }
+    },
+    "rules.gattai2.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The shared box is the hinge — return to it after every few placements.\n• A digit impossible in the overlap for one grid is impossible for the other too."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Le bloc partagé est la charnière — revenez-y régulièrement.\n• Un chiffre impossible dans le chevauchement pour une grille l'est aussi pour l'autre."
+          }
+        }
+      }
+    },
+    "rules.gattai3.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The middle grid touches both neighbours, so its deductions radiate outward — and constraints from both ends meet in it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La grille centrale touche ses deux voisines : ses déductions rayonnent vers l'extérieur, et les contraintes des deux bouts s'y rejoignent."
+          }
+        }
+      }
+    },
+    "rules.gattai3.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three 9×9 grids linked in a chain by shared box regions. Each grid must be valid; the overlaps tie them together."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois grilles 9×9 enchaînées par des blocs partagés. Chaque grille doit être valide ; les chevauchements les relient."
+          }
+        }
+      }
+    },
+    "rules.gattai3.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The middle grid is the busiest — expect the strongest deductions there.\n• Work the chain end to end; a stall in one grid often resolves from a neighbour."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• La grille centrale est la plus sollicitée — attendez-vous aux plus fortes déductions là.\n• Parcourez la chaîne de bout en bout ; un blocage se résout souvent depuis la voisine."
+          }
+        }
+      }
+    },
+    "rules.gattai8.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One placement in a busy overlap can ripple through three or four grids — follow the wave each time."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un placement dans un chevauchement actif peut se propager à travers trois ou quatre grilles — suivez l'onde à chaque fois."
+          }
+        }
+      }
+    },
+    "rules.gattai8.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eight interlocked 9×9 grids in a dense weave of shared boxes. Every grid must be valid, and every overlap must satisfy all grids it belongs to."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huit grilles 9×9 imbriquées en un tissage dense de blocs partagés. Chaque grille doit être valide, et chaque chevauchement doit satisfaire toutes les grilles concernées."
+          }
+        }
+      }
+    },
+    "rules.gattai8.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Map the overlaps first; they are the load-bearing walls.\n• Save often on a long solve.\n• When stuck, switch to the least-filled grid touching your best overlap."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Repérez d'abord les chevauchements ; ce sont les murs porteurs.\n• Sauvegardez souvent sur une longue résolution.\n• En cas de blocage, passez à la grille la moins remplie touchant votre meilleur chevauchement."
+          }
+        }
+      }
+    },
+    "rules.greaterthan.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cell smaller than all of its box neighbours trends toward 1 or 2. Chains like a<b<c across a box row force a minimum of 1, 2, 3 — and cap the ends."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une case plus petite que tous ses voisins de bloc tend vers 1 ou 2. Les chaînes a<b<c dans un bloc imposent au minimum 1, 2, 3 — et bornent les extrémités."
+          }
+        }
+      }
+    },
+    "rules.greaterthan.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, with inequality signs between every pair of neighbouring cells inside each box. Each sign points at the smaller digit, and every placement must respect all its signs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, avec des signes d'inégalité entre chaque paire de cases voisines à l'intérieur des blocs. Chaque signe pointe vers le chiffre le plus petit, et tout placement doit respecter ses signes."
+          }
+        }
+      }
+    },
+    "rules.greaterthan.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Follow inequality chains to their ends: 1 and 9 live at the extremes.\n• Count how many cells a cell dominates — it bounds the value from below.\n• Combine signs with ordinary sudoku eliminations; neither alone suffices."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Suivez les chaînes d'inégalités jusqu'au bout : 1 et 9 vivent aux extrêmes.\n• Comptez combien de cases une case domine — cela borne sa valeur par le bas.\n• Combinez les signes avec les éliminations classiques ; aucun des deux ne suffit seul."
+          }
+        }
+      }
+    },
+    "rules.hexadoku16.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A box missing only A and F: if its left column already holds an A, the left cell takes F and the other one A."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloc où ne manquent que A et F : si sa colonne de gauche contient déjà un A, la case de gauche prend F et l'autre A."
+          }
+        }
+      }
+    },
+    "rules.hexadoku16.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 16×16 grid using hexadecimal digits 0–F: every row, column, and 4×4 box contains all sixteen exactly once. A long, meditative solve."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 16×16 en chiffres hexadécimaux 0–F : chaque ligne, colonne et bloc 4×4 contient les seize valeurs exactement une fois. Une résolution longue et méditative."
+          }
+        }
+      }
+    },
+    "rules.hexadoku16.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Work box by box; sixteen candidates reward patience and notes.\n• Letters and digits mix — read B and 8 carefully."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Progressez bloc par bloc ; seize candidats récompensent patience et notes.\n• Lettres et chiffres se mélangent — distinguez bien B et 8."
+          }
+        }
+      }
+    },
+    "rules.jigsaw.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When a region snakes across three rows, its cells in one row exclude those digits from the rest of that row — the 'law of leftovers' between regions and rows is the key move."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand une région serpente sur trois lignes, ses cases dans une ligne excluent ces chiffres du reste de la ligne — la « loi des restes » entre régions et lignes est la déduction clé."
+          }
+        }
+      }
+    },
+    "rules.jigsaw.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The 3×3 boxes are replaced by nine irregular 9-cell regions. Every row, column, and outlined region contains 1–9 exactly once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les blocs 3×3 sont remplacés par neuf régions irrégulières de 9 cases. Chaque ligne, colonne et région délimitée contient 1 à 9 exactement une fois."
+          }
+        }
+      }
+    },
+    "rules.jigsaw.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Follow region outlines carefully before placing.\n• Compare a region with the rows it overlaps: cells outside the overlap mirror each other."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Suivez attentivement les contours avant de placer.\n• Comparez une région aux lignes qu'elle chevauche : les cases hors du chevauchement se répondent."
+          }
+        }
+      }
+    },
+    "rules.killer.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A two-cell cage totalling 3 can only be 1+2. A cage of 17 over two cells is 8+9. And since each box sums to 45, cages fully inside a box reveal what the leftover cells must total."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une cage de deux cases totalisant 3 ne peut être que 1+2. Une cage de 17 sur deux cases est 8+9. Et comme chaque bloc totalise 45, les cages entièrement incluses révèlent la somme des cases restantes."
+          }
+        }
+      }
+    },
+    "rules.killer.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus dashed cages: the digits inside each cage add up to the small number in its corner, and no digit repeats within a cage. Killer puzzles start with few or no givens — the sums carry the logic."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus des cages en pointillés : les chiffres d'une cage totalisent le petit nombre inscrit dans son coin, sans répétition à l'intérieur de la cage. Les grilles killer démarrent avec peu ou pas de chiffres donnés — les sommes portent toute la logique."
+          }
+        }
+      }
+    },
+    "rules.killer.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Memorise the forced combos: 3, 4, 16 and 17 on two cells; 6, 7, 23, 24 on three.\n• Use the 45 rule: every row, column and box sums to 45.\n• Note both digits of a forced pair — placement usually follows."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Mémorisez les combinaisons forcées : 3, 4, 16 et 17 sur deux cases ; 6, 7, 23 et 24 sur trois.\n• Utilisez la règle des 45 : chaque ligne, colonne et bloc totalise 45.\n• Notez les deux chiffres d'une paire forcée — le placement suit souvent."
+          }
+        }
+      }
+    },
+    "rules.killergt.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A two-cell cage of 5 is 1+4 or 2+3 — an inequality sign between the cells then decides the order, collapsing both candidates at once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une cage de deux cases totalisant 5 vaut 1+4 ou 2+3 — un signe d'inégalité entre les cases décide alors de l'ordre et fixe les deux candidats d'un coup."
+          }
+        }
+      }
+    },
+    "rules.killergt.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Killer rules plus inequalities: dashed cages sum to their corner totals with no repeats inside a cage, and inequality signs between neighbouring cells must also be respected."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les règles killer plus des inégalités : les cages en pointillés totalisent leur somme sans répétition interne, et les signes d'inégalité entre cases voisines doivent aussi être respectés."
+          }
+        }
+      }
+    },
+    "rules.killergt.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Use cage math to find the pair, then the sign to order it.\n• The 45 rule still applies to every row, column and box.\n• Signs across cage borders link cages together — follow those bridges."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• La somme trouve la paire, le signe l'ordonne.\n• La règle des 45 s'applique toujours à chaque ligne, colonne et bloc.\n• Les signes entre cages les relient — suivez ces ponts."
+          }
+        }
+      }
+    },
+    "rules.kropki.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Black-dot pairs can only be 1-2, 2-4, 3-6 or 4-8 — a cell on a black dot never holds 5, 7 or 9. A cell with white dots on both sides sits mid-chain: 2-3-4 style runs."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paires à point noir ne peuvent être que 1-2, 2-4, 3-6 ou 4-8 — une case sur un point noir n'est jamais 5, 7 ni 9. Une case flanquée de deux points blancs est au milieu d'une chaîne du type 2-3-4."
+          }
+        }
+      }
+    },
+    "rules.kropki.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, with dots between neighbouring cells: a white dot means the two digits are consecutive, a black dot means one is exactly double the other. Every qualifying pair is marked — so no dot between two cells means their digits are neither consecutive nor in a 1:2 ratio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, avec des points entre cases voisines : un point blanc signifie deux chiffres consécutifs, un point noir signifie que l'un est exactement le double de l'autre. Toutes les paires concernées sont marquées — l'absence de point signifie donc ni consécutifs, ni en rapport 1:2."
+          }
+        }
+      }
+    },
+    "rules.kropki.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The absence of a dot is information too — use the negative rule.\n• Black dots drastically cut candidates; resolve them first.\n• 1-2 is the only pair that satisfies both dot types."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• L'absence de point est aussi une information — exploitez la règle négative.\n• Les points noirs réduisent fortement les candidats ; traitez-les d'abord.\n• 1-2 est la seule paire qui satisfait les deux types de points."
+          }
+        }
+      }
+    },
+    "rules.littlekiller.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A three-cell diagonal totalling 6 could be 1+2+3 — but also 2+2+2 if those cells share no row, column or box. Check the geometry before excluding repeats."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une diagonale de trois cases totalisant 6 peut être 1+2+3 — mais aussi 2+2+2 si ces cases ne partagent ni ligne, ni colonne, ni bloc. Vérifiez la géométrie avant d'exclure les répétitions."
+          }
+        }
+      }
+    },
+    "rules.littlekiller.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus little-killer clues: each arrow outside the grid gives the total of all digits along the diagonal it points at. Digits may repeat on those diagonals wherever ordinary sudoku rules allow it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus des indices « little killer » : chaque flèche hors de la grille donne le total des chiffres de la diagonale qu'elle désigne. Les répétitions y sont possibles quand les règles sudoku classiques le permettent."
+          }
+        }
+      }
+    },
+    "rules.littlekiller.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Small totals over long diagonals force small digits, and vice versa.\n• Short two- or three-cell diagonals are the strongest clues.\n• Remember: repeats are legal on a diagonal, unlike in killer cages."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Un petit total sur une longue diagonale force de petits chiffres, et inversement.\n• Les diagonales courtes de deux ou trois cases sont les indices les plus forts.\n• Rappel : les répétitions sont légales sur une diagonale, contrairement aux cages killer."
+          }
+        }
+      }
+    },
+    "rules.mini4.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If a row shows 3 and 1, the two empty cells are 2 and 4 — the columns decide which goes where."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si une ligne montre 3 et 1, les deux cases vides sont 2 et 4 — les colonnes décident de leur ordre."
+          }
+        }
+      }
+    },
+    "rules.mini4.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The tiniest sudoku: a 4×4 grid where every row, column, and 2×2 box holds 1–4 exactly once. Perfect for warming up or learning the rules."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le plus petit sudoku : une grille 4×4 où chaque ligne, colonne et bloc 2×2 contient 1 à 4 exactement une fois. Parfait pour s'échauffer ou apprendre les règles."
+          }
+        }
+      }
+    },
+    "rules.mini4.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Every placement removes a candidate from three houses at once.\n• Great for practising notes and scanning habits."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Chaque placement élimine un candidat dans trois zones à la fois.\n• Idéal pour prendre l'habitude des notes et du balayage."
+          }
+        }
+      }
+    },
+    "rules.mini6.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 2×3 box missing 2 and 5: if its top row already has a 5 elsewhere, the top cell takes the 2 and the bottom one the 5."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bloc 2×3 où manquent 2 et 5 : si sa rangée du haut contient déjà un 5 ailleurs, la case du haut prend le 2 et celle du bas le 5."
+          }
+        }
+      }
+    },
+    "rules.mini6.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A quick 6×6 grid: every row, column, and 2×3 box holds the digits 1–6 exactly once. Same logic as classic, smaller playground."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille rapide 6×6 : chaque ligne, colonne et bloc 2×3 contient les chiffres 1 à 6 exactement une fois. Même logique que le classique, en plus compact."
+          }
+        }
+      }
+    },
+    "rules.mini6.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Boxes are 2 rows × 3 columns — scan them before rows.\n• With only six digits, counting what's missing is often fastest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les blocs font 2 lignes × 3 colonnes — inspectez-les avant les lignes.\n• Avec six chiffres seulement, compter ce qui manque est souvent le plus rapide."
+          }
+        }
+      }
+    },
+    "rules.miracle.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next to a 5, no orthogonal neighbour may be 4 or 6, no touching cell may be 5, and no knight-jump cell may be 5 — one digit shapes a whole neighbourhood."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À côté d'un 5, aucune voisine orthogonale ne peut être 4 ou 6, aucune case en contact ne peut être 5, et aucune case au saut de cavalier non plus — un seul chiffre façonne tout un voisinage."
+          }
+        }
+      }
+    },
+    "rules.miracle.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three global rules on top of classic sudoku: no digit repeats a knight's move away, none repeats a king's move away, and orthogonal neighbours are never consecutive. The constraints are so strong that a miracle grid starts from just a couple of givens."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trois règles globales s'ajoutent au sudoku classique : aucun chiffre ne se répète à un saut de cavalier, aucun à un pas de roi, et deux voisines orthogonales ne sont jamais consécutives. Les contraintes sont si fortes qu'une grille miracle démarre avec deux ou trois chiffres seulement."
+          }
+        }
+      }
+    },
+    "rules.miracle.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Every placement cascades — follow each consequence to the end before the next move.\n• The solution has a rigid repeating structure; once you sense the pattern, it accelerates.\n• Few givens doesn't mean guessing: the three rules always leave a logical next step."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Chaque placement se propage — suivez toutes ses conséquences avant le coup suivant.\n• La solution a une structure répétitive rigide ; une fois le motif senti, tout s'accélère.\n• Peu de chiffres donnés ne veut pas dire deviner : les trois règles laissent toujours une déduction possible."
+          }
+        }
+      }
+    },
+    "rules.samurai.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A digit placed in a shared corner box is constrained by two full grids — its row and column in one, its row and column in the other."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un chiffre placé dans un bloc partagé est contraint par deux grilles complètes — sa ligne et sa colonne dans l'une comme dans l'autre."
+          }
+        }
+      }
+    },
+    "rules.samurai.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Five overlapping 9×9 grids arranged in a cross, sharing their corner boxes. Every grid must be a valid sudoku on its own; shared boxes must work for both grids they belong to."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cinq grilles 9×9 en croix, partageant leurs blocs d'angle. Chaque grille doit être un sudoku valide en soi ; les blocs partagés doivent convenir aux deux grilles à la fois."
+          }
+        }
+      }
+    },
+    "rules.samurai.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Solve around the overlaps: shared boxes are the most constrained and unlock both grids.\n• Rows and columns do not cross between grids — only the shared boxes link them.\n• Rotate between grids when one stalls."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Travaillez autour des chevauchements : les blocs partagés, très contraints, débloquent les deux grilles.\n• Lignes et colonnes ne traversent pas les grilles — seuls les blocs partagés les relient.\n• Alternez de grille quand l'une bloque."
+          }
+        }
+      }
+    },
+    "rules.sandwich.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A clue of 0 means the 1 and 9 are adjacent. A clue of 35 means all seven other digits sit between them — the 1 and 9 are at the two ends."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un indice 0 signifie que le 1 et le 9 sont adjacents. Un indice 35 signifie que les sept autres chiffres sont entre eux — le 1 et le 9 occupent les extrémités."
+          }
+        }
+      }
+    },
+    "rules.sandwich.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus sandwich clues outside the grid: each number gives the sum of the digits squeezed between the 1 and the 9 of that row or column."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus des indices sandwich hors de la grille : chaque nombre donne la somme des chiffres coincés entre le 1 et le 9 de la ligne ou colonne."
+          }
+        }
+      }
+    },
+    "rules.sandwich.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Locate the 1s and 9s first; they are the bread of every sandwich.\n• Extreme clues (0, 2, 3, 33, 35) leave very few arrangements.\n• The filling's length is forced by which sums are even possible."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Placez d'abord les 1 et les 9 ; ils sont le pain de chaque sandwich.\n• Les indices extrêmes (0, 2, 3, 33, 35) laissent très peu d'arrangements.\n• La longueur de la garniture découle des sommes possibles."
+          }
+        }
+      }
+    },
+    "rules.section.example" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Example"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exemple"
+          }
+        }
+      }
+    },
+    "rules.section.howto" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to play"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment jouer"
+          }
+        }
+      }
+    },
+    "rules.section.tips" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tips"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuces"
+          }
+        }
+      }
+    },
+    "rules.shogun.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distant grids never touch, but constraints travel: an overlap resolved on the left tightens the middle, which tightens the right."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les grilles éloignées ne se touchent pas, mais les contraintes voyagent : un chevauchement résolu à gauche resserre le centre, qui resserre la droite."
+          }
+        }
+      }
+    },
+    "rules.shogun.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eleven overlapping 9×9 grids spread wide — a samurai stretched into a banner. Each grid must be valid; shared boxes bind neighbours."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onze grilles 9×9 qui se chevauchent en largeur — un samurai étiré en bannière. Chaque grille doit être valide ; les blocs partagés lient les voisines."
+          }
+        }
+      }
+    },
+    "rules.shogun.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Treat it as a relay of gattai puzzles; finish overlaps to pass the baton.\n• Track which grids are nearly done — they squeeze their neighbours hardest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Voyez-le comme un relais de puzzles gattai ; finissez les chevauchements pour passer le témoin.\n• Repérez les grilles presque finies — elles compriment le plus leurs voisines."
+          }
+        }
+      }
+    },
+    "rules.skyscraper.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A clue of 1 means the 9 stands first in line. A clue of 9 forces the full staircase 1,2,…,9. A 2 means the first building hides everything except one later riser — often the 9 right behind a tall first digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un indice 1 signifie que le 9 est en première position. Un indice 9 force l'escalier complet 1,2,…,9. Un 2 signifie qu'après le premier immeuble, un seul autre dépasse — souvent le 9 derrière un premier chiffre élevé."
+          }
+        }
+      }
+    },
+    "rules.skyscraper.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, where digits are building heights: each clue outside the grid counts how many buildings are visible from that side, taller buildings hiding all shorter ones behind them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, où les chiffres sont des hauteurs d'immeubles : chaque indice hors de la grille compte les immeubles visibles depuis ce côté, les plus hauts masquant les plus petits derrière eux."
+          }
+        }
+      }
+    },
+    "rules.skyscraper.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Clues of 1 and 9 are gifts — play them first.\n• Opposite clues on one line constrain both ends at once.\n• The 9 is visible from every direction; track where it can stand."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les indices 1 et 9 sont des cadeaux — jouez-les d'abord.\n• Deux indices opposés sur une même ligne contraignent les deux bouts à la fois.\n• Le 9 est visible de partout ; suivez où il peut se dresser."
+          }
+        }
+      }
+    },
+    "rules.sumo.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The central grids sit in the thick of several overlaps; a single digit there can close cells in four grids at once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les grilles centrales baignent dans plusieurs chevauchements ; un seul chiffre peut y fermer des cases dans quatre grilles à la fois."
+          }
+        }
+      }
+    },
+    "rules.sumo.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thirteen overlapping 9×9 grids — the colossus of the catalog. Classic rules in every grid, shared boxes gluing the giant together."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treize grilles 9×9 imbriquées — le colosse du catalogue. Règles classiques dans chaque grille, blocs partagés soudant l'ensemble."
+          }
+        }
+      }
+    },
+    "rules.sumo.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Break the colossus into gattai-sized chunks and rotate through them.\n• Overlap boxes first, always.\n• This is a multi-session solve — save and return fresh."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Découpez le colosse en morceaux de taille gattai et alternez.\n• Les blocs de chevauchement d'abord, toujours.\n• C'est une résolution en plusieurs séances — sauvegardez et revenez frais."
+          }
+        }
+      }
+    },
+    "rules.thermo.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A five-cell thermometer needs five increasing digits, so its bulb is at most 5 and its tip at least 5 — long thermos nearly place themselves."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un thermomètre de cinq cases exige cinq chiffres croissants : son bulbe vaut au plus 5 et sa pointe au moins 5 — les longs thermomètres se placent presque seuls."
+          }
+        }
+      }
+    },
+    "rules.thermo.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus thermometers: starting from each bulb, digits must strictly increase along the thermometer's path."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus des thermomètres : à partir de chaque bulbe, les chiffres croissent strictement le long du thermomètre."
+          }
+        }
+      }
+    },
+    "rules.thermo.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Bound every thermo cell: position from the bulb gives a minimum, distance to the tip a maximum.\n• Nine-cell thermometers are forced entirely: 1 through 9.\n• Bulbs are small, tips are large — scan for conflicts with rows and boxes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Bornez chaque case : la position depuis le bulbe donne un minimum, la distance à la pointe un maximum.\n• Un thermomètre de neuf cases est entièrement forcé : 1 à 9.\n• Bulbes petits, pointes grandes — traquez les conflits avec lignes et blocs."
+          }
+        }
+      }
+    },
+    "rules.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rules"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles"
+          }
+        }
+      }
+    },
+    "rules.tredoku.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A digit near the fold constrains cells on two faces at once: its line bends around the corner and keeps excluding."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un chiffre près de la pliure contraint des cases sur deux faces à la fois : sa ligne tourne le coin et continue d'exclure."
+          }
+        }
+      }
+    },
+    "rules.tredoku.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudoku in 3D: three faces of a corner, seen in perspective. Lines follow the fold — a row continues across the bend onto the neighbouring face — and every line and every 3×3 box must hold 1–9 without repetition."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le sudoku en 3D : trois faces d'un coin, vues en perspective. Les lignes suivent la pliure — une rangée continue sur la face voisine — et chaque ligne comme chaque bloc 3×3 contient 1 à 9 sans répétition."
+          }
+        }
+      }
+    },
+    "rules.tredoku.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Trace each line through the bend before trusting your scan.\n• Boxes never cross a fold — only lines do.\n• Cells at the corner belong to the most lines; start deductions there."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Suivez chaque ligne à travers la pliure avant de vous fier au balayage.\n• Les blocs ne traversent jamais une pliure — seules les lignes le font.\n• Les cases du coin appartiennent au plus de lignes ; commencez par elles."
+          }
+        }
+      }
+    },
+    "rules.windoku.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A digit placed inside a window is excluded from that window as well as its row, column and box — placements in windows work quadruple duty."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un chiffre placé dans une fenêtre est exclu de la fenêtre en plus de sa ligne, sa colonne et son bloc — un placement y travaille quadruplement."
+          }
+        }
+      }
+    },
+    "rules.windoku.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, plus four shaded 3×3 windows: each window must also contain 1–9 exactly once — thirteen box-like regions in total."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, plus quatre fenêtres 3×3 ombrées : chaque fenêtre doit aussi contenir 1 à 9 exactement une fois — treize régions de type bloc au total."
+          }
+        }
+      }
+    },
+    "rules.windoku.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The four windows also force structure on the unshaded cells between them.\n• Scan windows like extra boxes — they often break a stall."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Les quatre fenêtres contraignent aussi les cases non ombrées entre elles.\n• Balayez les fenêtres comme des blocs supplémentaires — elles débloquent souvent la situation."
+          }
+        }
+      }
+    },
+    "rules.wordoku.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The logic is identical to digits — if a row holds eight letters, the ninth fills the gap; boxes and columns eliminate the rest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La logique est identique aux chiffres — si une ligne contient huit lettres, la neuvième comble le trou ; blocs et colonnes éliminent le reste."
+          }
+        }
+      }
+    },
+    "rules.wordoku.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules with letters: every row, column, and 3×3 box contains each of the nine given letters exactly once."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques avec des lettres : chaque ligne, colonne et bloc 3×3 contient chacune des neuf lettres données exactement une fois."
+          }
+        }
+      }
+    },
+    "rules.wordoku.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Treat the letters as arbitrary symbols; don't look for words while solving.\n• The remaining-count under each letter keeps the set manageable."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Traitez les lettres comme des symboles arbitraires ; ne cherchez pas de mots en résolvant.\n• Le compteur sous chaque lettre garde l'ensemble lisible."
+          }
+        }
+      }
+    },
+    "rules.xv.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V pairs are 1-4 or 2-3 only — cells on a V never exceed 4. X pairs exclude 5, since 5+5 would repeat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paires V sont uniquement 1-4 ou 2-3 — les cases sur un V ne dépassent jamais 4. Les paires X excluent le 5, car 5+5 serait une répétition."
+          }
+        }
+      }
+    },
+    "rules.xv.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic rules, with marks between neighbouring cells: an X means the pair sums to 10, a V means it sums to 5. All such pairs are marked — no mark means the sum is neither 5 nor 10."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles classiques, avec des marques entre cases voisines : un X signifie que la paire totalise 10, un V qu'elle totalise 5. Toutes ces paires sont marquées — sans marque, la somme n'est ni 5 ni 10."
+          }
+        }
+      }
+    },
+    "rules.xv.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• A 5 can never sit on any mark — place fives using the negative rule.\n• V marks confine cells to 1–4; chase them first.\n• Crossing X and V constraints on one cell often forces it outright."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Un 5 ne peut jamais toucher une marque — placez les 5 grâce à la règle négative.\n• Les V confinent les cases à 1–4 ; traitez-les d'abord.\n• Un X et un V croisés sur une case la forcent souvent immédiatement."
+          }
+        }
+      }
+    },
     "section.chess" : {
       "extractionState" : "manual",
       "localizations" : {
