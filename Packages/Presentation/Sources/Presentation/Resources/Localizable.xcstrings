@@ -753,9 +753,6 @@
         }
       }
     },
-    "Average" : {
-
-    },
     "badge.new" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1297,9 +1294,6 @@
           }
         }
       }
-    },
-    "Fastest" : {
-
     },
     "game.exit.abandon" : {
       "localizations" : {
@@ -2380,9 +2374,6 @@
         }
       }
     },
-    "Kind" : {
-
-    },
     "newGame.bestTime" : {
       "localizations" : {
         "en" : {
@@ -2480,6 +2471,7 @@
       }
     },
     "newGame.start" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3486,6 +3478,7 @@
       }
     },
     "stats.chart.minutes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3646,6 +3639,7 @@
       }
     },
     "stats.streak.bestDaily" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3678,6 +3672,7 @@
       }
     },
     "stats.streak.bestWin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
