@@ -63,11 +63,18 @@ struct StatsView: View {
         }
     }
 
+    /// 2×2 grid: four short captions in one row truncate on small phones.
     private func totals(overview: StatsOverview, theme _: Theme) -> some View {
-        HStack(spacing: 10) {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 10),
+                GridItem(.flexible(), spacing: 10),
+            ],
+            spacing: 10,
+        ) {
             StatTile("stats.played", value: "\(overview.totalPlayed)")
-            StatTile("stats.won", value: "\(overview.totalWon)")
             StatTile("stats.winRate", value: "\(Int(overview.winRate * 100))%")
+            StatTile("stats.won", value: "\(overview.totalWon)")
             StatTile("stats.lost", value: "\(overview.totalLost)")
         }
     }
@@ -75,9 +82,7 @@ struct StatsView: View {
     private func perVariantTable(overview: StatsOverview, theme: Theme) -> some View {
         CardView {
             VStack(alignment: .leading, spacing: 10) {
-                Text("stats.byVariant", bundle: .module)
-                    .font(.headline)
-                    .foregroundStyle(theme.textPrimary)
+                SectionLabel("stats.byVariant")
                 ForEach(
                     Array(overview.perVariant.enumerated()),
                     id: \.offset,

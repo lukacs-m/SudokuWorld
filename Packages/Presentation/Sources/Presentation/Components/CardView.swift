@@ -14,8 +14,12 @@ public struct CardView<Content: View>: View {
         let theme = themeStore.theme(for: colorScheme)
         content
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(16)
-            .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+            .padding(18)
+            .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 20))
+            .shadow(
+                color: Color(red: 0.157, green: 0.141, blue: 0.110).opacity(0.05),
+                radius: 16,
+                y: 4,
+            )
     }
 }

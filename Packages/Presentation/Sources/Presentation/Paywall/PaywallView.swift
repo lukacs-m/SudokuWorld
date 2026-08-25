@@ -176,10 +176,9 @@ struct PaywallView: View {
     private func kindLabel(_ kind: PaywallProduct.Kind) -> String {
         switch kind {
         case let .subscription(period):
-            String(
-                localized: String.LocalizationValue("paywall.period.\(period)"),
-                bundle: .module,
-            )
+            // Interpolating inside a LocalizationValue literal turns the key
+            // into "paywall.period.%@" — build the key as a String first.
+            moduleString("paywall.period.\(period)")
 
         case .lifetime:
             String(localized: "paywall.lifetime", bundle: .module)

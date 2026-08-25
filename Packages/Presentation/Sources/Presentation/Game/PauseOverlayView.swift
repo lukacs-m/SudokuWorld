@@ -29,16 +29,9 @@ struct PauseOverlayView: View {
                 PrimaryButton("game.paused.resume", systemImage: "play.fill") {
                     onResume()
                 }
-                Button {
+                GhostButton("game.paused.saveExit") {
                     onSaveAndExit()
-                } label: {
-                    Text("game.paused.saveExit", bundle: .module)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(theme.textPrimary)
                 Button(role: .destructive) {
                     onAbandon()
                 } label: {
@@ -53,7 +46,7 @@ struct PauseOverlayView: View {
         }
         .padding(32)
         .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 24))
-        .shadow(radius: 24)
+        .shadow(color: .black.opacity(0.18), radius: 30, y: 10)
         .padding(24)
     }
 }

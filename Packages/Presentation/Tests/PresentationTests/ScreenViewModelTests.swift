@@ -267,7 +267,7 @@ struct SettingsViewModelTests {
         await viewModel.load()
 
         #expect(!viewModel.selectTheme(.midnight))
-        #expect(viewModel.settings.theme == .classicBlue)
+        #expect(viewModel.settings.theme == .warmPaper)
     }
 
     @Test func premiumThemeUnlocksWithEntitlement() async {

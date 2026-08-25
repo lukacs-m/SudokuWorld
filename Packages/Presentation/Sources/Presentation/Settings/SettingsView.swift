@@ -21,6 +21,10 @@ struct SettingsView: View {
                 themeSection(theme: theme)
                 gameCenterSection(theme: theme)
                 premiumSection(theme: theme)
+                #if DEBUG
+                    debugSection
+                #endif
+                aboutSection(theme: theme)
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity)
@@ -125,6 +129,24 @@ struct SettingsView: View {
 
     private func themeSection(theme _: Theme) -> some View {
         Section {
+            Picker(selection: Binding(
+                get: { viewModel.settings.appearance ?? .system },
+                set: { newValue in
+                    viewModel.update { $0.appearance = newValue }
+                    themeStore.selectAppearance(newValue)
+                },
+            )) {
+                Text("settings.appearance.light", bundle: .module)
+                    .tag(AppearancePreference.light)
+                Text("settings.appearance.dark", bundle: .module)
+                    .tag(AppearancePreference.dark)
+                Text("settings.appearance.system", bundle: .module)
+                    .tag(AppearancePreference.system)
+            } label: {
+                Text("settings.appearance", bundle: .module)
+            }
+            .pickerStyle(.segmented)
+
             ThemePickerView(
                 selected: viewModel.settings.theme,
                 isPremium: viewModel.isPremium,
@@ -197,6 +219,37 @@ struct SettingsView: View {
             }
         } header: {
             Text("settings.section.premium", bundle: .module)
+        }
+    }
+
+    #if DEBUG
+        private var debugSection: some View {
+            Section {
+                NavigationLink {
+                    DebugMenuView()
+                } label: {
+                    Label {
+                        Text("home.debug", bundle: .module)
+                    } icon: {
+                        Image(systemName: "hammer")
+                    }
+                }
+            }
+        }
+    #endif
+
+    private func aboutSection(theme: Theme) -> some View {
+        Section {} footer: {
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+            Text(
+                String(
+                    format: String(localized: "settings.version", bundle: .module),
+                    version ?? "—",
+                ),
+            )
+            .font(.caption)
+            .foregroundStyle(theme.textSecondary)
+            .frame(maxWidth: .infinity)
         }
     }
 

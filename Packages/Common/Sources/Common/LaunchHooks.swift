@@ -21,8 +21,28 @@ public enum LaunchHooks {
             let difficulty = UserDefaults.standard.string(forKey: "uiHookDifficulty") ?? "easy"
             return (variant, difficulty)
         }
+
+        /// Select a root tab at launch: `-uiHookTab <home|events|stats|settings>`.
+        public static var initialTab: String? {
+            UserDefaults.standard.string(forKey: "uiHookTab")
+        }
+
+        /// Seed fake game records and daily completions so data-driven
+        /// screens (stats, week strip) can be screenshotted: `-uiHookSeedStats YES`.
+        public static var seedStats: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookSeedStats")
+        }
+
+        /// Open the rules sheet for a variant inside the New Game sheet:
+        /// `-uiHookNewGameSheet YES -uiHookRules <variant-slug>`.
+        public static var rulesVariant: String? {
+            UserDefaults.standard.string(forKey: "uiHookRules")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
+        public static let initialTab: String? = nil
+        public static let seedStats = false
+        public static let rulesVariant: String? = nil
     #endif
 }

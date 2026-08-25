@@ -3,7 +3,8 @@
 /// lower layers.
 public enum ThemeID: String, CaseIterable, Equatable, Sendable, Codable {
     /// Raw values are persisted in settings — they must never change.
-    case classicBlue = "classicBlue"
+    /// (`warmPaper` keeps the original `classicBlue` slot's raw value.)
+    case warmPaper = "classicBlue"
     case slate
     case forest
     case midnight
@@ -13,7 +14,7 @@ public enum ThemeID: String, CaseIterable, Equatable, Sendable, Codable {
     /// Premium themes require the premium entitlement to select.
     public var isPremium: Bool {
         switch self {
-        case .classicBlue, .slate, .forest: false
+        case .warmPaper, .slate, .forest: false
         case .midnight, .rose, .amber: true
         }
     }

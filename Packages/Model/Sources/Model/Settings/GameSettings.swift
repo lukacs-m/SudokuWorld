@@ -12,6 +12,9 @@ public struct GameSettings: Equatable, Sendable, Codable {
     /// New games start in hardcore mode (limited mistakes, no hints).
     public var hardcoreByDefault: Bool
     public var theme: ThemeID
+    /// Optional so settings persisted before this field decode unchanged;
+    /// `nil` means `.system`.
+    public var appearance: AppearancePreference?
 
     public static let standard = Self(
         inputMode: .cellFirst,
@@ -21,7 +24,7 @@ public struct GameSettings: Equatable, Sendable, Codable {
         hapticsEnabled: true,
         timerVisible: true,
         hardcoreByDefault: false,
-        theme: .classicBlue,
+        theme: .warmPaper,
     )
 
     public init(
@@ -33,6 +36,7 @@ public struct GameSettings: Equatable, Sendable, Codable {
         timerVisible: Bool,
         hardcoreByDefault: Bool,
         theme: ThemeID,
+        appearance: AppearancePreference? = nil,
     ) {
         self.inputMode = inputMode
         self.autoCleanNotes = autoCleanNotes
@@ -42,5 +46,6 @@ public struct GameSettings: Equatable, Sendable, Codable {
         self.timerVisible = timerVisible
         self.hardcoreByDefault = hardcoreByDefault
         self.theme = theme
+        self.appearance = appearance
     }
 }
