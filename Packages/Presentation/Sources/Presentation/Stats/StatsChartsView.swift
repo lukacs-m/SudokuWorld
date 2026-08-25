@@ -3,8 +3,8 @@ import Foundation
 import Model
 import SwiftUI
 
-/// The stats screen's charts: 30-day activity, win rate per difficulty,
-/// best vs average times, and variant distribution — all Swift Charts.
+/// The stats screen's breakdown cards: 30-day activity, win rate per
+/// difficulty, best vs average times, and variant distribution.
 struct StatsChartsView: View {
     let overview: StatsOverview
 
@@ -14,39 +14,12 @@ struct StatsChartsView: View {
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
         VStack(spacing: 16) {
-            chartCard("stats.chart.activity", theme: theme) {
-                Chart(overview.gamesPerDay) { day in
-                    BarMark(
-                        x: .value("Day", day.day, unit: .day),
-                        y: .value("Games", day.count),
-                    )
-                    .foregroundStyle(theme.accent)
-                    .cornerRadius(2)
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: 7))
-                }
-                .frame(height: 140)
+            if hasRecentActivity {
+                ActivityChartView(days: overview.gamesPerDay)
             }
 
             if !overview.winRateByDifficulty.isEmpty {
-                chartCard("stats.chart.winRate", theme: theme) {
-                    Chart(overview.winRateByDifficulty) { entry in
-                        BarMark(
-                            x: .value("Rate", entry.rate * 100),
-                            y: .value("Difficulty", localizedDifficulty(entry.difficulty)),
-                        )
-                        .foregroundStyle(theme.accent)
-                        .cornerRadius(3)
-                        .annotation(position: .trailing) {
-                            Text("\(Int(entry.rate * 100))%")
-                                .font(.caption2)
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                    }
-                    .chartXScale(domain: 0 ... 100)
-                    .frame(height: CGFloat(overview.winRateByDifficulty.count) * 34 + 20)
-                }
+                WinRateBreakdownView(entries: overview.winRateByDifficulty)
             }
 
             if !overview.timesByDifficulty.isEmpty {
@@ -80,6 +53,12 @@ struct StatsChartsView: View {
                 }
             }
         }
+    }
+
+    /// `gamesPerDay` is zero-filled to exactly 30 entries, so it is never
+    /// empty — unlike its sibling series, the card has to check the counts.
+    private var hasRecentActivity: Bool {
+        overview.gamesPerDay.contains { $0.count >= 1 }
     }
 
     private func chartCard(

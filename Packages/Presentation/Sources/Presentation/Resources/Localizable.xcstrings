@@ -870,9 +870,6 @@
     "Day" : {
 
     },
-    "Difficulty" : {
-
-    },
     "difficulty.beginner" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2600,6 +2597,16 @@
         }
       }
     },
+    "overAllBest" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best time overall %@"
+          }
+        }
+      }
+    },
     "paywall.active" : {
       "localizations" : {
         "en" : {
@@ -2875,9 +2882,6 @@
           }
         }
       }
-    },
-    "Rate" : {
-
     },
     "rules.alphadoku25.example" : {
       "extractionState" : "manual",
@@ -5326,6 +5330,22 @@
         }
       }
     },
+    "stats.chart.activity.unit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Games per day"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parties par jour"
+          }
+        }
+      }
+    },
     "stats.chart.minutes" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5597,6 +5617,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Statistiques"
+          }
+        }
+      }
+    },
+    "stats.variant.best" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record %@"
+          }
+        }
+      }
+    },
+    "stats.variant.wonPlayed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d/%2$d won"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d/%2$d gagnées"
           }
         }
       }

@@ -35,7 +35,7 @@ struct StatsView: View {
                     totals(overview: overview, theme: theme)
                     StreakBadgeView(streaks: overview.streaks)
                     StatsChartsView(overview: overview)
-                    perVariantTable(overview: overview, theme: theme)
+                    VariantBreakdownView(overview: overview)
 
                 case .failed:
                     ContentUnavailableView {
@@ -76,39 +76,6 @@ struct StatsView: View {
             StatTile("stats.winRate", value: "\(Int(overview.winRate * 100))%")
             StatTile("stats.won", value: "\(overview.totalWon)")
             StatTile("stats.lost", value: "\(overview.totalLost)")
-        }
-    }
-
-    private func perVariantTable(overview: StatsOverview, theme: Theme) -> some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 10) {
-                SectionLabel("stats.byVariant")
-                ForEach(
-                    Array(overview.perVariant.enumerated()),
-                    id: \.offset,
-                ) { _, stats in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: moduleString("variant.\(stats.variant.slug)"))
-                                .font(.subheadline.weight(.medium))
-                            Text(verbatim: moduleString("difficulty.\(stats.difficulty.slug)"))
-                                .font(.caption)
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text("\(stats.won)/\(stats.played)")
-                                .font(.subheadline.monospacedDigit())
-                            if let fastest = stats.fastestTime {
-                                Text(DurationFormatter.string(for: fastest))
-                                    .font(.caption.monospacedDigit())
-                                    .foregroundStyle(theme.textSecondary)
-                            }
-                        }
-                    }
-                    .padding(.vertical, 2)
-                }
-            }
         }
     }
 }
