@@ -11,8 +11,6 @@ import Testing
 struct GameViewModelTests {
     private func registerBaseMocks(
         startPuzzle: PuzzleDefinition = TestFixtures.puzzle(),
-        entitlements: Entitlements = .free,
-        interstitial: AdCreative? = nil,
     ) -> (saves: SaveRecorder, completions: CompletionRecorder) {
         let saves = SaveRecorder()
         let completions = CompletionRecorder()
@@ -23,12 +21,6 @@ struct GameViewModelTests {
         Container.shared.completeGameUseCase.register { MockCompleteGame(recorder: completions) }
         Container.shared.getHintUseCase.register { MockGetHint() }
         Container.shared.revealCellUseCase.register { MockRevealCell() }
-        Container.shared.interstitialGateUseCase.register {
-            MockInterstitialGate(creative: interstitial)
-        }
-        Container.shared.getEntitlementsUseCase.register {
-            MockGetEntitlements(entitlements: entitlements)
-        }
         Container.shared.settingsRepository.register { MockSettingsRepository() }
         return (saves, completions)
     }
@@ -133,17 +125,9 @@ struct GameViewModelTests {
         }
     }
 
-    @Test func solvingRunsCompletionAndInterstitialGate() async throws {
-        let creative = AdCreative(
-            id: "test",
-            format: .interstitial,
-            headline: "h",
-            body: "b",
-            callToAction: "c",
-        )
+    @Test func solvingRunsCompletion() async throws {
         let (_, completions) = registerBaseMocks(
             startPuzzle: TestFixtures.almostSolvedPuzzle(),
-            interstitial: creative,
         )
         let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
             variant: .classic,
@@ -163,7 +147,6 @@ struct GameViewModelTests {
 
         let outcomes = await completions.outcomes
         #expect(outcomes == [.won])
-        #expect(viewModel.interstitial == creative)
         if case let .finished(summary) = viewModel.phase {
             #expect(summary.outcome == .won)
         } else {
@@ -171,7 +154,7 @@ struct GameViewModelTests {
         }
     }
 
-    @Test func freeTierHintLimitIsEnforced() async {
+    @Test func hintsAreUnlimited() async {
         _ = registerBaseMocks()
         let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
             variant: .classic,
@@ -180,33 +163,13 @@ struct GameViewModelTests {
         )))
         await viewModel.start()
 
-        for _ in 0..<FreeTier.hintsPerGame {
+        for _ in 0..<5 {
             #expect(viewModel.canRequestHint)
             await viewModel.requestHint()
             #expect(viewModel.presentedHint != nil)
             viewModel.applyPresentedHint()
         }
-        #expect(!viewModel.canRequestHint)
-        #expect(viewModel.hintsRemaining == 0)
-    }
-
-    @Test func premiumHasUnlimitedHints() async {
-        _ = registerBaseMocks(
-            entitlements: Entitlements(isPremium: true, source: .subscription),
-        )
-        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
-            variant: .classic,
-            difficulty: .easy,
-            mode: .normal,
-        )))
-        await viewModel.start()
-
-        for _ in 0..<5 {
-            await viewModel.requestHint()
-            viewModel.applyPresentedHint()
-        }
         #expect(viewModel.canRequestHint)
-        #expect(viewModel.hintsRemaining == nil)
     }
 
     @Test func hardcoreModeDisallowsHints() async {
@@ -278,8 +241,6 @@ struct GameViewModelTests {
         Container.shared.completeGameUseCase.register { MockCompleteGame(recorder: completions) }
         Container.shared.getHintUseCase.register { MockGetHint() }
         Container.shared.revealCellUseCase.register { MockRevealCell() }
-        Container.shared.interstitialGateUseCase.register { MockInterstitialGate(creative: nil) }
-        Container.shared.getEntitlementsUseCase.register { MockGetEntitlements() }
         return (saves, completions)
     }
 }

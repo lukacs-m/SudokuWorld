@@ -56,7 +56,9 @@ public struct RevenueCatPurchasesService: PurchasesService {
             let offerings = try await Purchases.shared.offerings()
             guard let current = offerings.current else { return .empty }
             return PaywallOfferings(
-                products: current.availablePackages.map(Self.map(package:)),
+                products: current.availablePackages
+                    .compactMap(Self.map(package:))
+                    .sorted { Self.displayRank($0.kind) < Self.displayRank($1.kind) },
             )
         } catch {
             throw DomainError.purchasesUnavailable
@@ -112,29 +114,43 @@ public struct RevenueCatPurchasesService: PurchasesService {
         return Entitlements(isPremium: true, source: source)
     }
 
-    private static func map(package: Package) -> PaywallProduct {
-        let product = package.storeProduct
-        let kind: PaywallProduct.Kind = if let period = product.subscriptionPeriod {
-            .subscription(period: Self.periodKey(period))
-        } else {
-            .lifetime
+    /// Maps by package type — the offering is the source of truth for which
+    /// three products exist; anything else in it is ignored.
+    private static func map(package: Package) -> PaywallProduct? {
+        let kind: PaywallProduct.Kind? = switch package.packageType {
+        case .monthly: .monthly
+        case .annual: .annual
+        case .lifetime: .lifetime
+        default: nil
         }
+        guard let kind else { return nil }
+        let product = package.storeProduct
         return PaywallProduct(
             id: product.productIdentifier,
             kind: kind,
             title: product.localizedTitle,
             details: product.localizedDescription,
             priceText: product.localizedPriceString,
+            trialDays: Self.trialDays(product.introductoryDiscount),
         )
     }
 
-    /// A stable period token ("year", "month", …) localized by Presentation.
-    private static func periodKey(_ period: SubscriptionPeriod) -> String {
-        switch period.unit {
-        case .day: "day"
-        case .week: "week"
-        case .month: "month"
-        case .year: "year"
+    private static func trialDays(_ intro: StoreProductDiscount?) -> Int? {
+        guard let intro, intro.paymentMode == .freeTrial else { return nil }
+        let period = intro.subscriptionPeriod
+        return switch period.unit {
+        case .day: period.value
+        case .week: period.value * 7
+        case .month: period.value * 30
+        case .year: period.value * 365
+        }
+    }
+
+    private static func displayRank(_ kind: PaywallProduct.Kind) -> Int {
+        switch kind {
+        case .monthly: 0
+        case .annual: 1
+        case .lifetime: 2
         }
     }
 }

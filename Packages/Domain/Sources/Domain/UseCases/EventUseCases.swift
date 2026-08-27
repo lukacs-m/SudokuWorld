@@ -1,36 +1,35 @@
 public import Foundation
 public import Model
 
-// MARK: - Daily challenge
+// MARK: - Daily lineup
 
-/// Today's challenge: plan, deterministic puzzle, and completion status.
-public protocol GetDailyChallengeUseCase: Sendable {
-    func callAsFunction(now: Date) async -> DailyChallenge
+/// A day's lineup: the three slot plans plus their completion status.
+/// Cheap — puzzles are only generated when a slot is actually launched.
+public protocol GetDailyLineupUseCase: Sendable {
+    func callAsFunction(dateKey: String) async -> DailyLineup
 }
 
-public struct GetDailyChallenge: GetDailyChallengeUseCase {
+public struct GetDailyLineup: GetDailyLineupUseCase {
     private let dailyChallenges: any DailyChallengeRepository
-    private let generator = PuzzleGenerator()
 
     public init(dailyChallenges: any DailyChallengeRepository) {
         self.dailyChallenges = dailyChallenges
     }
 
-    public func callAsFunction(now: Date) async -> DailyChallenge {
-        let dateKey = EventSeeds.dailyDateKey(for: now)
-        let plan = EventSeeds.dailyPlan(dateKey: dateKey)
-        let puzzle = await generator.generate(
-            variant: plan.variant,
-            difficulty: plan.difficulty,
-            seed: EventSeeds.dailySeed(dateKey: dateKey),
-        )
-        let completionTime = try? await dailyChallenges.completionTime(dateKey: dateKey)
-        return DailyChallenge(
+    public func callAsFunction(dateKey: String) async -> DailyLineup {
+        let times = await (try? dailyChallenges.completions(dateKey: dateKey)) ?? [:]
+        let slots = EventSeeds.dailySlots(dateKey: dateKey).map { plan in
+            DailyLineup.Slot(
+                variant: plan.variant,
+                difficulty: plan.difficulty,
+                completionTime: times[plan.variant],
+            )
+        }
+        let dayStart = EventSeeds.date(fromDateKey: dateKey) ?? .distantPast
+        return DailyLineup(
             dateKey: dateKey,
-            endsAt: EventSeeds.nextDailyReset(after: now),
-            puzzle: puzzle,
-            isCompleted: completionTime != nil,
-            completionTime: completionTime,
+            endsAt: EventSeeds.nextDailyReset(after: dayStart),
+            slots: slots,
         )
     }
 }

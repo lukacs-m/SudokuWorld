@@ -2,20 +2,10 @@ import Data
 public import Domain
 public import FactoryKit
 
-/// Monetization wiring: purchases, entitlements, and the ad pipeline.
+/// Monetization wiring: purchases and entitlements.
 public extension Container {
     var purchasesService: Factory<any PurchasesService> {
         self { RevenueCatPurchasesService() }
-            .singleton
-    }
-
-    var adProvider: Factory<any AdProviding> {
-        self { SimulatedAdProvider() }
-            .singleton
-    }
-
-    var adStateRepository: Factory<any AdStateRepository> {
-        self { UserDefaultsAdStateRepository() }
             .singleton
     }
 
@@ -41,24 +31,5 @@ public extension Container {
 
     var restorePurchasesUseCase: Factory<any RestorePurchasesUseCase> {
         self { RestorePurchases(purchases: self.purchasesService()) }
-    }
-
-    var interstitialGateUseCase: Factory<any InterstitialGateUseCase> {
-        self {
-            InterstitialGate(
-                purchases: self.purchasesService(),
-                adState: self.adStateRepository(),
-                adProvider: self.adProvider(),
-            )
-        }
-    }
-
-    var getBannerUseCase: Factory<any GetBannerUseCase> {
-        self {
-            GetBanner(
-                purchases: self.purchasesService(),
-                adProvider: self.adProvider(),
-            )
-        }
     }
 }

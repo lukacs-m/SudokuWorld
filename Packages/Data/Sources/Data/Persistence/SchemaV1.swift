@@ -61,15 +61,26 @@ final class GameRecordEntity {
     }
 }
 
-/// One row per completed daily challenge — the daily-streak history.
+/// One row per completed daily slot — the daily-streak history.
 @Model
 final class DailyCompletionEntity {
-    @Attribute(.unique) var dateKey: String
+    /// "<dateKey>:<variant slug>" — one row per day per slot.
+    @Attribute(.unique) var key: String
+    var dateKey: String
+    var variantSlug: String
     var completedAt: Date
     var durationSeconds: Double
 
-    init(dateKey: String, completedAt: Date, durationSeconds: Double) {
+    init(
+        key: String,
+        dateKey: String,
+        variantSlug: String,
+        completedAt: Date,
+        durationSeconds: Double,
+    ) {
+        self.key = key
         self.dateKey = dateKey
+        self.variantSlug = variantSlug
         self.completedAt = completedAt
         self.durationSeconds = durationSeconds
     }

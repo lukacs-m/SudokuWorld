@@ -517,226 +517,6 @@
         }
       }
     },
-    "ad.house.daily.body" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One puzzle, the whole world. Keep your streak alive!"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Une grille, le monde entier. Gardez votre série en vie !"
-          }
-        }
-      }
-    },
-    "ad.house.daily.cta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouer"
-          }
-        }
-      }
-    },
-    "ad.house.daily.headline" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daily Challenge"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défi du jour"
-          }
-        }
-      }
-    },
-    "ad.house.hardcore.body" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Three mistakes, no hints. Are you up to it?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trois erreurs, zéro indice. Chiche ?"
-          }
-        }
-      }
-    },
-    "ad.house.hardcore.cta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try it"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essayer"
-          }
-        }
-      }
-    },
-    "ad.house.hardcore.headline" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try Hardcore"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essayez le mode hardcore"
-          }
-        }
-      }
-    },
-    "ad.house.premium.body" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No ads, unlimited hints, and exclusive themes."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans pub, indices illimités et thèmes exclusifs."
-          }
-        }
-      }
-    },
-    "ad.house.premium.cta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upgrade"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Découvrir"
-          }
-        }
-      }
-    },
-    "ad.house.premium.headline" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Go Premium"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passez à Premium"
-          }
-        }
-      }
-    },
-    "ad.house.variety.body" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Killer, Windoku, Samurai and more await."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Killer, Windoku, Samouraï et bien plus vous attendent."
-          }
-        }
-      }
-    },
-    "ad.house.variety.cta" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explore"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Explorer"
-          }
-        }
-      }
-    },
-    "ad.house.variety.headline" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seven ways to play"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sept façons de jouer"
-          }
-        }
-      }
-    },
-    "ad.label" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pub"
-          }
-        }
-      }
-    },
     "app.title" : {
       "localizations" : {
         "en" : {
@@ -749,6 +529,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SudokuWorld"
+          }
+        }
+      }
+    },
+    "archive.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Past dailies will appear here"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les défis passés apparaîtront ici"
+          }
+        }
+      }
+    },
+    "archive.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily archive"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archives des défis"
           }
         }
       }
@@ -783,6 +595,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Populaire"
+          }
+        }
+      }
+    },
+    "catalog.dailyOn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défi %@"
+          }
+        }
+      }
+    },
+    "catalog.playToday" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À jouer aujourd'hui"
           }
         }
       }
@@ -972,6 +816,22 @@
         }
       }
     },
+    "events.archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily archive"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archives des défis"
+          }
+        }
+      }
+    },
     "events.daily.completedTile" : {
       "localizations" : {
         "en" : {
@@ -988,22 +848,6 @@
         }
       }
     },
-    "events.daily.done" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completed in %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminé en %@"
-          }
-        }
-      }
-    },
     "events.daily.doneNoTime" : {
       "localizations" : {
         "en" : {
@@ -1016,22 +860,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminé"
-          }
-        }
-      }
-    },
-    "events.daily.play" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play today's puzzle"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouer la grille du jour"
           }
         }
       }
@@ -2467,6 +2295,22 @@
         }
       }
     },
+    "newGame.playToday" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play today's %@ daily"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer le défi %@ du jour"
+          }
+        }
+      }
+    },
     "newGame.start" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2623,50 +2467,18 @@
         }
       }
     },
-    "paywall.benefit.hints" : {
+    "paywall.benefit.archive" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlimited hints"
+            "value" : "Replay any past daily"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indices illimités"
-          }
-        }
-      }
-    },
-    "paywall.benefit.noAds" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No ads, ever"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune publicité"
-          }
-        }
-      }
-    },
-    "paywall.benefit.stats" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detailed statistics"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statistiques détaillées"
+            "value" : "Rejouez tous les défis passés"
           }
         }
       }
@@ -2683,6 +2495,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thèmes exclusifs"
+          }
+        }
+      }
+    },
+    "paywall.benefit.variants" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited puzzles in every variant"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grilles illimitées dans toutes les variantes"
+          }
+        }
+      }
+    },
+    "paywall.bestValue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEST VALUE"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MEILLEURE OFFRE"
+          }
+        }
+      }
+    },
+    "paywall.cta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        }
+      }
+    },
+    "paywall.kind.annual" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yearly, auto-renews"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuel, renouvellement automatique"
+          }
+        }
+      }
+    },
+    "paywall.kind.monthly" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monthly, auto-renews"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensuel, renouvellement automatique"
           }
         }
       }
@@ -2719,70 +2611,18 @@
         }
       }
     },
-    "paywall.period.day" : {
-      "extractionState" : "stale",
+    "paywall.privacy" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "per day"
+            "value" : "Privacy Policy"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "par jour"
-          }
-        }
-      }
-    },
-    "paywall.period.month" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "per month"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "par mois"
-          }
-        }
-      }
-    },
-    "paywall.period.week" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "per week"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "par semaine"
-          }
-        }
-      }
-    },
-    "paywall.period.year" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "per year"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "par an"
+            "value" : "Politique de confidentialité"
           }
         }
       }
@@ -2851,6 +2691,22 @@
         }
       }
     },
+    "paywall.terms" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Use"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conditions d'utilisation"
+          }
+        }
+      }
+    },
     "paywall.title" : {
       "localizations" : {
         "en" : {
@@ -2863,6 +2719,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SudokuWorld Premium"
+          }
+        }
+      }
+    },
+    "paywall.trial" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld-day free trial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai gratuit de %lld jours"
           }
         }
       }
@@ -5294,6 +5166,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version %@"
+          }
+        }
+      }
+    },
+    "softwall.next" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next %1$@ daily: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prochain défi %1$@ : %2$@"
+          }
+        }
+      }
+    },
+    "softwall.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Come back for more"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revenez pour la suite"
+          }
+        }
+      }
+    },
+    "softwall.tomorrow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow's dailies: %1$@ · %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défis de demain : %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "softwall.unlock" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock unlimited"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débloquer l'illimité"
+          }
+        }
+      }
+    },
+    "softwall.wait" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See you then"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À bientôt"
           }
         }
       }

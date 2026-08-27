@@ -10,9 +10,11 @@ public struct PaywallOfferings: Equatable, Sendable {
 }
 
 public struct PaywallProduct: Identifiable, Equatable, Sendable {
+    /// Mirrors the RevenueCat offering's package types; the paywall shows
+    /// exactly these three, with annual anchored as best value.
     public enum Kind: Equatable, Sendable {
-        /// An auto-renewing subscription with a localized period description.
-        case subscription(period: String)
+        case monthly
+        case annual
         /// The one-time lifetime unlock.
         case lifetime
     }
@@ -24,12 +26,22 @@ public struct PaywallProduct: Identifiable, Equatable, Sendable {
     public let details: String
     /// Localized price straight from StoreKit.
     public let priceText: String
+    /// Length of the free introductory trial in days, nil without one.
+    public let trialDays: Int?
 
-    public init(id: String, kind: Kind, title: String, details: String, priceText: String) {
+    public init(
+        id: String,
+        kind: Kind,
+        title: String,
+        details: String,
+        priceText: String,
+        trialDays: Int? = nil,
+    ) {
         self.id = id
         self.kind = kind
         self.title = title
         self.details = details
         self.priceText = priceText
+        self.trialDays = trialDays
     }
 }

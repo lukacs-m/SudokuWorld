@@ -39,13 +39,16 @@ events, RevenueCat monetization, and full English + French localization.
 - **Game Center** — 84 matrix leaderboards + 4 aggregates, 16 achievements
   (incremental progress for milestones), offline submission queue, standings
   in the events hub. Gameplay never blocks on authentication.
-- **Events** — rotating Daily Challenge with streak protection reminders
-  (opt-in local notifications) and a Weekly Tournament (themed variant ×
-  difficulty per ISO week, cumulative points on a recurring leaderboard).
-- **Monetization** — RevenueCat subscription + lifetime unlock (no ads,
-  unlimited hints, premium themes); house-ad pipeline behind a swappable
-  `AdProviding` abstraction (banners on menu screens, interstitials only
-  between games, never for premium, never mid-puzzle); paywall with restore.
+- **Events** — three Daily Challenges per day (classic plus two rotating
+  variants covering the full catalog every 17 days, identical for every
+  player), streak protection reminders (opt-in local notifications), and a
+  Weekly Tournament (themed variant × difficulty per ISO week, cumulative
+  points on a recurring leaderboard).
+- **Monetization** — fair freemium, no ads: classic play, all difficulties,
+  hints, and undo are free forever; the three dailies are free on their day.
+  The `premium` entitlement (RevenueCat monthly/annual/lifetime) unlocks
+  unlimited variant play, the daily archive, and premium themes. Soft wall
+  instead of lock screens; paywall with restore and no dark patterns.
 - **Polish** — 6 color themes (3 premium) with light/dark palettes, full
   VoiceOver labels on every board cell, Dynamic Type, complete English +
   French string catalogs.
@@ -163,41 +166,22 @@ incremental percent automatically:
 
 ### RevenueCat
 
-1. Create App Store Connect in-app purchases: auto-renewing subscription
-   `sudokuworld.premium.yearly` and non-consumable
-   `sudokuworld.premium.lifetime` (IDs pinned in `PremiumProducts`,
+1. Create App Store Connect in-app purchases: auto-renewing subscriptions
+   `sudokuworld.premium.monthly` and `sudokuworld.premium.yearly` (7-day intro
+   trial on yearly only) and non-consumable `sudokuworld.premium.lifetime`
+   (IDs pinned in `PremiumProducts`,
    [`PurchasesService.swift`](Packages/Domain/Sources/Domain/Services/PurchasesService.swift)).
 2. In the RevenueCat dashboard: create an entitlement named **`premium`**,
-   attach both products, and add them to the *current* Offering.
-3. Paste your public Apple API key (`appl_…`) into `AppSecrets.revenueCatAPIKey`.
+   attach all three products, and add them to the *current* Offering as the
+   standard *monthly*, *annual*, and *lifetime* packages (the paywall maps by
+   package type, and all gating checks the entitlement — never product IDs).
+3. Paste your public Apple API key (`appl_…`) into
+   `AppSecrets.revenueCatAPIKey`. A `test_…` sandbox key works for local
+   testing.
 
-With the placeholder key, `configure()` is a no-op and purchase/restore throw
+With a placeholder key, `configure()` is a no-op and purchase/restore throw
 `DomainError.purchasesUnavailable`, which the paywall renders as a friendly
 unavailable state — gameplay is never affected.
-
-### Ads (swappable provider)
-
-Ads flow through the `AdProviding` protocol
-([`AdProviding.swift`](Packages/Domain/Sources/Domain/Services/AdProviding.swift));
-frequency policy (3 games between interstitials + 3-minute cooldown) is pure,
-unit-tested Swift, and every placement is entitlement-gated. The shipped
-[`SimulatedAdProvider`](Packages/Data/Sources/Data/Ads/SimulatedAdProvider.swift)
-serves localized house creatives.
-
-**Dropping in AdMob:** the Google Mobile Ads SDK is iOS-only and would break
-this repo's macOS-host `swift test` workflow, so it must live in the app
-target — not the package graph:
-
-1. `project.yml` → add to the `SudokuWorld` target:
-   `packages: GoogleMobileAds: { url: https://github.com/googleads/swift-package-manager-google-mobile-ads, from: 12.0.0 }`
-   and the product dependency; then `make generate`.
-2. Info.plist properties (same file): `GADApplicationIdentifier` (your AdMob
-   app ID), `NSUserTrackingUsageDescription`, and the
-   [SKAdNetworkItems](https://developers.google.com/admob/ios/quick-start) list.
-3. In the app target, implement `AdProviding` mapping
-   `GADInterstitialAd`/banner loads into `AdCreative` values, and register it
-   at launch: `Container.shared.adProvider.register { AdMobAdProvider() }`.
-   Nothing else changes — policy, gating, and UI stay as they are.
 
 ### Notifications
 
@@ -208,8 +192,8 @@ All copy lives in the string catalog.
 ## Localization
 
 `Packages/Presentation/Sources/Presentation/Resources/Localizable.xcstrings`
-carries complete **English and French** (~170 keys: UI, technique names, hint
-explanations, notifications, house ads). French-default-ready: the catalog is
+carries complete **English and French** (~450 keys: UI, technique names, hint
+explanations, notifications, paywall). French-default-ready: the catalog is
 complete, so shipping French-first is just a `CFBundleDevelopmentRegion` flip
 in `project.yml`. Test at runtime with:
 
@@ -219,23 +203,24 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-139 tests across four packages (`make test`, macOS host, ~40 s):
+Tests across four packages (`make test`, macOS host, ~40 s):
 
-- **Domain (97)** — solver correctness on known fixtures, per-variant
-  generation (uniqueness re-verified from scratch, cage partitions, parity,
-  determinism, daily-seed identity), technique finders on crafted grids,
-  grader monotonicity, `GameSession` rules (mistakes, hardcore loss, undo
-  restoring auto-cleaned notes, pause/resume clock math), `GameCenterIDs`
-  matrix (84/88/16, prefix, no duplicates), achievement evaluator (all 16),
-  stats/streak edge cases, interstitial policy.
-- **Data (14)** — SwiftData roundtrips on in-memory containers (saved-game
-  upserts per context, records, daily completions, tournament scores),
-  UserDefaults repositories.
-- **Presentation (28)** — ViewModels with container-registered mocks
-  (`@Suite(.container)`): game flow incl. hardcore loss and the
-  completion→interstitial pipeline, free-tier hint limit vs premium,
-  digit-first input, paywall flows, premium theme gating, events hub.
-- **Model (13)** — note bitsets, board/topology invariants.
+- **Domain** — solver correctness on known fixtures, per-variant generation
+  (uniqueness re-verified from scratch, cage partitions, parity, determinism,
+  daily-seed identity), daily rotation (full-catalog coverage per 17-day
+  cycle without repeats, accessible/complex pairing, next-appearance scan),
+  technique finders on crafted grids, grader monotonicity, `GameSession`
+  rules (mistakes, hardcore loss, undo restoring auto-cleaned notes,
+  pause/resume clock math), `GameCenterIDs` matrix (84/88/16, prefix, no
+  duplicates), achievement evaluator (all 16), stats/streak edge cases.
+- **Data** — SwiftData roundtrips on in-memory containers (saved-game upserts
+  per context, records, per-slot daily completions incl. the on-day streak
+  rule, tournament scores), UserDefaults repositories.
+- **Presentation** — ViewModels with container-registered mocks
+  (`@Suite(.container)`): game flow incl. hardcore loss, unlimited hints,
+  digit-first input, `PremiumGate` (cache seed + stream flips), paywall
+  flows, premium theme gating, events hub.
+- **Model** — note bitsets, board/topology invariants.
 
 CI (`.github/workflows/ci.yml`): format-check → lint → generate → test →
 simulator build.

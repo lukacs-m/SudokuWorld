@@ -4,14 +4,16 @@ import Model
 import SwiftUI
 
 /// The game screen: header (difficulty, clock, mistakes), board, digit pad,
-/// and the pause / hint / completion / interstitial layers. Pushed from Home;
-/// leaving mid-game saves silently, abandoning is always explicit.
+/// and the pause / hint / completion layers. Pushed from Home; leaving
+/// mid-game saves silently, abandoning is always explicit.
 struct GameView: View {
     @State private var viewModel: GameViewModel
     @State private var showExitDialog = false
+    @State private var softWall: SoftWallContext?
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
+    @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
 
@@ -55,6 +57,9 @@ struct GameView: View {
                     onDismiss: { viewModel.dismissHint() },
                 )
             }
+        }
+        .sheet(item: $softWall) { context in
+            SoftWallView(variant: context.variant)
         }
         .confirmationDialog(
             Text("game.exit.title", bundle: .module),
@@ -158,10 +163,7 @@ struct GameView: View {
                     StatTile("game.finished.mistakes", value: "\(session.mistakes)")
                 }
                 if session.mode.allowsHints {
-                    StatTile(
-                        "game.finished.hints",
-                        value: viewModel.hintsRemaining.map(String.init) ?? "∞",
-                    )
+                    StatTile("game.finished.hints", value: "\(session.hintsUsed)")
                 }
             }
             .padding(.horizontal, 16)
@@ -190,25 +192,28 @@ struct GameView: View {
         }
 
         if case let .finished(summary) = viewModel.phase {
-            if let creative = viewModel.interstitial {
-                InterstitialOverlayView(creative: creative) {
-                    viewModel.dismissInterstitial()
-                }
-            } else {
-                if summary.outcome == .won {
-                    ConfettiView()
-                        .ignoresSafeArea()
-                }
-                CompletionView(
-                    summary: summary,
-                    onNewGame: {
-                        // Fresh presentation token, so the cover rebuilds even
-                        // for an identical configuration.
-                        router.play(newGameLaunch())
-                    },
-                    onHome: { router.goHome() },
-                )
+            if summary.outcome == .won {
+                ConfettiView()
+                    .ignoresSafeArea()
             }
+            CompletionView(
+                summary: summary,
+                onNewGame: {
+                    // A free player finishing a variant daily gets the soft
+                    // wall (next rotation vs. unlock), never a fresh board.
+                    if !premiumGate.isPremium,
+                       let dailyVariant = viewModel.session?.context.dailyVariant,
+                       dailyVariant != .classic
+                    {
+                        softWall = SoftWallContext(variant: dailyVariant)
+                    } else {
+                        // Fresh presentation token, so the cover rebuilds
+                        // even for an identical configuration.
+                        router.play(newGameLaunch())
+                    }
+                },
+                onHome: { router.goHome() },
+            )
         }
     }
 

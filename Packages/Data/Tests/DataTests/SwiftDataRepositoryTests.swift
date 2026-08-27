@@ -40,7 +40,7 @@ struct SavedGameRepositoryTests {
         let repository = try makeRepository()
         let main = PersistenceFixtures.savedGame(context: .regular, elapsed: 11)
         let daily = PersistenceFixtures.savedGame(
-            context: .daily(dateKey: "2026-07-04"),
+            context: .daily(dateKey: "2026-07-04", variant: .classic),
             elapsed: 22,
         )
 
@@ -48,7 +48,9 @@ struct SavedGameRepositoryTests {
         try await repository.save(daily)
 
         let loadedMain = try await repository.load(context: .regular)
-        let loadedDaily = try await repository.load(context: .daily(dateKey: "2026-07-04"))
+        let loadedDaily = try await repository.load(
+            context: .daily(dateKey: "2026-07-04", variant: .classic),
+        )
         #expect(loadedMain?.elapsed == 11)
         #expect(loadedDaily?.elapsed == 22)
     }
@@ -105,32 +107,96 @@ struct DailyChallengeRepositoryTests {
         SwiftDataDailyChallengeRepository(container: try ModelContainerProvider.inMemory())
     }
 
-    @Test func markCompletedRecordsTheDay() async throws {
-        let repository = try makeRepository()
-        try await repository.markCompleted(dateKey: "2026-07-04", duration: 300, at: Date())
+    /// Noon UTC on the day named by the key, so completions count as on-day.
+    private func noon(_ dateKey: String) -> Date {
+        let parts = dateKey.split(separator: "-").compactMap { Int($0) }
+        var components = DateComponents(year: parts[0], month: parts[1], day: parts[2])
+        components.hour = 12
+        return EventSeeds.utcCalendar.date(from: components) ?? Date(timeIntervalSince1970: 0)
+    }
 
-        let keys = try await repository.completedDateKeys()
-        #expect(keys == ["2026-07-04"])
-        let time = try await repository.completionTime(dateKey: "2026-07-04")
-        #expect(time == 300)
+    @Test func markCompletedRecordsTheSlot() async throws {
+        let repository = try makeRepository()
+        try await repository.markCompleted(
+            dateKey: "2026-07-04",
+            variant: .classic,
+            duration: 300,
+            at: noon("2026-07-04"),
+        )
+
+        let days = try await repository.completedDays()
+        #expect(days == ["2026-07-04"])
+        let times = try await repository.completions(dateKey: "2026-07-04")
+        #expect(times == [.classic: 300])
+    }
+
+    @Test func slotsOfADayAreIndependent() async throws {
+        let repository = try makeRepository()
+        let at = noon("2026-07-04")
+        try await repository.markCompleted(
+            dateKey: "2026-07-04", variant: .classic, duration: 300, at: at,
+        )
+        try await repository.markCompleted(
+            dateKey: "2026-07-04", variant: .killer, duration: 500, at: at,
+        )
+
+        let times = try await repository.completions(dateKey: "2026-07-04")
+        #expect(times == [.classic: 300, .killer: 500])
+        let days = try await repository.completedDays()
+        #expect(days == ["2026-07-04"])
     }
 
     @Test func repeatCompletionKeepsBestTime() async throws {
         let repository = try makeRepository()
-        try await repository.markCompleted(dateKey: "2026-07-04", duration: 300, at: Date())
-        try await repository.markCompleted(dateKey: "2026-07-04", duration: 250, at: Date())
-        try await repository.markCompleted(dateKey: "2026-07-04", duration: 400, at: Date())
+        let at = noon("2026-07-04")
+        for duration in [300.0, 250, 400] {
+            try await repository.markCompleted(
+                dateKey: "2026-07-04", variant: .classic, duration: duration, at: at,
+            )
+        }
 
-        let time = try await repository.completionTime(dateKey: "2026-07-04")
-        #expect(time == 250)
-        let keys = try await repository.completedDateKeys()
-        #expect(keys.count == 1)
+        let times = try await repository.completions(dateKey: "2026-07-04")
+        #expect(times[.classic] == 250)
     }
 
-    @Test func missingCompletionIsNil() async throws {
+    @Test func replayCreditsTheCompletionDayNotThePuzzleDay() async throws {
         let repository = try makeRepository()
-        let time = try await repository.completionTime(dateKey: "2026-01-01")
-        #expect(time == nil)
+        // July 4th's puzzle, solved on July 6th: the slot shows as done and
+        // July 6th joins the streak history — July 4th never does.
+        try await repository.markCompleted(
+            dateKey: "2026-07-04",
+            variant: .classic,
+            duration: 300,
+            at: noon("2026-07-06"),
+        )
+
+        let times = try await repository.completions(dateKey: "2026-07-04")
+        #expect(times == [.classic: 300])
+        let days = try await repository.completedDays()
+        #expect(days == ["2026-07-06"])
+    }
+
+    @Test func repeatReplayNeverMintsANewDay() async throws {
+        let repository = try makeRepository()
+        try await repository.markCompleted(
+            dateKey: "2026-07-04", variant: .classic, duration: 300, at: noon("2026-07-04"),
+        )
+        // Replaying the same slot later only improves the time — the
+        // original completion day stands.
+        try await repository.markCompleted(
+            dateKey: "2026-07-04", variant: .classic, duration: 200, at: noon("2026-07-09"),
+        )
+
+        let days = try await repository.completedDays()
+        #expect(days == ["2026-07-04"])
+        let times = try await repository.completions(dateKey: "2026-07-04")
+        #expect(times[.classic] == 200)
+    }
+
+    @Test func missingCompletionIsEmpty() async throws {
+        let repository = try makeRepository()
+        let times = try await repository.completions(dateKey: "2026-01-01")
+        #expect(times.isEmpty)
     }
 
     @Test func tournamentScoreRoundtrip() async throws {
@@ -162,30 +228,6 @@ struct DailyChallengeRepositoryTests {
         let loaded = try await repository.tournamentScore(weekKey: "2026-W27")
         #expect(loaded?.points == 1200)
         #expect(loaded?.gamesCounted == 2)
-    }
-}
-
-@Suite
-struct AdStateRepositoryTests {
-    @Test func countersAccumulateAndReset() async {
-        let suite = "test.adstate.\(UUID().uuidString)"
-        let repository = UserDefaultsAdStateRepository(suiteName: suite)
-        defer { UserDefaults().removePersistentDomain(forName: suite) }
-
-        let initial = await repository.gamesFinishedSinceInterstitial()
-        #expect(initial == 0)
-
-        await repository.recordGameFinished()
-        await repository.recordGameFinished()
-        let afterTwo = await repository.gamesFinishedSinceInterstitial()
-        #expect(afterTwo == 2)
-
-        let shownAt = Date(timeIntervalSince1970: 1_700_000_000)
-        await repository.recordInterstitialShown(at: shownAt)
-        let afterShow = await repository.gamesFinishedSinceInterstitial()
-        #expect(afterShow == 0)
-        let lastShown = await repository.lastInterstitialShownAt()
-        #expect(lastShown == shownAt)
     }
 }
 

@@ -1,10 +1,10 @@
-/// Third-party API keys. These are the ONLY placeholders in the codebase:
-/// the app runs fully without them (purchases disabled → permanent free
-/// tier, simulated ads). Paste real keys here before shipping — see the
-/// README's "RevenueCat setup" section.
+/// Third-party API keys. The app runs fully without a real key (purchases
+/// disabled → permanent free tier) — see the README's "RevenueCat setup"
+/// section.
 enum AppSecrets {
-    /// RevenueCat public SDK key (starts with "appl_" for App Store apps).
-    static let revenueCatAPIKey = "REPLACE_ME_REVENUECAT_API_KEY"
+    /// RevenueCat public SDK key. Currently the sandbox test-store key
+    /// ("test_…"); swap in the production "appl_…" key before shipping.
+    static let revenueCatAPIKey = "test_txBSGiwuLLgGAFJwYiOQuCjnEZA"
 
     static var revenueCatKeyIsPlaceholder: Bool {
         revenueCatAPIKey.hasPrefix("REPLACE_ME")

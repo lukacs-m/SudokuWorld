@@ -193,22 +193,3 @@ struct StatsAggregatorTests {
         #expect(overview.totalLost == 1)
     }
 }
-
-@Suite
-struct InterstitialPolicyTests {
-    @Test func requiresEnoughGames() {
-        let policy = InterstitialPolicy.standard
-        let now = day("2026-07-04")
-        #expect(!policy.allowsInterstitial(gamesFinishedSince: 2, lastShownAt: nil, now: now))
-        #expect(policy.allowsInterstitial(gamesFinishedSince: 3, lastShownAt: nil, now: now))
-    }
-
-    @Test func honorsCooldown() {
-        let policy = InterstitialPolicy.standard
-        let now = day("2026-07-04")
-        let justShown = now.addingTimeInterval(-60)
-        #expect(!policy.allowsInterstitial(gamesFinishedSince: 5, lastShownAt: justShown, now: now))
-        let longAgo = now.addingTimeInterval(-3600)
-        #expect(policy.allowsInterstitial(gamesFinishedSince: 5, lastShownAt: longAgo, now: now))
-    }
-}

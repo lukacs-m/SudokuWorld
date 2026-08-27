@@ -32,9 +32,9 @@ public struct StartGame: StartGameUseCase {
         at now: Date,
     ) async -> GameSession {
         let seed: UInt64 = switch context {
-        case let .daily(dateKey):
+        case let .daily(dateKey, dailyVariant):
             // The shared worldwide seed — every player gets the same board.
-            EventSeeds.dailySeed(dateKey: dateKey)
+            EventSeeds.dailySeed(dateKey: dateKey, variant: dailyVariant)
 
         case .regular, .weekly:
             Self.entropySeed(from: now)

@@ -10,18 +10,10 @@ import Testing
 @Suite(.container)
 @MainActor
 struct HomeViewModelTests {
-    private func registerMocks(
-        saved: SavedGame? = nil,
-        entitlements: Entitlements = .free,
-        banner: AdCreative? = nil,
-    ) {
+    private func registerMocks(saved: SavedGame? = nil) {
         Container.shared.resumeGameUseCase.register { MockResumeGame(saved: saved) }
         Container.shared.computeStatsUseCase.register { MockComputeStats() }
-        Container.shared.getDailyChallengeUseCase.register { MockGetDailyChallenge() }
-        Container.shared.getBannerUseCase.register { MockGetBanner(creative: banner) }
-        Container.shared.getEntitlementsUseCase.register {
-            MockGetEntitlements(entitlements: entitlements)
-        }
+        Container.shared.getDailyLineupUseCase.register { MockGetDailyLineup() }
     }
 
     @Test func refreshLoadsContentAndDaily() async {
@@ -32,7 +24,7 @@ struct HomeViewModelTests {
         #expect(viewModel.state.value != nil)
         #expect(viewModel.state.value?.continueGame == nil)
         #expect(viewModel.dailyState.value != nil)
-        #expect(viewModel.dailyState.value?.isCompleted == false)
+        #expect(viewModel.dailyState.value?.slots.allSatisfy { !$0.isCompleted } == true)
     }
 
     @Test func continueCardAppearsWithASavedGame() async {
@@ -45,40 +37,6 @@ struct HomeViewModelTests {
         #expect(viewModel.state.value?.continueGame?.puzzle.variant == .classic)
     }
 
-    @Test func premiumHidesTheBanner() async {
-        let creative = AdCreative(
-            id: "b",
-            format: .banner,
-            headline: "h",
-            body: "b",
-            callToAction: "c",
-        )
-        registerMocks(
-            entitlements: Entitlements(isPremium: true, source: .lifetime),
-            banner: creative,
-        )
-        let viewModel = HomeViewModel()
-        await viewModel.refresh()
-
-        #expect(viewModel.isPremium)
-        #expect(viewModel.banner == nil)
-    }
-
-    @Test func freeTierSeesTheBanner() async {
-        let creative = AdCreative(
-            id: "b",
-            format: .banner,
-            headline: "h",
-            body: "b",
-            callToAction: "c",
-        )
-        registerMocks(banner: creative)
-        let viewModel = HomeViewModel()
-        await viewModel.refresh()
-
-        #expect(!viewModel.isPremium)
-        #expect(viewModel.banner == creative)
-    }
 }
 
 @Suite(.container)
@@ -86,8 +44,6 @@ struct HomeViewModelTests {
 struct StatsViewModelTests {
     @Test func emptyHistoryShowsEmptyState() async {
         Container.shared.computeStatsUseCase.register { MockComputeStats(overview: .empty) }
-        Container.shared.getBannerUseCase.register { MockGetBanner(creative: nil) }
-        Container.shared.getEntitlementsUseCase.register { MockGetEntitlements() }
 
         let viewModel = StatsViewModel()
         await viewModel.load()
@@ -110,8 +66,6 @@ struct StatsViewModelTests {
             variantShares: [],
         )
         Container.shared.computeStatsUseCase.register { MockComputeStats(overview: overview) }
-        Container.shared.getBannerUseCase.register { MockGetBanner(creative: nil) }
-        Container.shared.getEntitlementsUseCase.register { MockGetEntitlements() }
 
         let viewModel = StatsViewModel()
         await viewModel.load()
@@ -124,14 +78,12 @@ struct StatsViewModelTests {
 @MainActor
 struct EventsHubViewModelTests {
     private func registerMocks(auth: GameCenterAuthState = .unauthenticated) {
-        Container.shared.getDailyChallengeUseCase.register { MockGetDailyChallenge() }
+        Container.shared.getDailyLineupUseCase.register { MockGetDailyLineup() }
         Container.shared.getWeeklyTournamentUseCase.register { MockGetWeeklyTournament() }
         Container.shared.getStandingsUseCase.register { MockGetStandings() }
         Container.shared.observeGameCenterAuthUseCase.register {
             MockObserveGameCenterAuth(state: auth)
         }
-        Container.shared.getBannerUseCase.register { MockGetBanner(creative: nil) }
-        Container.shared.getEntitlementsUseCase.register { MockGetEntitlements() }
     }
 
     @Test func loadPopulatesBothEvents() async {
@@ -139,7 +91,7 @@ struct EventsHubViewModelTests {
         let viewModel = EventsHubViewModel()
         await viewModel.load()
 
-        #expect(viewModel.state.value?.daily.isCompleted == false)
+        #expect(viewModel.state.value?.daily.slots.count == 3)
         #expect(viewModel.state.value?.weekly.points == 1500)
         #expect(viewModel.state.value?.weekly.variant == .killer)
     }
@@ -173,11 +125,19 @@ struct PaywallViewModelTests {
     private var sampleOfferings: PaywallOfferings {
         PaywallOfferings(products: [
             PaywallProduct(
+                id: PremiumProducts.monthlySubscriptionID,
+                kind: .monthly,
+                title: "Premium Monthly",
+                details: "All the things",
+                priceText: "$2.99",
+            ),
+            PaywallProduct(
                 id: PremiumProducts.yearlySubscriptionID,
-                kind: .subscription(period: "year"),
+                kind: .annual,
                 title: "Premium",
                 details: "All the things",
                 priceText: "$19.99",
+                trialDays: 7,
             ),
             PaywallProduct(
                 id: PremiumProducts.lifetimeID,
@@ -193,7 +153,7 @@ struct PaywallViewModelTests {
         registerMocks(offerings: .success(sampleOfferings))
         let viewModel = PaywallViewModel()
         await viewModel.load()
-        #expect(viewModel.state.value?.products.count == 2)
+        #expect(viewModel.state.value?.products.count == 3)
     }
 
     @Test func keylessConfigurationShowsUnavailable() async {
@@ -242,11 +202,8 @@ struct PaywallViewModelTests {
 @Suite(.container)
 @MainActor
 struct SettingsViewModelTests {
-    private func registerMocks(entitlements: Entitlements = .free) {
+    private func registerMocks() {
         Container.shared.settingsRepository.register { MockSettingsRepository() }
-        Container.shared.getEntitlementsUseCase.register {
-            MockGetEntitlements(entitlements: entitlements)
-        }
         Container.shared.updateRemindersUseCase.register { MockUpdateReminders() }
         Container.shared.observeGameCenterAuthUseCase.register { MockObserveGameCenterAuth() }
         Container.shared.authenticateGameCenterUseCase.register { MockAuthenticateGameCenter() }
@@ -257,7 +214,7 @@ struct SettingsViewModelTests {
         let viewModel = SettingsViewModel()
         await viewModel.load()
 
-        #expect(viewModel.selectTheme(.forest))
+        #expect(viewModel.selectTheme(.forest, isPremium: false))
         #expect(viewModel.settings.theme == .forest)
     }
 
@@ -266,16 +223,16 @@ struct SettingsViewModelTests {
         let viewModel = SettingsViewModel()
         await viewModel.load()
 
-        #expect(!viewModel.selectTheme(.midnight))
+        #expect(!viewModel.selectTheme(.midnight, isPremium: false))
         #expect(viewModel.settings.theme == .warmPaper)
     }
 
     @Test func premiumThemeUnlocksWithEntitlement() async {
-        registerMocks(entitlements: Entitlements(isPremium: true, source: .lifetime))
+        registerMocks()
         let viewModel = SettingsViewModel()
         await viewModel.load()
 
-        #expect(viewModel.selectTheme(.midnight))
+        #expect(viewModel.selectTheme(.midnight, isPremium: true))
         #expect(viewModel.settings.theme == .midnight)
     }
 
@@ -298,5 +255,40 @@ struct SettingsViewModelTests {
 
         await viewModel.updateNotifications { $0.dailyReminderEnabled = true }
         #expect(viewModel.notificationsDenied)
+    }
+
+    @Test func restoreRecoversPremium() async {
+        registerMocks()
+        Container.shared.restorePurchasesUseCase.register {
+            MockRestorePurchases(result: .success(
+                Entitlements(isPremium: true, source: .subscription),
+            ))
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.restore()
+        #expect(viewModel.restorePhase == .restored)
+    }
+
+    @Test func restoreWithNoPurchasesSaysSo() async {
+        registerMocks()
+        Container.shared.restorePurchasesUseCase.register {
+            MockRestorePurchases(result: .success(.free))
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.restore()
+        #expect(viewModel.restorePhase == .nothingToRestore)
+    }
+
+    @Test func restoreFailureIsSurfaced() async {
+        registerMocks()
+        Container.shared.restorePurchasesUseCase.register {
+            MockRestorePurchases(result: .failure(.purchasesUnavailable))
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.restore()
+        #expect(viewModel.restorePhase == .failed)
     }
 }

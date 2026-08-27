@@ -7,6 +7,9 @@ import SwiftUI
 struct VariantCard: View {
     let variant: SudokuVariant
     let selected: Bool
+    /// Free-tier scheduling note ("Play today" / "Daily Fri"); reads as an
+    /// invitation, never as a lock.
+    var availabilityText: String?
     let theme: Theme
     let action: () -> Void
 
@@ -31,6 +34,12 @@ struct VariantCard: View {
                         .foregroundStyle(theme.textSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
+                    if let availabilityText {
+                        Text(availabilityText)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(theme.accent)
+                            .padding(.top, 2)
+                    }
                 }
             }
             .padding(12)

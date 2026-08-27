@@ -11,8 +11,10 @@ public import SwiftUI
 public struct AppRootView: View {
     @State private var router = Router()
     @State private var themeStore = ThemeStore()
+    @State private var premiumGate = PremiumGate()
     @State private var launched = false
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     public init() {}
 
@@ -68,8 +70,14 @@ public struct AppRootView: View {
         #endif
                 .environment(router)
                 .environment(themeStore)
+                .environment(premiumGate)
                 .tint(themeStore.theme(for: colorScheme).accent)
                 .preferredColorScheme(themeStore.preferredColorScheme)
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active {
+                        Task { await premiumGate.refresh() }
+                    }
+                }
                 .task {
                     guard !launched else { return }
                     launched = true
@@ -86,6 +94,9 @@ public struct AppRootView: View {
                     #endif
                     await themeStore.load()
                     await LaunchTasks.run()
+                    // Never returns: follows entitlement changes for the
+                    // app's lifetime, after purchases are configured.
+                    await premiumGate.start()
                 }
     }
 }

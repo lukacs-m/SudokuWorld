@@ -1,4 +1,5 @@
 public import Foundation
+public import Model
 
 /// The local player's accumulated weekly-tournament score.
 /// `lastSubmittedPoints` deduplicates Game Center submissions.
@@ -16,12 +17,21 @@ public struct TournamentScore: Equatable, Sendable {
     }
 }
 
-/// Persistence for event progress: daily-challenge completions (streak
-/// history) and weekly-tournament scores.
+/// Persistence for event progress: daily-slot completions (streak history)
+/// and weekly-tournament scores.
 public protocol DailyChallengeRepository: Sendable {
-    func completedDateKeys() async throws -> Set<String>
-    func completionTime(dateKey: String) async throws -> TimeInterval?
-    func markCompleted(dateKey: String, duration: TimeInterval, at date: Date) async throws
+    /// UTC days on which the player first completed at least one daily slot
+    /// (any day's puzzle). Past days can never be minted after the fact —
+    /// no streak repair.
+    func completedDays() async throws -> Set<String>
+    /// Best time per completed slot of the given day.
+    func completions(dateKey: String) async throws -> [SudokuVariant: TimeInterval]
+    func markCompleted(
+        dateKey: String,
+        variant: SudokuVariant,
+        duration: TimeInterval,
+        at date: Date,
+    ) async throws
 
     func tournamentScore(weekKey: String) async throws -> TournamentScore?
     func saveTournamentScore(_ score: TournamentScore) async throws

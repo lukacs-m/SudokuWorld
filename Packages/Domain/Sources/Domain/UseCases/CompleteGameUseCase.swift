@@ -111,8 +111,8 @@ public struct CompleteGame: CompleteGameUseCase {
         try? await gameRecords.insert(record)
         try? await savedGames.delete(context: session.context)
 
-        if won, let dateKey = session.context.dailyDateKey {
-            try? await dailyChallenges.markCompleted(dateKey: dateKey, duration: duration, at: now)
+        if won {
+            await markDailyCompleted(context: session.context, duration: duration, at: now)
         }
         let weeklyCumulative = await updateTournamentScore(
             for: record,
@@ -121,7 +121,7 @@ public struct CompleteGame: CompleteGameUseCase {
 
         let records = priorRecords + [record]
         let totalWins = records.count { $0.outcome == .won }
-        let dailyKeys = await (try? dailyChallenges.completedDateKeys()) ?? []
+        let dailyKeys = await (try? dailyChallenges.completedDays()) ?? []
         let dailyStreak = streaks.dailyStreak(completedDateKeys: dailyKeys, today: now)
 
         if won {
@@ -156,6 +156,20 @@ public struct CompleteGame: CompleteGameUseCase {
     /// Tournament scoring: a base for winning plus a speed bonus.
     static func points(forWinDuration duration: TimeInterval) -> Int {
         500 + max(0, 600 - Int(duration))
+    }
+
+    private func markDailyCompleted(
+        context: GameContext,
+        duration: TimeInterval,
+        at now: Date,
+    ) async {
+        guard case let .daily(dateKey, dailyVariant) = context else { return }
+        try? await dailyChallenges.markCompleted(
+            dateKey: dateKey,
+            variant: dailyVariant,
+            duration: duration,
+            at: now,
+        )
     }
 
     private func updateTournamentScore(for record: GameRecord, points: Int) async -> Int? {
@@ -199,7 +213,12 @@ public struct CompleteGame: CompleteGameUseCase {
         if bestDailyStreak > 0 {
             await gameCenter.submitScore(bestDailyStreak, leaderboardID: GameCenterIDs.bestStreak)
         }
-        if record.context.dailyDateKey != nil {
+        // The daily board is classic-only and same-day-only: variant slots
+        // and archive replays must not compete with today's classic times.
+        if case let .daily(dateKey, dailyVariant) = record.context,
+           dailyVariant == .classic,
+           dateKey == EventSeeds.dailyDateKey(for: record.finishedAt)
+        {
             await gameCenter.submitScore(centiseconds, leaderboardID: GameCenterIDs.daily)
         }
         if let weeklyCumulative, let weekKey = record.context.weekKey {

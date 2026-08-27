@@ -3,11 +3,17 @@ import Foundation
 import Model
 import SwiftUI
 
-/// The Premium paywall: benefits, products (subscription + lifetime), and
-/// restore. Shows a graceful unavailable state when purchases are not
-/// configured (placeholder API key) — the app remains fully playable.
+/// The Premium paywall: benefits, the three products (monthly / annual /
+/// lifetime, annual pre-selected as best value), restore, and legal links.
+/// Shows a graceful unavailable state when purchases are not configured —
+/// the app remains fully playable. No urgency, no tricks.
 struct PaywallView: View {
+    // TODO: real policy URLs before release.
+    private static let privacyURL = URL(string: "https://sudokuworld.app/privacy")!
+    private static let termsURL = URL(string: "https://sudokuworld.app/terms")!
+
     @State private var viewModel = PaywallViewModel()
+    @State private var selectedID: String?
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -58,10 +64,17 @@ struct PaywallView: View {
     private func benefits(theme: Theme) -> some View {
         CardView {
             VStack(alignment: .leading, spacing: 10) {
-                benefit("paywall.benefit.noAds", systemImage: "rectangle.slash", theme: theme)
-                benefit("paywall.benefit.hints", systemImage: "lightbulb.fill", theme: theme)
+                benefit(
+                    "paywall.benefit.variants",
+                    systemImage: "square.grid.3x3.fill",
+                    theme: theme,
+                )
+                benefit(
+                    "paywall.benefit.archive",
+                    systemImage: "calendar.badge.clock",
+                    theme: theme,
+                )
                 benefit("paywall.benefit.themes", systemImage: "paintpalette.fill", theme: theme)
-                benefit("paywall.benefit.stats", systemImage: "chart.bar.fill", theme: theme)
             }
         }
     }
@@ -134,54 +147,107 @@ struct PaywallView: View {
             .buttonStyle(.plain)
             .foregroundStyle(theme.textSecondary)
             .disabled(viewModel.purchasePhase == .purchasing)
+
+            HStack(spacing: 6) {
+                Link(destination: Self.privacyURL) {
+                    Text("paywall.privacy", bundle: .module)
+                }
+                Text("·")
+                Link(destination: Self.termsURL) {
+                    Text("paywall.terms", bundle: .module)
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(theme.textSecondary)
         }
     }
 
     private func products(_ offerings: PaywallOfferings, theme: Theme) -> some View {
         VStack(spacing: 10) {
             ForEach(offerings.products) { product in
-                Button {
-                    Task { await viewModel.purchase(productID: product.id) }
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(product.title)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(theme.textPrimary)
-                            Text(kindLabel(product.kind))
-                                .font(.caption)
-                                .foregroundStyle(theme.textSecondary)
-                        }
-                        Spacer()
-                        Text(product.priceText)
-                            .font(.headline)
-                            .foregroundStyle(theme.accent)
-                    }
-                    .padding(14)
-                    .background(theme.cardBackground, in: RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(theme.accent.opacity(0.4), lineWidth: 1),
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(viewModel.purchasePhase == .purchasing)
+                productRow(product, theme: theme)
             }
+            PrimaryButton("paywall.cta") {
+                guard let selectedID else { return }
+                Task { await viewModel.purchase(productID: selectedID) }
+            }
+            .disabled(selectedID == nil || viewModel.purchasePhase == .purchasing)
             if viewModel.purchasePhase == .purchasing {
                 ProgressView()
             }
         }
+        .onAppear {
+            // Annual is the anchor: pre-selected, tagged best value.
+            if selectedID == nil {
+                selectedID = (offerings.products.first { $0.kind == .annual }
+                    ?? offerings.products.first)?.id
+            }
+        }
     }
 
-    private func kindLabel(_ kind: PaywallProduct.Kind) -> String {
-        switch kind {
-        case let .subscription(period):
-            // Interpolating inside a LocalizationValue literal turns the key
-            // into "paywall.period.%@" — build the key as a String first.
-            moduleString("paywall.period.\(period)")
+    private func productRow(_ product: PaywallProduct, theme: Theme) -> some View {
+        let selected = product.id == selectedID
+        return Button {
+            selectedID = product.id
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(product.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(theme.textPrimary)
+                        if product.kind == .annual {
+                            Text("paywall.bestValue", bundle: .module)
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(theme.accent.opacity(0.14), in: Capsule())
+                                .foregroundStyle(theme.accent)
+                        }
+                    }
+                    Text(kindLabel(product.kind), bundle: .module)
+                        .font(.caption)
+                        .foregroundStyle(theme.textSecondary)
+                    if let trialDays = product.trialDays {
+                        Text(
+                            String(
+                                format: String(localized: "paywall.trial", bundle: .module),
+                                trialDays,
+                            ),
+                        )
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(theme.success)
+                    }
+                }
+                Spacer()
+                Text(product.priceText)
+                    .font(.headline)
+                    .foregroundStyle(theme.accent)
+            }
+            .padding(14)
+            .background(
+                selected ? theme.accent.opacity(0.10) : theme.cardBackground,
+                in: RoundedRectangle(cornerRadius: 14),
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(
+                        selected ? theme.accent : theme.accent.opacity(0.25),
+                        lineWidth: selected ? 1.5 : 1,
+                    ),
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel.purchasePhase == .purchasing)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
 
-        case .lifetime:
-            String(localized: "paywall.lifetime", bundle: .module)
+    private func kindLabel(_ kind: PaywallProduct.Kind) -> LocalizedStringKey {
+        switch kind {
+        case .monthly: "paywall.kind.monthly"
+        case .annual: "paywall.kind.annual"
+        case .lifetime: "paywall.lifetime"
         }
     }
 }

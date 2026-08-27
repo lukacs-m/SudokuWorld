@@ -8,7 +8,6 @@ import SwiftUI
 /// countdowns, plus live standings from Game Center.
 struct EventsHubView: View {
     @State private var viewModel = EventsHubViewModel()
-    @State private var showPaywall = false
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -37,12 +36,6 @@ struct EventsHubView: View {
                         }
                     }
                 }
-
-                if !viewModel.isPremium, let banner = viewModel.banner {
-                    BannerAdView(creative: banner) {
-                        showPaywall = true
-                    }
-                }
             }
             .padding(16)
         }
@@ -56,12 +49,9 @@ struct EventsHubView: View {
                 Task { await viewModel.load() }
             }
         }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
-        }
     }
 
-    private func dailyCard(_ daily: DailyChallenge, theme: Theme) -> some View {
+    private func dailyCard(_ daily: DailyLineup, theme: Theme) -> some View {
         CardView {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
@@ -84,26 +74,26 @@ struct EventsHubView: View {
 
                 weekStrip(theme: theme)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text("events.daily.today", bundle: .module)
-                        Text("·")
-                        Text(Date.now.formatted(.dateTime.month(.wide).day()))
-                    }
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(theme.textSecondary)
-                    HStack(spacing: 6) {
-                        Text(verbatim: moduleString("variant.\(daily.puzzle.variant.slug)"))
-                        Text("·")
-                        Text(verbatim: moduleString(
-                            "difficulty.\(daily.puzzle.requestedDifficulty.slug)",
-                        ))
-                    }
-                    .font(.headline)
-                    .foregroundStyle(theme.textPrimary)
+                HStack(spacing: 6) {
+                    Text("events.daily.today", bundle: .module)
+                    Text("·")
+                    Text(Date.now.formatted(.dateTime.month(.wide).day()))
                 }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(theme.textSecondary)
 
-                dailyStatus(daily, theme: theme)
+                ForEach(daily.slots, id: \.variant) { slot in
+                    DailySlotRow(slot: slot, theme: theme) {
+                        router.play(GameLaunch(kind: .daily(
+                            dateKey: daily.dateKey,
+                            variant: slot.variant,
+                            difficulty: slot.difficulty,
+                        )))
+                    }
+                    if slot != daily.slots.last {
+                        Divider()
+                    }
+                }
 
                 HStack(spacing: 10) {
                     StatTile(
@@ -116,6 +106,8 @@ struct EventsHubView: View {
                     )
                 }
 
+                archiveLink(theme: theme)
+
                 Divider()
                 Text("events.standings.daily", bundle: .module)
                     .font(.subheadline.weight(.semibold))
@@ -126,6 +118,29 @@ struct EventsHubView: View {
                 )
             }
         }
+    }
+
+    private func archiveLink(theme: Theme) -> some View {
+        NavigationLink {
+            DailyArchiveView()
+        } label: {
+            HStack {
+                Label {
+                    Text("events.archive", bundle: .module)
+                        .font(.subheadline.weight(.medium))
+                } icon: {
+                    Image(systemName: "calendar.badge.clock")
+                        .foregroundStyle(theme.accent)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote)
+                    .foregroundStyle(theme.textSecondary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(theme.textPrimary)
     }
 
     /// The mock's week strip: this week's days, today accented, completed
@@ -165,33 +180,6 @@ struct EventsHubView: View {
             }
         }
         .accessibilityHidden(true)
-    }
-
-    /// Completed badge (with time when known) or the play button.
-    @ViewBuilder
-    private func dailyStatus(_ daily: DailyChallenge, theme: Theme) -> some View {
-        if daily.isCompleted {
-            Label {
-                if let time = daily.completionTime {
-                    Text(
-                        String(
-                            format: String(localized: "events.daily.done", bundle: .module),
-                            DurationFormatter.string(for: time),
-                        ),
-                    )
-                } else {
-                    Text("events.daily.doneNoTime", bundle: .module)
-                }
-            } icon: {
-                Image(systemName: "checkmark.seal.fill")
-            }
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(theme.success)
-        } else {
-            PrimaryButton("events.daily.play", systemImage: "play.fill") {
-                router.play(GameLaunch(kind: .daily))
-            }
-        }
     }
 
     private func weeklyCard(_ weekly: WeeklyTournament, theme: Theme) -> some View {

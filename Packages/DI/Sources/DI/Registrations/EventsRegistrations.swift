@@ -14,8 +14,8 @@ public extension Container {
             .singleton
     }
 
-    var getDailyChallengeUseCase: Factory<any GetDailyChallengeUseCase> {
-        self { GetDailyChallenge(dailyChallenges: self.dailyChallengeRepository()) }
+    var getDailyLineupUseCase: Factory<any GetDailyLineupUseCase> {
+        self { GetDailyLineup(dailyChallenges: self.dailyChallengeRepository()) }
     }
 
     var getWeeklyTournamentUseCase: Factory<any GetWeeklyTournamentUseCase> {

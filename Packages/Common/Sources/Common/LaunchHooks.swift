@@ -38,11 +38,18 @@ public enum LaunchHooks {
         public static var rulesVariant: String? {
             UserDefaults.standard.string(forKey: "uiHookRules")
         }
+
+        /// Present the paywall immediately on the home screen:
+        /// `-uiHookPaywall YES`.
+        public static var openPaywall: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookPaywall")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
         public static let initialTab: String? = nil
         public static let seedStats = false
         public static let rulesVariant: String? = nil
+        public static let openPaywall = false
     #endif
 }

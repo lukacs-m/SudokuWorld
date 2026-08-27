@@ -36,7 +36,7 @@ public struct UpdateReminders: UpdateRemindersUseCase {
         }
         guard await scheduler.requestAuthorization() else { return false }
 
-        let completedKeys = await (try? dailyChallenges.completedDateKeys()) ?? []
+        let completedKeys = await (try? dailyChallenges.completedDays()) ?? []
         let streak = streaks.dailyStreak(completedDateKeys: completedKeys, today: now)
         let todayDone = completedKeys.contains(EventSeeds.dailyDateKey(for: now))
         await scheduler.updateReminders(

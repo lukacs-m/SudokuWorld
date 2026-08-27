@@ -21,7 +21,7 @@ public struct ComputeStats: ComputeStatsUseCase {
 
     public func callAsFunction(today: Date) async -> StatsOverview {
         let records = await (try? gameRecords.allRecords()) ?? []
-        let dailyKeys = await (try? dailyChallenges.completedDateKeys()) ?? []
+        let dailyKeys = await (try? dailyChallenges.completedDays()) ?? []
         return aggregator.overview(
             records: records,
             dailyCompletionKeys: dailyKeys,

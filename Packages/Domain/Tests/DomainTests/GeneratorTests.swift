@@ -160,8 +160,8 @@ struct GeneratorTests {
     }
 
     @Test func dailySeedProducesIdenticalPuzzles() {
-        let seed = EventSeeds.dailySeed(dateKey: "2026-07-04")
-        let plan = EventSeeds.dailyPlan(dateKey: "2026-07-04")
+        let plan = EventSeeds.dailySlots(dateKey: "2026-07-04")[1]
+        let seed = EventSeeds.dailySeed(dateKey: "2026-07-04", variant: plan.variant)
         let first = generator.generateNow(
             variant: plan.variant,
             difficulty: plan.difficulty,

@@ -9,11 +9,13 @@ struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var showNewGame = false
     @State private var showPaywall = false
+    @State private var softWall: SoftWallContext?
     @State private var hardcoreDefault = false
     @State private var launchHooksHandled = false
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
+    @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -38,19 +40,18 @@ struct HomeView: View {
                     DailyChallengeCard(
                         dailyState: viewModel.dailyState,
                         dailyStreak: content.streaks.currentDailyStreak,
-                    ) {
-                        router.play(GameLaunch(kind: .daily))
+                    ) { slot in
+                        guard let lineup = viewModel.dailyState.value else { return }
+                        router.play(GameLaunch(kind: .daily(
+                            dateKey: lineup.dateKey,
+                            variant: slot.variant,
+                            difficulty: slot.difficulty,
+                        )))
                     }
                 } else {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 60)
-                }
-
-                if !viewModel.isPremium, let banner = viewModel.banner {
-                    BannerAdView(creative: banner) {
-                        showPaywall = true
-                    }
                 }
             }
             .padding(20)
@@ -71,11 +72,30 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showNewGame) {
-            NewGameSheet(hardcoreDefault: hardcoreDefault) { variant, difficulty, mode in
-                router.play(GameLaunch(
-                    kind: .new(variant: variant, difficulty: difficulty, mode: mode),
-                ))
-            }
+            NewGameSheet(
+                hardcoreDefault: hardcoreDefault,
+                isPremium: premiumGate.isPremium,
+                lineup: viewModel.dailyState.value,
+                onStart: { variant, difficulty, mode in
+                    router.play(GameLaunch(
+                        kind: .new(variant: variant, difficulty: difficulty, mode: mode),
+                    ))
+                },
+                onPlayDaily: { slot in
+                    guard let lineup = viewModel.dailyState.value else { return }
+                    router.play(GameLaunch(kind: .daily(
+                        dateKey: lineup.dateKey,
+                        variant: slot.variant,
+                        difficulty: slot.difficulty,
+                    )))
+                },
+                onSoftWall: { variant in
+                    softWall = SoftWallContext(variant: variant)
+                },
+            )
+        }
+        .sheet(item: $softWall) { context in
+            SoftWallView(variant: context.variant)
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
@@ -91,6 +111,9 @@ struct HomeView: View {
             launchHooksHandled = true
             if LaunchHooks.openNewGameSheet {
                 showNewGame = true
+            }
+            if LaunchHooks.openPaywall {
+                showPaywall = true
             }
             if let start = LaunchHooks.autostart,
                let variant = SudokuVariant(rawValue: start.variantSlug),
@@ -167,7 +190,7 @@ struct HomeView: View {
                 }
             }
             Spacer()
-            if !viewModel.isPremium {
+            if !premiumGate.isPremium {
                 Button {
                     showPaywall = true
                 } label: {

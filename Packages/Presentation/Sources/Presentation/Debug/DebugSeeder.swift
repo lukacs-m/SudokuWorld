@@ -47,6 +47,7 @@
                 ) else { continue }
                 try? await dailies.markCompleted(
                     dateKey: EventSeeds.dailyDateKey(for: day),
+                    variant: .classic,
                     duration: 240,
                     at: day,
                 )

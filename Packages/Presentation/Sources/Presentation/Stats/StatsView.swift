@@ -5,7 +5,6 @@ import SwiftUI
 /// The statistics screen: totals, streaks, charts, and the per-variant table.
 struct StatsView: View {
     @State private var viewModel = StatsViewModel()
-    @State private var showPaywall = false
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -46,21 +45,12 @@ struct StatsView: View {
                         }
                     }
                 }
-
-                if !viewModel.isPremium, let banner = viewModel.banner {
-                    BannerAdView(creative: banner) {
-                        showPaywall = true
-                    }
-                }
             }
             .padding(16)
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("stats.title", bundle: .module))
         .task { await viewModel.load() }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
-        }
     }
 
     /// 2×2 grid: four short captions in one row truncate on small phones.

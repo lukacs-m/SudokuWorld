@@ -171,19 +171,18 @@ nonisolated struct MockGetEntitlements: GetEntitlementsUseCase {
     }
 }
 
-nonisolated struct MockInterstitialGate: InterstitialGateUseCase {
-    var creative: AdCreative?
+/// Yields the given values, then finishes (a finite stand-in for the
+/// app-lifetime entitlement stream).
+nonisolated struct MockObserveEntitlements: ObserveEntitlementsUseCase {
+    var values: [Entitlements] = []
 
-    func callAsFunction(at now: Date) async -> AdCreative? {
-        creative
-    }
-}
-
-nonisolated struct MockGetBanner: GetBannerUseCase {
-    var creative: AdCreative?
-
-    func callAsFunction(placement: AdPlacement) async -> AdCreative? {
-        creative
+    func callAsFunction() -> AsyncStream<Entitlements> {
+        AsyncStream { continuation in
+            for value in values {
+                continuation.yield(value)
+            }
+            continuation.finish()
+        }
     }
 }
 
@@ -222,16 +221,20 @@ nonisolated struct MockComputeStats: ComputeStatsUseCase {
     }
 }
 
-nonisolated struct MockGetDailyChallenge: GetDailyChallengeUseCase {
+nonisolated struct MockGetDailyLineup: GetDailyLineupUseCase {
     var completed = false
 
-    func callAsFunction(now: Date) async -> DailyChallenge {
-        DailyChallenge(
-            dateKey: EventSeeds.dailyDateKey(for: now),
-            endsAt: EventSeeds.nextDailyReset(after: now),
-            puzzle: TestFixtures.puzzle(),
-            isCompleted: completed,
-            completionTime: completed ? 300 : nil,
+    func callAsFunction(dateKey: String) async -> DailyLineup {
+        DailyLineup(
+            dateKey: dateKey,
+            endsAt: Date(timeIntervalSince1970: 1_800_000_000),
+            slots: EventSeeds.dailySlots(dateKey: dateKey).map { plan in
+                DailyLineup.Slot(
+                    variant: plan.variant,
+                    difficulty: plan.difficulty,
+                    completionTime: completed ? 300 : nil,
+                )
+            },
         )
     }
 }

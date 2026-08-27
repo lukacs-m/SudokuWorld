@@ -9,18 +9,19 @@ struct SettingsView: View {
     @State private var showPaywall = false
 
     @Environment(ThemeStore.self) private var themeStore
+    @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
         List {
             if viewModel.isLoaded {
+                premiumSection(theme: theme)
                 inputSection(theme: theme)
                 assistanceSection(theme: theme)
                 notificationSection(theme: theme)
                 themeSection(theme: theme)
                 gameCenterSection(theme: theme)
-                premiumSection(theme: theme)
                 #if DEBUG
                     debugSection
                 #endif
@@ -37,9 +38,6 @@ struct SettingsView: View {
         .task { await viewModel.observeAuthState() }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
-                .onDisappear {
-                    Task { await viewModel.refreshEntitlements() }
-                }
         }
     }
 
@@ -149,9 +147,9 @@ struct SettingsView: View {
 
             ThemePickerView(
                 selected: viewModel.settings.theme,
-                isPremium: viewModel.isPremium,
+                isPremium: premiumGate.isPremium,
                 onSelect: { id in
-                    if viewModel.selectTheme(id) {
+                    if viewModel.selectTheme(id, isPremium: premiumGate.isPremium) {
                         themeStore.select(id)
                     }
                 },
@@ -199,7 +197,7 @@ struct SettingsView: View {
 
     private func premiumSection(theme: Theme) -> some View {
         Section {
-            if viewModel.isPremium {
+            if premiumGate.isPremium {
                 Label {
                     Text("paywall.active", bundle: .module)
                 } icon: {
@@ -216,9 +214,39 @@ struct SettingsView: View {
                         Image(systemName: "crown")
                     }
                 }
+                Button {
+                    Task { await viewModel.restore() }
+                } label: {
+                    HStack {
+                        Label {
+                            Text("paywall.restore", bundle: .module)
+                        } icon: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        if viewModel.restorePhase == .restoring {
+                            Spacer()
+                            ProgressView()
+                        }
+                    }
+                }
+                .disabled(viewModel.restorePhase == .restoring)
             }
         } header: {
             Text("settings.section.premium", bundle: .module)
+        } footer: {
+            switch viewModel.restorePhase {
+            case .nothingToRestore:
+                Text("paywall.nothingToRestore", bundle: .module)
+
+            case .failed:
+                Text("paywall.restoreFailed", bundle: .module)
+                    .foregroundStyle(theme.conflict)
+
+            case .idle, .restoring, .restored:
+                // A successful restore flips the section to the active
+                // crown through PremiumGate — no extra text needed.
+                EmptyView()
+            }
         }
     }
 

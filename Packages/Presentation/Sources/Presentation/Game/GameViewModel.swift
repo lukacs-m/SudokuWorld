@@ -6,7 +6,7 @@ public import Observation
 
 /// Owns the live `GameSession` and every interaction of the game screen:
 /// input modes, notes, undo/redo, hints, autosave, the clock, and the
-/// completion flow (record → achievements → leaderboards → interstitial).
+/// completion flow (record → achievements → leaderboards).
 @MainActor
 @Observable
 public final class GameViewModel {
@@ -30,9 +30,6 @@ public final class GameViewModel {
     /// The hint currently presented in the hint sheet.
     public private(set) var presentedHint: Hint?
     public private(set) var settings: GameSettings = .standard
-    public private(set) var isPremium = false
-    /// Interstitial to show before the completion card (free tier only).
-    public private(set) var interstitial: AdCreative?
     /// Drives `.sensoryFeedback` in the view; bumped on every applied move.
     public private(set) var feedback: MoveFeedback?
 
@@ -51,8 +48,6 @@ public final class GameViewModel {
     @ObservationIgnored @Injected(\.completeGameUseCase) private var completeGame
     @ObservationIgnored @Injected(\.getHintUseCase) private var getHint
     @ObservationIgnored @Injected(\.revealCellUseCase) private var revealCell
-    @ObservationIgnored @Injected(\.interstitialGateUseCase) private var interstitialGate
-    @ObservationIgnored @Injected(\.getEntitlementsUseCase) private var getEntitlements
     @ObservationIgnored @Injected(\.settingsRepository) private var settingsRepository
 
     private let launch: GameLaunch
@@ -71,16 +66,9 @@ public final class GameViewModel {
     /// their lookup tables on every construction; set alongside `session`.
     public private(set) var topology: GridTopology?
 
-    public var hintsRemaining: Int? {
-        guard let session else { return nil }
-        guard session.mode.allowsHints else { return 0 }
-        guard !isPremium else { return nil } // unlimited
-        return max(0, FreeTier.hintsPerGame - session.hintsUsed)
-    }
-
     public var canRequestHint: Bool {
-        guard let session, session.mode.allowsHints, phase == .playing else { return false }
-        return isPremium || session.hintsUsed < FreeTier.hintsPerGame
+        guard let session else { return false }
+        return session.mode.allowsHints && phase == .playing
     }
 
     /// Cells sharing a house or cage with the selection.
@@ -115,7 +103,6 @@ public final class GameViewModel {
 
     public func start(now: Date = Date()) async {
         settings = await settingsRepository.gameSettings()
-        isPremium = await getEntitlements().isPremium
 
         guard var newSession = await restoreOrStartSession(now: now) else {
             phase = .failed
@@ -286,10 +273,6 @@ public final class GameViewModel {
         }
     }
 
-    public func dismissInterstitial() {
-        interstitial = nil
-    }
-
     // MARK: - Completion
 
     private func finish(outcome: GameOutcome, now: Date) async {
@@ -299,7 +282,6 @@ public final class GameViewModel {
         self.session = session
 
         let summary = await completeGame(session: session, outcome: outcome, at: now)
-        interstitial = await interstitialGate(at: now)
         phase = .finished(summary)
     }
 
@@ -343,16 +325,14 @@ private extension GameViewModel {
                 at: now,
             )
 
-        case .daily:
-            let dateKey = EventSeeds.dailyDateKey(for: now)
-            let context = GameContext.daily(dateKey: dateKey)
+        case let .daily(dateKey, variant, difficulty):
+            let context = GameContext.daily(dateKey: dateKey, variant: variant)
             if let saved = await resumeGame(context: context) {
                 return saved
             }
-            let plan = EventSeeds.dailyPlan(dateKey: dateKey)
             return await startGame(
-                variant: plan.variant,
-                difficulty: plan.difficulty,
+                variant: variant,
+                difficulty: difficulty,
                 mode: .normal,
                 context: context,
                 at: now,

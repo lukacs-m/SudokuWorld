@@ -9,8 +9,8 @@ public struct GameLaunch: Hashable, Sendable {
         case new(variant: SudokuVariant, difficulty: Difficulty, mode: GameMode)
         /// Resume the saved regular game.
         case resume
-        /// Play (or resume) today's daily challenge.
-        case daily
+        /// Play (or resume) one slot of a day's daily lineup.
+        case daily(dateKey: String, variant: SudokuVariant, difficulty: Difficulty)
         /// Play a game counting toward this week's tournament.
         case weekly(variant: SudokuVariant, difficulty: Difficulty)
     }

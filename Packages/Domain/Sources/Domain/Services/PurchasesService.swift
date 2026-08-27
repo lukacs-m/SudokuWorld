@@ -19,12 +19,7 @@ public protocol PurchasesService: Sendable {
 /// paywall, and the README's store-setup instructions.
 public enum PremiumProducts {
     public static let entitlementID = "premium"
+    public static let monthlySubscriptionID = "sudokuworld.premium.monthly"
     public static let yearlySubscriptionID = "sudokuworld.premium.yearly"
     public static let lifetimeID = "sudokuworld.premium.lifetime"
-}
-
-/// Free-tier limits lifted by premium.
-public enum FreeTier {
-    /// Logical hints allowed per game for free players.
-    public static let hintsPerGame = 3
 }

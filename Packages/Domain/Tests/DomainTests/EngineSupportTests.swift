@@ -70,19 +70,80 @@ struct EventSeedsTests {
         let keyMorning = EventSeeds.dailyDateKey(for: morning)
         let keyEvening = EventSeeds.dailyDateKey(for: evening)
         #expect(keyMorning == keyEvening)
-        #expect(EventSeeds.dailySeed(dateKey: keyMorning) == EventSeeds.dailySeed(dateKey: keyEvening))
+        #expect(
+            EventSeeds.dailySeed(dateKey: keyMorning, variant: .classic)
+                == EventSeeds.dailySeed(dateKey: keyEvening, variant: .classic),
+        )
     }
 
     @Test func differentDaysYieldDifferentSeeds() {
-        #expect(EventSeeds.dailySeed(dateKey: "2026-07-04") != EventSeeds.dailySeed(dateKey: "2026-07-05"))
+        #expect(
+            EventSeeds.dailySeed(dateKey: "2026-07-04", variant: .classic)
+                != EventSeeds.dailySeed(dateKey: "2026-07-05", variant: .classic),
+        )
     }
 
-    @Test func dailyPlanIsStable() {
-        let first = EventSeeds.dailyPlan(dateKey: "2026-07-04")
-        let second = EventSeeds.dailyPlan(dateKey: "2026-07-04")
-        #expect(first.variant == second.variant)
-        #expect(first.difficulty == second.difficulty)
-        #expect(first.variant != .samurai)
+    @Test func dailySeedDiffersPerSlot() {
+        #expect(
+            EventSeeds.dailySeed(dateKey: "2026-07-04", variant: .classic)
+                != EventSeeds.dailySeed(dateKey: "2026-07-04", variant: .killer),
+        )
+    }
+
+    @Test func dailySlotsAreStable() {
+        let first = EventSeeds.dailySlots(dateKey: "2026-07-04")
+        let second = EventSeeds.dailySlots(dateKey: "2026-07-04")
+        #expect(first.map(\.variant) == second.map(\.variant))
+        #expect(first.map(\.difficulty) == second.map(\.difficulty))
+        #expect(first.count == 3)
+        #expect(first[0].variant == .classic)
+    }
+
+    @Test func bucketsPartitionTheCatalog() {
+        let accessible = Set(EventSeeds.accessibleRotation)
+        let complex = Set(EventSeeds.complexRotation)
+        #expect(accessible.count == EventSeeds.accessibleRotation.count)
+        #expect(complex.count == EventSeeds.complexRotation.count)
+        #expect(accessible.count == complex.count)
+        #expect(accessible.isDisjoint(with: complex))
+        #expect(accessible.union(complex) == Set(SudokuVariant.allCases).subtracting([.classic]))
+    }
+
+    @Test func cycleCoversTheCatalogWithoutRepeats() {
+        // Walk one full 17-day cycle from the rotation epoch: every
+        // non-classic variant must appear exactly once.
+        let calendar = EventSeeds.utcCalendar
+        let epoch = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        var seen: [SudokuVariant] = []
+        for offset in 0 ..< EventSeeds.accessibleRotation.count {
+            let day = calendar.date(byAdding: .day, value: offset, to: epoch)!
+            let slots = EventSeeds.dailySlots(dateKey: EventSeeds.dailyDateKey(for: day))
+            seen.append(contentsOf: slots.dropFirst().map(\.variant))
+        }
+        #expect(seen.count == 34)
+        #expect(Set(seen).count == 34)
+        #expect(Set(seen) == Set(SudokuVariant.allCases).subtracting([.classic]))
+    }
+
+    @Test func slotsPairAccessibleWithComplex() {
+        for dateKey in ["2026-07-04", "2026-01-01", "2026-12-31", "2027-03-15"] {
+            let slots = EventSeeds.dailySlots(dateKey: dateKey)
+            #expect(EventSeeds.accessibleRotation.contains(slots[1].variant))
+            #expect(EventSeeds.complexRotation.contains(slots[2].variant))
+        }
+    }
+
+    @Test func nextAppearanceFindsEveryVariant() {
+        for variant in [SudokuVariant.killer, .mini4, .alphadoku25, .fogOfWar] {
+            let next = EventSeeds.nextAppearance(of: variant, after: "2026-07-04")
+            guard let next else {
+                Issue.record("No appearance for \(variant) within two cycles")
+                continue
+            }
+            #expect(next > "2026-07-04")
+            #expect(EventSeeds.dailySlots(dateKey: next).contains { $0.variant == variant })
+        }
+        #expect(EventSeeds.nextAppearance(of: .classic, after: "2026-07-04") == nil)
     }
 
     @Test func nextDailyResetIsUTCMidnight() {

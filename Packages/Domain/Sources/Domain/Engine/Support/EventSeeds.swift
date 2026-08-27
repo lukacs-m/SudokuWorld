@@ -25,38 +25,110 @@ public enum EventSeeds {
         )
     }
 
-    /// The shared worldwide seed for a daily challenge.
-    public static func dailySeed(dateKey: String) -> UInt64 {
-        SplitMix64.evolve(fnv1a("daily:\(dateKey)"))
+    /// The shared worldwide seed for one of a day's challenges.
+    public static func dailySeed(dateKey: String, variant: SudokuVariant) -> UInt64 {
+        SplitMix64.evolve(fnv1a("daily:\(dateKey):\(variant.slug)"))
     }
 
-    /// The variant × difficulty a given day's challenge uses. Rotates through
-    /// an accessible mix — samurai is excluded, and difficulty stays in the
-    /// beginner...hard band so the daily remains broadly playable.
-    public static func dailyPlan(dateKey: String)
-        -> (variant: SudokuVariant, difficulty: Difficulty)
+    // MARK: - Daily rotation
+
+    /// Non-classic variants split by how quickly a newcomer picks them up.
+    /// The buckets must stay the same size: each day pairs one variant from
+    /// each, and a full cycle walks both buckets exactly once.
+    static let accessibleRotation: [SudokuVariant] = [
+        .mini4, .mini6, .diagonal, .windoku, .evenOdd, .asterisk, .argyle,
+        .jigsaw, .wordoku, .kropki, .xv, .consecutive, .greaterThan, .thermo,
+        .antiKnight, .antiKing, .fogOfWar,
+    ]
+
+    static let complexRotation: [SudokuVariant] = [
+        .killer, .killerGT, .arrow, .sandwich, .skyscraper, .littleKiller,
+        .miracle, .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo,
+        .tredoku, .dodeka12, .hexadoku16, .alphadoku25,
+    ]
+
+    /// Every player's three challenges for a UTC day: classic plus one
+    /// accessible and one complex variant. A seeded shuffle per 17-day cycle
+    /// covers the full catalog with no repeats inside a cycle.
+    public static func dailySlots(dateKey: String)
+        -> [(variant: SudokuVariant, difficulty: Difficulty)]
     {
-        let rotation: [(SudokuVariant, Difficulty)] = [
-            (.classic, .easy),
-            (.mini6, .medium),
-            (.diagonal, .medium),
-            (.classic, .hard),
-            (.evenOdd, .easy),
-            (.windoku, .medium),
-            (.killer, .medium),
-            (.classic, .medium),
-            (.mini6, .easy),
-            (.diagonal, .hard),
-            (.evenOdd, .medium),
-            (.windoku, .hard),
-            (.killer, .easy),
-            (.classic, .beginner),
-        ]
-        let index = Int(fnv1a("plan:\(dateKey)") % UInt64(rotation.count))
-        return rotation[index]
+        let (cycle, position) = floorDiv(
+            dayNumber(dateKey: dateKey),
+            accessibleRotation.count,
+        )
+        var rng = Xoshiro256StarStar(seed: SplitMix64.evolve(fnv1a("rotation:\(cycle)")))
+        let accessible = accessibleRotation.shuffled(using: &rng)[position]
+        let complex = complexRotation.shuffled(using: &rng)[position]
+        return [.classic, accessible, complex].map { variant in
+            (variant, dailyDifficulty(dateKey: dateKey, variant: variant))
+        }
     }
 
-    /// The next UTC midnight after `date` — when the daily challenge rotates.
+    /// The next UTC day after `dateKey` whose rotation includes `variant`.
+    /// Classic runs every day, so it has no "next" appearance.
+    public static func nextAppearance(
+        of variant: SudokuVariant,
+        after dateKey: String,
+    ) -> String? {
+        guard variant != .classic, let start = date(fromDateKey: dateKey) else { return nil }
+        let calendar = utcCalendar
+        // A variant appears once per cycle; two cycles bound the scan.
+        for offset in 1 ... (2 * accessibleRotation.count) {
+            guard let day = calendar.date(byAdding: .day, value: offset, to: start) else {
+                continue
+            }
+            let key = dailyDateKey(for: day)
+            if dailySlots(dateKey: key).contains(where: { $0.variant == variant }) {
+                return key
+            }
+        }
+        return nil
+    }
+
+    /// Difficulty weighted toward the easy end so dailies stay broadly
+    /// playable; classic gets the wider beginner...hard band.
+    static func dailyDifficulty(dateKey: String, variant: SudokuVariant) -> Difficulty {
+        let table: [Difficulty] = variant == .classic
+            ? [.beginner, .easy, .easy, .medium, .medium, .hard]
+            : [.easy, .easy, .medium, .medium, .hard]
+        let index = Int(fnv1a("dailydiff:\(dateKey):\(variant.slug)") % UInt64(table.count))
+        return table[index]
+    }
+
+    /// Whole days between the fixed rotation epoch (2026-01-01 UTC) and the
+    /// day named by `dateKey`.
+    static func dayNumber(dateKey: String) -> Int {
+        let calendar = utcCalendar
+        guard let day = date(fromDateKey: dateKey),
+              let epoch = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))
+        else { return 0 }
+        return calendar.dateComponents([.day], from: epoch, to: day).day ?? 0
+    }
+
+    /// Midnight UTC starting the day named by `dateKey`.
+    public static func date(fromDateKey dateKey: String) -> Date? {
+        let parts = dateKey.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        return utcCalendar.date(from: DateComponents(
+            year: parts[0],
+            month: parts[1],
+            day: parts[2],
+        ))
+    }
+
+    /// Floored division so pre-epoch days still map into a stable cycle.
+    private static func floorDiv(_ value: Int, _ divisor: Int) -> (Int, Int) {
+        var quotient = value / divisor
+        var remainder = value % divisor
+        if remainder < 0 {
+            quotient -= 1
+            remainder += divisor
+        }
+        return (quotient, remainder)
+    }
+
+    /// The next UTC midnight after `date` — when the daily lineup rotates.
     public static func nextDailyReset(after date: Date) -> Date {
         let calendar = utcCalendar
         let startOfDay = calendar.startOfDay(for: date)

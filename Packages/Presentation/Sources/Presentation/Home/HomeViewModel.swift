@@ -5,9 +5,7 @@ public import Foundation
 public import Model
 public import Observation
 
-/// Home screen state: the resumable game, streaks, today's challenge, and
-/// the banner slot. The daily puzzle is cached per date key — it only
-/// regenerates when the day rolls over or completion status may have changed.
+/// Home screen state: the resumable game, streaks, and today's lineup.
 @MainActor
 @Observable
 public final class HomeViewModel {
@@ -22,15 +20,11 @@ public final class HomeViewModel {
     }
 
     public private(set) var state: ViewState<Content> = .idle
-    public private(set) var dailyState: ViewState<DailyChallenge> = .idle
-    public private(set) var banner: AdCreative?
-    public private(set) var isPremium = false
+    public private(set) var dailyState: ViewState<DailyLineup> = .idle
 
     @ObservationIgnored @Injected(\.resumeGameUseCase) private var resumeGame
     @ObservationIgnored @Injected(\.computeStatsUseCase) private var computeStats
-    @ObservationIgnored @Injected(\.getDailyChallengeUseCase) private var getDailyChallenge
-    @ObservationIgnored @Injected(\.getBannerUseCase) private var getBanner
-    @ObservationIgnored @Injected(\.getEntitlementsUseCase) private var getEntitlements
+    @ObservationIgnored @Injected(\.getDailyLineupUseCase) private var getDailyLineup
 
     public init() {}
 
@@ -46,22 +40,15 @@ public final class HomeViewModel {
             streaks: stats.streaks,
         ))
 
-        isPremium = await getEntitlements().isPremium
-        banner = isPremium ? nil : await getBanner(placement: .homeBanner)
-
         await refreshDaily(now: now)
     }
 
     private func refreshDaily(now: Date) async {
-        let todayKey = EventSeeds.dailyDateKey(for: now)
-        // Completed challenges can't change until the day rolls over — skip
-        // the (relatively expensive) regeneration in that case.
-        if let cached = dailyState.value, cached.dateKey == todayKey, cached.isCompleted {
-            return
-        }
         if dailyState.value == nil {
             dailyState = .loading
         }
-        dailyState = await .loaded(getDailyChallenge(now: now))
+        dailyState = await .loaded(getDailyLineup(
+            dateKey: EventSeeds.dailyDateKey(for: now),
+        ))
     }
 }

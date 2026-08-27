@@ -58,7 +58,7 @@ enum PersistenceFixtures {
             difficulty: .hard,
             mode: .hardcore,
             outcome: outcome,
-            context: .daily(dateKey: "2026-07-04"),
+            context: .daily(dateKey: "2026-07-04", variant: .classic),
             duration: 345.6,
             mistakes: 2,
             hintsUsed: 0,

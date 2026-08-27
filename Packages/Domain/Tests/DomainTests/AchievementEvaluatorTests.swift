@@ -147,7 +147,7 @@ struct AchievementEvaluatorTests {
 
     @Test func streaksReportIncrementally() {
         let progress = evaluator.progress(
-            for: makeInput(record: makeRecord(context: .daily(dateKey: "2026-07-04")), dailyStreak: 14),
+            for: makeInput(record: makeRecord(context: .daily(dateKey: "2026-07-04", variant: .classic)), dailyStreak: 14),
         )
         #expect(percent(.streak7, in: progress) == 100)
         #expect(percent(.streak30, in: progress).map { abs($0 - 1400.0 / 30.0) < 0.01 } == true)
@@ -175,7 +175,7 @@ struct AchievementEvaluatorTests {
     }
 
     @Test func dailyFirstFiresOnDailyContext() {
-        let daily = makeRecord(context: .daily(dateKey: "2026-07-04"))
+        let daily = makeRecord(context: .daily(dateKey: "2026-07-04", variant: .classic))
         #expect(percent(.dailyFirst, in: evaluator.progress(for: makeInput(record: daily))) == 100)
 
         let regular = makeRecord()

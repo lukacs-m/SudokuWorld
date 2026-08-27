@@ -2,21 +2,28 @@
 /// and their dedicated leaderboards; regular games feed the standard boards.
 public enum GameContext: Hashable, Sendable, Codable {
     case regular
-    case daily(dateKey: String)
+    case daily(dateKey: String, variant: SudokuVariant)
     case weekly(weekKey: String)
 
     /// Stable persistence key; at most one saved game exists per key.
     public var contextKey: String {
         switch self {
         case .regular: "main"
-        case let .daily(dateKey): "daily:\(dateKey)"
+        case let .daily(dateKey, variant): "daily:\(dateKey):\(variant.slug)"
         case let .weekly(weekKey): "weekly:\(weekKey)"
         }
     }
 
     public var dailyDateKey: String? {
-        if case let .daily(dateKey) = self {
+        if case let .daily(dateKey, _) = self {
             return dateKey
+        }
+        return nil
+    }
+
+    public var dailyVariant: SudokuVariant? {
+        if case let .daily(_, variant) = self {
+            return variant
         }
         return nil
     }
