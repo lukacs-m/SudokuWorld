@@ -1,6 +1,7 @@
 import Domain
 import Foundation
 import Model
+import StoreKit
 import SwiftUI
 
 /// The game screen: header (difficulty, clock, mistakes), board, digit pad,
@@ -16,6 +17,7 @@ struct GameView: View {
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.requestReview) private var requestReview
 
     init(launch: GameLaunch) {
         _viewModel = State(initialValue: GameViewModel(launch: launch))
@@ -36,6 +38,15 @@ struct GameView: View {
             case .active: viewModel.sceneBecameActive()
             case .inactive, .background: viewModel.sceneLeftForeground()
             @unknown default: break
+            }
+        }
+        .onChange(of: viewModel.phase) { _, newPhase in
+            guard case let .finished(summary) = newPhase, summary.outcome == .won else { return }
+            Task {
+                // Let the confetti and completion card land before the
+                // system decides whether to show the rating prompt.
+                try? await Task.sleep(for: .seconds(2))
+                requestReview()
             }
         }
         .sheet(

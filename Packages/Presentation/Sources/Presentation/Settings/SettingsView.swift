@@ -5,6 +5,10 @@ import SwiftUI
 /// Settings: input preferences, assistance toggles, notifications, themes,
 /// Game Center status, and purchases (paywall + restore).
 struct SettingsView: View {
+    // TODO: replace with the real App Store ID before release.
+    private static let appStoreReviewURL =
+        URL(string: "https://apps.apple.com/app/id0000000000?action=write-review")!
+
     @State private var viewModel = SettingsViewModel()
     @State private var showPaywall = false
 
@@ -267,7 +271,15 @@ struct SettingsView: View {
     #endif
 
     private func aboutSection(theme: Theme) -> some View {
-        Section {} footer: {
+        Section {
+            Link(destination: Self.appStoreReviewURL) {
+                Label {
+                    Text("settings.rate", bundle: .module)
+                } icon: {
+                    Image(systemName: "star")
+                }
+            }
+        } footer: {
             let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
             Text(
                 String(

@@ -5026,6 +5026,22 @@
         }
       }
     },
+    "settings.rate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate SudokuWorld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Évaluer SudokuWorld"
+          }
+        }
+      }
+    },
     "settings.section.assistance" : {
       "localizations" : {
         "en" : {
