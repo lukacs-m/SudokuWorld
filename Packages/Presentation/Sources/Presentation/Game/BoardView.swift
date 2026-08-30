@@ -5,14 +5,19 @@ import SwiftUI
 
 /// The playing surface. One Canvas draws everything (shading, highlights,
 /// cages, digits, notes, grid), and a transparent per-cell layer on top
-/// provides tap targets and VoiceOver access. Entirely topology-driven, so
-/// classic, mini, killer, diagonal, windoku, even-odd, and samurai all render
-/// through this single view.
+/// provides VoiceOver access; taps land on the container and map through the
+/// zoom transform. Pinch zooms and drag pans the board within its slot.
+/// Entirely topology-driven, so classic, mini, killer, diagonal, windoku,
+/// even-odd, and samurai all render through this single view.
 struct BoardView: View {
     let viewModel: GameViewModel
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
+
+    @State private var zoom = BoardZoom()
+    @GestureState private var pinch: (magnification: CGFloat, start: CGPoint)?
+    @GestureState private var drag: CGSize = .zero
 
     var body: some View {
         if let session = viewModel.session, let topology = viewModel.topology {
@@ -21,14 +26,24 @@ struct BoardView: View {
             // one-cell gutter around the grid for their labels.
             let gutterCells: CGFloat = session.puzzle.outsideClues.isEmpty ? 0 : 2
             GeometryReader { proxy in
-                let cellSize = min(
+                let baseCell = min(
                     proxy.size.width / (CGFloat(topology.colCount) + gutterCells),
                     proxy.size.height / (CGFloat(topology.rowCount) + gutterCells),
                 )
+                let base = CGSize(
+                    width: baseCell * (CGFloat(topology.colCount) + gutterCells),
+                    height: baseCell * (CGFloat(topology.rowCount) + gutterCells),
+                )
+                let maxScale = BoardZoom.maxScale(rows: topology.rowCount, cols: topology.colCount)
+                let display = displayZoom(base: base, maxScale: maxScale)
+                // The board re-renders at the zoomed cell size (rather than
+                // scaling the drawn output) so digits stay crisp.
+                let cellSize = baseCell * display.scale
                 let gutter = cellSize * gutterCells / 2
-                let boardWidth = cellSize * CGFloat(topology.colCount) + gutter * 2
-                let boardHeight = cellSize * CGFloat(topology.rowCount) + gutter * 2
 
+                // Not a button: the per-cell layer carries the VoiceOver
+                // button semantics; the container tap is plain hit testing.
+                // swiftlint:disable:next accessibility_trait_for_button
                 ZStack(alignment: .topLeading) {
                     boardCanvas(
                         session: session,
@@ -37,10 +52,32 @@ struct BoardView: View {
                         cellSize: cellSize,
                         gutter: gutter,
                     )
+                    // Accessibility-only: .clipped() below does not clip hit
+                    // testing, so zoomed cells must not be tappable — the
+                    // container tap plus inverse math handles touch instead.
                     tapLayer(session: session, topology: topology, cellSize: cellSize)
                         .offset(x: gutter, y: gutter)
+                        .allowsHitTesting(false)
                 }
-                .frame(width: boardWidth, height: boardHeight)
+                .frame(width: base.width * display.scale, height: base.height * display.scale)
+                .offset(display.offset)
+                .frame(width: base.width, height: base.height)
+                .clipped()
+                .contentShape(Rectangle())
+                .gesture(
+                    magnify(base: base, maxScale: maxScale)
+                        .simultaneously(with: pan(base: base, maxScale: maxScale)),
+                )
+                .onTapGesture { location in
+                    tapCell(
+                        at: location,
+                        base: base,
+                        baseCell: baseCell,
+                        gutterCells: gutterCells,
+                        maxScale: maxScale,
+                        topology: topology,
+                    )
+                }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .aspectRatio(
@@ -49,6 +86,69 @@ struct BoardView: View {
                 contentMode: .fit,
             )
         }
+    }
+
+    /// Committed zoom plus any in-flight pinch/drag, run through the same
+    /// clamped math the gesture commits use, so live and committed state
+    /// cannot drift.
+    private func displayZoom(base: CGSize, maxScale: CGFloat) -> BoardZoom {
+        var display = zoom
+        if let pinch {
+            display = display.zoomed(
+                by: pinch.magnification,
+                about: CGPoint(
+                    x: pinch.start.x - base.width / 2,
+                    y: pinch.start.y - base.height / 2,
+                ),
+                base: base,
+                maxScale: maxScale,
+            )
+        }
+        return display.panned(by: drag, base: base, maxScale: maxScale)
+    }
+
+    private func magnify(base: CGSize, maxScale: CGFloat) -> some Gesture {
+        MagnifyGesture()
+            .updating($pinch) { value, state, _ in
+                state = (value.magnification, value.startLocation)
+            }
+            .onEnded { value in
+                zoom = zoom.zoomed(
+                    by: value.magnification,
+                    about: CGPoint(
+                        x: value.startLocation.x - base.width / 2,
+                        y: value.startLocation.y - base.height / 2,
+                    ),
+                    base: base,
+                    maxScale: maxScale,
+                )
+            }
+    }
+
+    private func pan(base: CGSize, maxScale: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 10)
+            .updating($drag) { value, state, _ in
+                state = value.translation
+            }
+            .onEnded { value in
+                zoom = zoom.panned(by: value.translation, base: base, maxScale: maxScale)
+            }
+    }
+
+    private func tapCell(
+        at location: CGPoint,
+        base: CGSize,
+        baseCell: CGFloat,
+        gutterCells: CGFloat,
+        maxScale: CGFloat,
+        topology: GridTopology,
+    ) {
+        let point = displayZoom(base: base, maxScale: maxScale).boardPoint(location, base: base)
+        let gutter = baseCell * gutterCells / 2
+        let row = Int(((point.y - gutter) / baseCell).rounded(.down))
+        let col = Int(((point.x - gutter) / baseCell).rounded(.down))
+        guard let index = topology.index(row: row, col: col) else { return }
+        viewModel.tapCell(index)
     }
 
     private func boardCanvas(
@@ -88,7 +188,7 @@ struct BoardView: View {
                 .contentShape(Rectangle())
                 .frame(width: rect.width, height: rect.height)
                 .offset(x: rect.minX, y: rect.minY)
-                .onTapGesture { viewModel.tapCell(index) }
+                .accessibilityAction { viewModel.tapCell(index) }
                 .accessibilityLabel(GameAccessibility.cellLabel(
                     index: index,
                     board: session.board,
