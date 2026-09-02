@@ -67,7 +67,7 @@ struct GameCenterIDsTests {
             "greaterthan", "kropki", "xv", "consecutive", "miracle",
             "thermo", "arrow",
             "sandwich", "skyscraper", "littlekiller",
-            "fogofwar", "killergt", "tredoku",
+            "fogofwar", "killergt", "tredoku", "cube",
         ])
         #expect(Difficulty.allCases.map(\.slug) == [
             "beginner", "easy", "medium", "hard", "expert", "master",

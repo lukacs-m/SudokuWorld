@@ -33,36 +33,38 @@ public enum EventSeeds {
     // MARK: - Daily rotation
 
     /// Non-classic variants split by how quickly a newcomer picks them up.
-    /// The buckets must stay the same size: each day pairs one variant from
-    /// each, and a full cycle walks both buckets exactly once.
+    /// Each day pairs one variant from each bucket; a bucket cycles on its
+    /// own length, so the two need not be the same size.
     static let accessibleRotation: [SudokuVariant] = [
         .mini4, .mini6, .diagonal, .windoku, .evenOdd, .asterisk, .argyle,
         .jigsaw, .wordoku, .kropki, .xv, .consecutive, .greaterThan, .thermo,
-        .antiKnight, .antiKing, .fogOfWar,
+        .antiKnight, .antiKing, .fogOfWar, .dodeka12,
     ]
 
     static let complexRotation: [SudokuVariant] = [
         .killer, .killerGT, .arrow, .sandwich, .skyscraper, .littleKiller,
         .miracle, .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo,
-        .tredoku, .dodeka12, .hexadoku16, .alphadoku25,
+        .tredoku, .cube, .hexadoku16, .alphadoku25,
     ]
 
     /// Every player's three challenges for a UTC day: classic plus one
-    /// accessible and one complex variant. A seeded shuffle per 17-day cycle
-    /// covers the full catalog with no repeats inside a cycle.
+    /// accessible and one complex variant. A seeded shuffle per bucket cycle
+    /// covers that bucket with no repeats inside the cycle.
     public static func dailySlots(dateKey: String)
         -> [(variant: SudokuVariant, difficulty: Difficulty)]
     {
-        let (cycle, position) = floorDiv(
-            dayNumber(dateKey: dateKey),
-            accessibleRotation.count,
-        )
-        var rng = Xoshiro256StarStar(seed: SplitMix64.evolve(fnv1a("rotation:\(cycle)")))
-        let accessible = accessibleRotation.shuffled(using: &rng)[position]
-        let complex = complexRotation.shuffled(using: &rng)[position]
+        let day = dayNumber(dateKey: dateKey)
+        let accessible = pick(from: accessibleRotation, bucket: "accessible", day: day)
+        let complex = pick(from: complexRotation, bucket: "complex", day: day)
         return [.classic, accessible, complex].map { variant in
             (variant, dailyDifficulty(dateKey: dateKey, variant: variant))
         }
+    }
+
+    private static func pick(from rotation: [SudokuVariant], bucket: String, day: Int) -> SudokuVariant {
+        let (cycle, position) = floorDiv(day, rotation.count)
+        var rng = Xoshiro256StarStar(seed: SplitMix64.evolve(fnv1a("rotation:\(bucket):\(cycle)")))
+        return rotation.shuffled(using: &rng)[position]
     }
 
     /// The next UTC day after `dateKey` whose rotation includes `variant`.
@@ -74,7 +76,8 @@ public enum EventSeeds {
         guard variant != .classic, let start = date(fromDateKey: dateKey) else { return nil }
         let calendar = utcCalendar
         // A variant appears once per cycle; two cycles bound the scan.
-        for offset in 1 ... (2 * accessibleRotation.count) {
+        let longestCycle = max(accessibleRotation.count, complexRotation.count)
+        for offset in 1 ... (2 * longestCycle) {
             guard let day = calendar.date(byAdding: .day, value: offset, to: start) else {
                 continue
             }
