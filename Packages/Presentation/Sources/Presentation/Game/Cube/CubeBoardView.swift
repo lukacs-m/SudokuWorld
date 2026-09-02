@@ -51,6 +51,9 @@ struct CubeBoardView: View {
                 .contentShape(Rectangle())
                 .gesture(rotate.simultaneously(with: magnify))
                 .onTapGesture { location in
+                    // While the settle animation plays the cube is not yet at
+                    // `orientation`, so a ray cast would pick the wrong cell.
+                    guard !scene.isSettling else { return }
                     guard let cell = CubeGeometry.hitCell(
                         at: location,
                         in: size,
@@ -90,10 +93,6 @@ struct CubeBoardView: View {
                 theme: theme,
             )
         }
-        let liveOrientation = dragTranslation
-            .map { CubeGeometry.rotation(forDrag: $0) * orientation }
-            ?? orientation
-        let liveScale = pinch.map { CubeGeometry.clampedScale(scale * Float($0)) } ?? scale
         return CubeSceneState(
             snapshots: snapshots,
             orientation: liveOrientation,
@@ -104,6 +103,18 @@ struct CubeBoardView: View {
         )
     }
 
+    /// The pose the cube is showing right now: the committed one plus
+    /// whichever gesture is still in flight. The two gestures run
+    /// simultaneously, so either one ending must settle to *both* gestures'
+    /// current values or it would drag the other one backwards.
+    private var liveOrientation: simd_quatf {
+        dragTranslation.map { CubeGeometry.rotation(forDrag: $0) * orientation } ?? orientation
+    }
+
+    private var liveScale: Float {
+        pinch.map { CubeGeometry.clampedScale(scale * Float($0)) } ?? scale
+    }
+
     private var rotate: some Gesture {
         DragGesture(minimumDistance: 8)
             .updating($dragTranslation) { value, state, _ in
@@ -112,7 +123,7 @@ struct CubeBoardView: View {
             .onEnded { value in
                 let free = CubeGeometry.rotation(forDrag: value.translation) * orientation
                 orientation = CubeGeometry.settledOrientation(near: free)
-                scene.settle(orientation: orientation, scale: scale)
+                scene.settle(orientation: orientation, scale: liveScale)
             }
     }
 
@@ -123,7 +134,7 @@ struct CubeBoardView: View {
             }
             .onEnded { value in
                 scale = CubeGeometry.clampedScale(scale * Float(value.magnification))
-                scene.settle(orientation: orientation, scale: scale)
+                scene.settle(orientation: liveOrientation, scale: scale)
             }
     }
 }
@@ -149,6 +160,13 @@ final class CubeScene {
     private var faces: [ModelEntity] = []
     private var lastSnapshots: [CubeFaceSnapshot?] = Array(repeating: nil, count: 6)
     private var isLit = false
+    private var settling: AnimationPlaybackController?
+
+    /// True while the release animation still drives `root.transform`, so
+    /// the cube is somewhere between the released pose and the settled one.
+    var isSettling: Bool {
+        settling?.isPlaying ?? false
+    }
 
     func build(into content: inout RealityViewCameraContent, state: CubeSceneState) {
         content.camera = .virtual
@@ -193,6 +211,10 @@ final class CubeScene {
         camera.camera.fieldOfViewInDegrees = CubeGeometry.verticalFieldOfView(aspect: state.aspect)
         root.isEnabled = !state.hidden
         if state.interacting {
+            // RealityKit's animation writes `root.transform` every frame, so
+            // it has to be stopped or it would overwrite the live gesture.
+            settling?.stop()
+            settling = nil
             root.transform = Self.transform(orientation: state.orientation, scale: state.scale)
         }
         for (face, snapshot) in state.snapshots.enumerated() where lastSnapshots[face] != snapshot {
@@ -209,7 +231,8 @@ final class CubeScene {
     }
 
     func settle(orientation: simd_quatf, scale: Float) {
-        root.move(
+        settling?.stop()
+        settling = root.move(
             to: Self.transform(orientation: orientation, scale: scale),
             relativeTo: nil,
             duration: 0.35,

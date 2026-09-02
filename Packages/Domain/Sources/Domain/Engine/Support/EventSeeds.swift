@@ -38,13 +38,13 @@ public enum EventSeeds {
     static let accessibleRotation: [SudokuVariant] = [
         .mini4, .mini6, .diagonal, .windoku, .evenOdd, .asterisk, .argyle,
         .jigsaw, .wordoku, .kropki, .xv, .consecutive, .greaterThan, .thermo,
-        .antiKnight, .antiKing, .fogOfWar, .dodeka12,
+        .antiKnight, .antiKing, .fogOfWar,
     ]
 
     static let complexRotation: [SudokuVariant] = [
         .killer, .killerGT, .arrow, .sandwich, .skyscraper, .littleKiller,
         .miracle, .samurai, .gattai2, .gattai3, .gattai8, .shogun, .sumo,
-        .tredoku, .cube, .hexadoku16, .alphadoku25,
+        .tredoku, .dodeka12, .cube, .hexadoku16, .alphadoku25,
     ]
 
     /// Every player's three challenges for a UTC day: classic plus one

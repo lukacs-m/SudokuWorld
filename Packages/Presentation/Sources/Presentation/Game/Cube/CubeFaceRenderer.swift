@@ -36,7 +36,7 @@ struct CubeFaceSnapshot: Equatable, Sendable {
         theme: Theme,
     ) -> Self {
         let faceCells = (0 ..< CubeNet.cellsPerFace).map { offset in
-            let index = face.rawValue * CubeNet.cellsPerFace + offset
+            let index = CubeNet.index(face: face, row: offset / 3, col: offset % 3)
             let cell = session.board[index]
             let isWrong = settings.mistakeHighlighting
                 && !cell.isGiven

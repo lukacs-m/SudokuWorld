@@ -9,7 +9,7 @@ enum CubeTopology {
     static func build() -> GridTopology {
         let cells = (0 ..< CubeNet.cellCount).map(CubeNet.netPosition)
         let houses = CubeNet.Face.allCases.map { face in
-            (0 ..< CubeNet.cellsPerFace).map { face.rawValue * CubeNet.cellsPerFace + $0 }
+            (0 ..< CubeNet.cellsPerFace).map { CubeNet.index(face: face, row: $0 / 3, col: $0 % 3) }
         }
         return GridTopology(
             variant: .cube,
