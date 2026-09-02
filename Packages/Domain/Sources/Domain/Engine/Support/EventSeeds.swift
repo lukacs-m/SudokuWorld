@@ -61,7 +61,11 @@ public enum EventSeeds {
         }
     }
 
-    private static func pick(from rotation: [SudokuVariant], bucket: String, day: Int) -> SudokuVariant {
+    private static func pick(
+        from rotation: [SudokuVariant],
+        bucket: String,
+        day: Int,
+    ) -> SudokuVariant {
         let (cycle, position) = floorDiv(day, rotation.count)
         var rng = Xoshiro256StarStar(seed: SplitMix64.evolve(fnv1a("rotation:\(bucket):\(cycle)")))
         return rotation.shuffled(using: &rng)[position]

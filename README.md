@@ -24,7 +24,7 @@ French localization.
     Sandwich, Skyscraper, Little Killer.
   - *Chess* — Anti-Knight, Anti-King, Miracle.
   - *Multi-grid* — Samurai, Gattai-2, Gattai-3, Gattai-8, Shogun, Sumo.
-  - *Twists* — Even-Odd, Wordoku, Fog of War, Killer GT, Tredoku.
+  - *Twists* — Even-Odd, Wordoku, Fog of War, Killer GT, Tredoku, Cube (a real 3D cube you rotate).
 
   Fog of War, Killer GT, and Tredoku wear the *New* badge
   (`VariantCatalog.newVariants`).

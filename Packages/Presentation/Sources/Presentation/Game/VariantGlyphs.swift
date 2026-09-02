@@ -22,7 +22,7 @@ enum VariantGlyphs {
              .antiKnight, .antiKing,
              .greaterThan, .kropki, .xv, .consecutive, .miracle,
              .thermo, .arrow, .sandwich, .skyscraper, .littleKiller,
-             .fogOfWar, .killerGT, .tredoku:
+             .fogOfWar, .killerGT, .tredoku, .cube:
             "\(digit)"
         }
     }

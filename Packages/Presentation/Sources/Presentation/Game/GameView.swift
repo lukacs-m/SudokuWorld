@@ -1,3 +1,4 @@
+import Common
 import Domain
 import Foundation
 import Model
@@ -32,7 +33,12 @@ struct GameView: View {
         }
         .navigationBarBackButtonHidden(true)
         .toolbar { toolbarContent(theme: theme) }
-        .task { await viewModel.start() }
+        .task {
+            await viewModel.start()
+            if let cell = LaunchHooks.selectCell {
+                viewModel.tapCell(cell)
+            }
+        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active: viewModel.sceneBecameActive()
@@ -140,7 +146,7 @@ struct GameView: View {
         case .playing, .paused, .finished:
             VStack(spacing: 12) {
                 header(theme: theme)
-                BoardView(viewModel: viewModel)
+                board
                     .padding(.horizontal, 8)
                     .opacity(viewModel.phase == .paused ? 0.05 : 1)
                 Spacer(minLength: 0)
@@ -148,6 +154,17 @@ struct GameView: View {
                     .padding(.horizontal, 12)
             }
             .padding(.vertical, 8)
+        }
+    }
+
+    /// The cube is the one variant with its own rendering and gestures;
+    /// every other shape goes through the flat canvas board.
+    @ViewBuilder
+    private var board: some View {
+        if viewModel.session?.puzzle.variant == .cube {
+            CubeBoardView(viewModel: viewModel)
+        } else {
+            BoardView(viewModel: viewModel)
         }
     }
 

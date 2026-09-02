@@ -57,8 +57,8 @@ public enum CubeNet {
         case right
     }
 
-    /// Two face sides glued together on the cube. Boundary cell `k` of
-    /// `sideA` touches boundary cell `k` of `sideB`, or `2 - k` when
+    /// Two face sides glued together on the cube. Boundary cell `n` of
+    /// `sideA` touches boundary cell `n` of `sideB`, or `2 - n` when
     /// `flipped`, so a row or column leaving one face continues straight
     /// onto the other.
     public struct Edge: Sendable {
@@ -68,8 +68,8 @@ public enum CubeNet {
         public let sideB: Side
         public let flipped: Bool
 
-        public func matchingBoundaryCell(_ k: Int) -> Int {
-            flipped ? 2 - k : k
+        public func matchingBoundaryCell(_ boundaryCell: Int) -> Int {
+            flipped ? 2 - boundaryCell : boundaryCell
         }
     }
 
@@ -99,26 +99,32 @@ public enum CubeNet {
         face.rawValue * cellsPerFace + row * 3 + col
     }
 
-    public static func facePosition(of index: Int) -> (face: Face, row: Int, col: Int) {
+    public struct FacePosition: Equatable, Sendable {
+        public let face: Face
+        public let row: Int
+        public let col: Int
+    }
+
+    public static func facePosition(of index: Int) -> FacePosition {
         let face = Face(rawValue: index / cellsPerFace) ?? .up
         let offset = index % cellsPerFace
-        return (face, offset / 3, offset % 3)
+        return FacePosition(face: face, row: offset / 3, col: offset % 3)
     }
 
     public static func netPosition(of index: Int) -> GridPosition {
-        let (face, row, col) = facePosition(of: index)
-        let origin = face.netOrigin
-        return GridPosition(row: origin.row + row, col: origin.col + col)
+        let position = facePosition(of: index)
+        let origin = position.face.netOrigin
+        return GridPosition(row: origin.row + position.row, col: origin.col + position.col)
     }
 
     /// The three cells of the line that leaves `face` through boundary
-    /// cell `k` of `side`, ordered from the far end toward that side.
-    static func line(face: Face, side: Side, boundaryCell k: Int) -> [Int] {
+    /// cell `boundaryCell` of `side`, ordered from the far end toward that side.
+    static func line(face: Face, side: Side, boundaryCell: Int) -> [Int] {
         let cells: [(Int, Int)] = switch side {
-        case .top: [(2, k), (1, k), (0, k)]
-        case .bottom: [(0, k), (1, k), (2, k)]
-        case .left: [(k, 2), (k, 1), (k, 0)]
-        case .right: [(k, 0), (k, 1), (k, 2)]
+        case .top: [(2, boundaryCell), (1, boundaryCell), (0, boundaryCell)]
+        case .bottom: [(0, boundaryCell), (1, boundaryCell), (2, boundaryCell)]
+        case .left: [(boundaryCell, 2), (boundaryCell, 1), (boundaryCell, 0)]
+        case .right: [(boundaryCell, 0), (boundaryCell, 1), (boundaryCell, 2)]
         }
         return cells.map { index(face: face, row: $0.0, col: $0.1) }
     }
@@ -128,12 +134,12 @@ public enum CubeNet {
     /// other, ordered end to end.
     static func bentLines() -> [[Int]] {
         edges.flatMap { edge in
-            (0 ..< 3).map { k in
-                line(face: edge.faceA, side: edge.sideA, boundaryCell: k)
+            (0 ..< 3).map { boundaryCell in
+                line(face: edge.faceA, side: edge.sideA, boundaryCell: boundaryCell)
                     + line(
                         face: edge.faceB,
                         side: edge.sideB,
-                        boundaryCell: edge.matchingBoundaryCell(k),
+                        boundaryCell: edge.matchingBoundaryCell(boundaryCell),
                     ).reversed()
             }
         }

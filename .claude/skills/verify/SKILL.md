@@ -31,3 +31,11 @@ Gotchas:
 - Board geometry for checking outside-clue/overlay positions: read the grid
   edges off the screenshot, cell size = width/9; clue labels sit in a
   one-cell gutter band around the grid.
+- Cube variant (`-uiHookVariant cube`): `-uiHookCubeYaw 35 -uiHookCubePitch 25`
+  starts the 3D board turned (degrees; keep values positive — a leading `-`
+  is parsed as a new key) and `-uiHookSelectCell 22` pre-selects a cell
+  (indices are face-major, see `CubeNet`). Real drags/pinches need touch
+  injection: a throwaway XCUITest bundle (any project, `XCUIApplication(
+  bundleIdentifier:)` + `press(forDuration:thenDragTo:)` / `pinch(withScale:)`)
+  run with `xcodebuild test -destination id=$SIM` works without idb; take
+  `simctl io screenshot`s from a shell loop while it runs.
