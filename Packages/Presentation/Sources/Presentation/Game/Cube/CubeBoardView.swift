@@ -204,7 +204,6 @@ final class CubeScene {
             root.addChild(quad)
             faces.append(quad)
         }
-        root.transform = Self.transform(orientation: state.orientation, scale: state.scale)
         content.add(root)
         apply(state)
     }
