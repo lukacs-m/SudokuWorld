@@ -104,9 +104,7 @@ struct CubeBoardView: View {
     }
 
     /// The pose the cube is showing right now: the committed one plus
-    /// whichever gesture is still in flight. The two gestures run
-    /// simultaneously, so either one ending must settle to *both* gestures'
-    /// current values or it would drag the other one backwards.
+    /// whichever gesture is still in flight.
     private var liveOrientation: simd_quatf {
         dragTranslation.map { CubeGeometry.rotation(forDrag: $0) * orientation } ?? orientation
     }
@@ -123,7 +121,10 @@ struct CubeBoardView: View {
             .onEnded { value in
                 let free = CubeGeometry.rotation(forDrag: value.translation) * orientation
                 orientation = CubeGeometry.settledOrientation(near: free)
-                scene.settle(orientation: orientation, scale: liveScale)
+                // The gestures run simultaneously; whichever ends last
+                // settles once, to both gestures' committed values.
+                guard pinch == nil else { return }
+                scene.settle(orientation: orientation, scale: scale)
             }
     }
 
@@ -134,7 +135,8 @@ struct CubeBoardView: View {
             }
             .onEnded { value in
                 scale = CubeGeometry.clampedScale(scale * Float(value.magnification))
-                scene.settle(orientation: liveOrientation, scale: scale)
+                guard dragTranslation == nil else { return }
+                scene.settle(orientation: orientation, scale: scale)
             }
     }
 }

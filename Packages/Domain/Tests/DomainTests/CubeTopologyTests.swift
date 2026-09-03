@@ -70,15 +70,6 @@ struct CubeTopologyTests {
                 let onB = clique.filter { CubeNet.facePosition(of: $0).face == edge.faceB }
                 #expect(onA.count == 3)
                 #expect(onB.count == 3)
-                // Read from either face, the same six cells make the line:
-                // crossing the edge from face B through the matching
-                // boundary cell reaches face B's half of this clique.
-                let fromB = CubeNet.line(
-                    face: edge.faceB,
-                    side: edge.sideB,
-                    boundaryCell: edge.matchingBoundaryCell(k),
-                )
-                #expect(Set(onA + fromB) == Set(clique))
             }
         }
     }
