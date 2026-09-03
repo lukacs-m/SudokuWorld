@@ -300,7 +300,7 @@ extension VariantIconArtwork {
         }
     }
 
-    private static func lerp(_ a: CGPoint, _ b: CGPoint, _ t: CGFloat) -> CGPoint {
-        CGPoint(x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t)
+    private static func lerp(_ a: CGPoint, _ b: CGPoint, _ fraction: CGFloat) -> CGPoint {
+        CGPoint(x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction)
     }
 }
