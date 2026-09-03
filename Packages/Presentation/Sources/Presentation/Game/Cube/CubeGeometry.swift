@@ -134,7 +134,7 @@ enum CubeGeometry {
             let across = simd_dot(hit, frame.right) + halfSide
             let downward = simd_dot(hit, frame.down) + halfSide
             guard across >= 0, across < 3, downward >= 0, downward < 3 else { continue }
-            if nearest == nil || distance < (nearest?.distance ?? .infinity) {
+            if distance < (nearest?.distance ?? .infinity) {
                 let cell = CubeNet.index(face: face, row: Int(downward), col: Int(across))
                 nearest = (distance, cell)
             }

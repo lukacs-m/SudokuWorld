@@ -53,7 +53,8 @@ public enum LaunchHooks {
         }
 
         /// Start the cube board turned by yaw then pitch, in degrees:
-        /// `-uiHookCubeYaw 35 -uiHookCubePitch -25`.
+        /// `-uiHookCubeYaw 35 -uiHookCubePitch 25` — a leading `-` on the
+        /// value is parsed as another key, so keep both positive.
         public static var cubePose: (yaw: Double, pitch: Double)? {
             let defaults = UserDefaults.standard
             guard defaults.object(forKey: "uiHookCubeYaw") != nil

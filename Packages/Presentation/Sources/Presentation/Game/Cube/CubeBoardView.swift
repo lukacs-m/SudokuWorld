@@ -215,6 +215,10 @@ final class CubeScene {
             // it has to be stopped or it would overwrite the live gesture.
             settling?.stop()
             settling = nil
+        }
+        // Outside the settle animation the cube must show `state.orientation`,
+        // including when a gesture is cancelled instead of ended.
+        if !isSettling {
             root.transform = Self.transform(orientation: state.orientation, scale: state.scale)
         }
         for (face, snapshot) in state.snapshots.enumerated() where lastSnapshots[face] != snapshot {
