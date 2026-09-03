@@ -121,9 +121,6 @@ struct CubeBoardView: View {
             .onEnded { value in
                 let free = CubeGeometry.rotation(forDrag: value.translation) * orientation
                 orientation = CubeGeometry.settledOrientation(near: free)
-                // The gestures run simultaneously; whichever ends last
-                // settles once, to both gestures' committed values.
-                guard pinch == nil else { return }
                 scene.settle(orientation: orientation, scale: scale)
             }
     }
@@ -135,7 +132,6 @@ struct CubeBoardView: View {
             }
             .onEnded { value in
                 scale = CubeGeometry.clampedScale(scale * Float(value.magnification))
-                guard dragTranslation == nil else { return }
                 scene.settle(orientation: orientation, scale: scale)
             }
     }
