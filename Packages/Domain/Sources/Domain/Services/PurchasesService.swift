@@ -16,10 +16,12 @@ public protocol PurchasesService: Sendable {
 }
 
 /// Product and entitlement identifiers shared between the adapter, the
-/// paywall, and the README's store-setup instructions.
+/// paywall, and the README's store-setup instructions. These must match the
+/// RevenueCat dashboard exactly: a purchase whose entitlement is named
+/// differently succeeds in the store yet maps to the free tier.
 public enum PremiumProducts {
-    public static let entitlementID = "premium"
-    public static let monthlySubscriptionID = "sudokuworld.premium.monthly"
-    public static let yearlySubscriptionID = "sudokuworld.premium.yearly"
-    public static let lifetimeID = "sudokuworld.premium.lifetime"
+    public static let entitlementID = "SudokuWorld Pro"
+    public static let monthlySubscriptionID = "monthly"
+    public static let yearlySubscriptionID = "yearly"
+    public static let lifetimeID = "lifetime"
 }

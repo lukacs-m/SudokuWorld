@@ -77,7 +77,14 @@ public struct RevenueCatPurchasesService: PurchasesService {
             if result.userCancelled {
                 throw DomainError.purchaseCancelled
             }
-            return Self.map(result.customerInfo)
+            let entitlements = Self.map(result.customerInfo)
+            if !entitlements.isPremium {
+                let active = result.customerInfo.entitlements.active.keys.sorted()
+                Log.error(
+                    "RevenueCat: purchase \(productID) did not grant premium; active: \(active)",
+                )
+            }
+            return entitlements
         } catch let error as DomainError {
             throw error
         } catch {
@@ -103,10 +110,15 @@ public struct RevenueCatPurchasesService: PurchasesService {
 
     // MARK: - Mapping
 
-    private static func map(_ info: CustomerInfo) -> Entitlements {
-        guard let entitlement = info.entitlements[PremiumProducts.entitlementID],
-              entitlement.isActive
-        else { return .free }
+    static func map(_ info: CustomerInfo) -> Entitlements {
+        let expected = PremiumProducts.entitlementID
+        guard let entitlement = info.entitlements[expected], entitlement.isActive else {
+            let active = info.entitlements.active.keys.sorted()
+            if !active.isEmpty {
+                Log.error("RevenueCat: entitlement \"\(expected)\" not active; active: \(active)")
+            }
+            return .free
+        }
         let source: Entitlements.Source = entitlement.productIdentifier == PremiumProducts
             .lifetimeID
             ? .lifetime

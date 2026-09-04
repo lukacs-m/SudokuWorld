@@ -69,7 +69,7 @@ French localization.
   difficulty per ISO week, cumulative points on a recurring leaderboard).
 - **Monetization** — fair freemium, no ads: classic play, all difficulties,
   hints, and undo are free forever; any variant in today's lineup is free
-  to play that day. The `premium` entitlement (RevenueCat
+  to play that day. The `SudokuWorld Pro` entitlement (RevenueCat
   monthly/annual/lifetime) unlocks unlimited variant play, the daily archive
   (free players can only resume a game they already started there), and
   premium themes. Soft wall with the variant's next daily date instead of
@@ -87,7 +87,7 @@ Requirements: Xcode 26.x (Swift 6.3 toolchain), plus `xcodegen`, `swiftlint`,
 ```bash
 make setup      # install XcodeGen and generate SudokuWorld.xcodeproj
 make open       # open in Xcode — select the SudokuWorld scheme and run
-make test       # run every package's test suite (248 tests; Domain alone ~50 s)
+make test       # run every package's test suite (Domain alone ~50 s)
 make build      # build for the iOS simulator from the CLI
 make lint       # SwiftLint
 make format     # SwiftFormat (in place)
@@ -197,14 +197,17 @@ incremental percent automatically:
 ### RevenueCat
 
 1. Create App Store Connect in-app purchases: auto-renewing subscriptions
-   `sudokuworld.premium.monthly` and `sudokuworld.premium.yearly` (7-day intro
-   trial on yearly only) and non-consumable `sudokuworld.premium.lifetime`
-   (IDs pinned in `PremiumProducts`,
-   [`PurchasesService.swift`](Packages/Domain/Sources/Domain/Services/PurchasesService.swift)).
-2. In the RevenueCat dashboard: create an entitlement named **`premium`**,
-   attach all three products, and add them to the *current* Offering as the
-   standard *monthly*, *annual*, and *lifetime* packages (the paywall maps by
-   package type, and all gating checks the entitlement — never product IDs).
+   `monthly` and `yearly` (7-day intro trial on yearly only) and
+   non-consumable `lifetime` (IDs pinned in `PremiumProducts`,
+   [`PurchasesService.swift`](Packages/Domain/Sources/Domain/Services/PurchasesService.swift);
+   the lifetime ID decides whether premium is reported as lifetime or
+   subscription).
+2. In the RevenueCat dashboard: create an entitlement named
+   **`SudokuWorld Pro`** (exactly what `PremiumProducts.entitlementID`
+   holds — a different name makes every purchase succeed while the app stays
+   free), attach all three products, and add them to the *current* Offering
+   as the standard *monthly*, *annual*, and *lifetime* packages (the paywall
+   maps by package type, and all gating checks the entitlement).
 3. Paste your public Apple API key (`appl_…`) into
    `AppSecrets.revenueCatAPIKey`, replacing the committed `test_…` sandbox
    key.
@@ -233,7 +236,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 248 tests; the Domain
+Tests across four packages (`make test`, macOS host, 253 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
@@ -249,7 +252,9 @@ suite alone runs ~50 s):
   stats/streak edge cases.
 - **Data** — SwiftData roundtrips on in-memory containers (saved-game upserts
   per context, records, per-slot daily completions incl. the on-day streak
-  rule, tournament scores), UserDefaults repositories.
+  rule, tournament scores), UserDefaults repositories, and the RevenueCat
+  `CustomerInfo` → `Entitlements` mapping pinned against the identifiers the
+  dashboard returns.
 - **Presentation** — ViewModels with container-registered mocks
   (`@Suite(.container)`): game flow incl. hardcore loss, unlimited hints,
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall

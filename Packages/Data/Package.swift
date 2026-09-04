@@ -48,6 +48,8 @@ let package = Package(
                 .product(name: "Common", package: "Common"),
                 .product(name: "Model", package: "Model"),
                 .product(name: "Domain", package: "Domain"),
+                // Only to build CustomerInfo fixtures for the mapping tests.
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
             ],
             swiftSettings: sharedSwiftSettings
         ),
