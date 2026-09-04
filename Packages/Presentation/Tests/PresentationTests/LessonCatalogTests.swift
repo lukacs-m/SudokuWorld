@@ -43,6 +43,8 @@ struct LessonCatalogTests {
         }
         #expect(LessonGroup.basics.techniques == [.nakedSingle, .hiddenSingle])
         #expect(LessonGroup.advanced.techniques == [.xWing, .swordfish, .xyWing, .xyChain])
+        #expect(LessonGroup.variantSpecific.techniques
+            == [.relationAnalysis, .cageArithmetic, .arrowArithmetic, .outsideClueAnalysis])
     }
 
     @Test func catalogIsReadable() {
