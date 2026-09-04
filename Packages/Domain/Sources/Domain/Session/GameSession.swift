@@ -113,8 +113,9 @@ public struct GameSession: Equatable, Sendable {
 
     /// The never-stuck rule (fair fog only): lifts seeded windows until the
     /// visible position has a logical step within the puzzle's grade. Runs
-    /// after every move that can shrink the visible position — a placement
-    /// the ladder could not derive may be taken back again.
+    /// after every move that can shrink the visible position: a placement
+    /// the ladder could not derive may be taken back, or overwritten with a
+    /// wrong digit, which drops it out of view again.
     private mutating func liftFogWhileStuck() {
         guard FogOfWar.isFair(puzzle), !isSolved else { return }
         let solver = FogOfWar.solverContext(for: puzzle)
@@ -203,6 +204,7 @@ public struct GameSession: Equatable, Sendable {
                 isLost = true
                 return .hardcoreLoss
             }
+            liftFogWhileStuck()
             return .mistake(total: mistakes)
         }
         if puzzle.variant == .fogOfWar {

@@ -170,28 +170,62 @@ struct FogOfWarTests {
         }
     }
 
-    /// Taking back a correct digit the ladder had not derived shrinks the
-    /// visible position, so the never-stuck rule has to run there too.
-    @Test func erasingAPlacementLeavesALogicalStepInView() {
-        var session = fairSession()
-        guard let derived = logicalPlacement(session) else {
-            Issue.record("stuck")
-            return
-        }
-        guard let lucky = session.revealedCells.sorted().first(where: {
-            $0 != derived.cell && session.puzzle.givens[$0] == nil && session.board[$0].value == nil
-        }) else {
-            Issue.record("no second open revealed cell")
-            return
-        }
+    /// An invariant test, not a before/after reproduction: erasing, undoing
+    /// or overwriting a correct digit shrinks the visible position, and this
+    /// pins the never-stuck guarantee (and the never-re-fog guarantee)
+    /// across all of those paths. A board that is provably stuck after one
+    /// of them is not constructible from a generated puzzle, so this asserts
+    /// the property rather than a specific failure.
+    @Test(arguments: [Difficulty.expert, .master])
+    func shrinkingMovesKeepALogicalStepInView(difficulty: Difficulty) {
+        for seed in 1 ... 6 as ClosedRange<UInt64> {
+            var session = fairSession(difficulty: difficulty, seed: seed)
+            var revealed = session.revealedCells
 
-        _ = session.place(session.puzzle.solution[lucky], at: lucky, autoCleanNotes: false)
-        _ = session.clear(at: lucky)
-        #expect(session.logicalFogPlacement() != nil, "stuck after erasing")
+            func expectStepInView(after move: String) {
+                let label = "\(difficulty) seed \(seed), after \(move)"
+                #expect(session.logicalFogPlacement() != nil, "stuck: \(label)")
+                #expect(session.revealedCells.isSuperset(of: revealed), "re-fogged: \(label)")
+                revealed = session.revealedCells
+            }
 
-        _ = session.place(session.puzzle.solution[lucky], at: lucky, autoCleanNotes: false)
-        session.undo()
-        #expect(session.logicalFogPlacement() != nil, "stuck after undo")
+            guard let derived = session.logicalFogPlacement() else {
+                Issue.record("\(difficulty) seed \(seed) starts stuck")
+                continue
+            }
+            guard let undeduced = session.revealedCells.sorted().first(where: {
+                $0 != derived.cell && session.puzzle.givens[$0] == nil
+                    && session.board[$0].value == nil
+            }) else {
+                Issue.record("\(difficulty) seed \(seed) has no second open revealed cell")
+                continue
+            }
+
+            // A correct digit the ladder had not offered, then taken back.
+            let lucky = session.puzzle.solution[undeduced]
+            _ = session.place(lucky, at: undeduced, autoCleanNotes: false)
+            expectStepInView(after: "an undeduced placement")
+            _ = session.clear(at: undeduced)
+            expectStepInView(after: "erasing it")
+
+            // The ladder's own step, undone and redone.
+            _ = session.place(derived.digit, at: derived.cell, autoCleanNotes: false)
+            expectStepInView(after: "the derived step")
+            session.undo()
+            expectStepInView(after: "undoing it")
+            session.redo()
+            expectStepInView(after: "redoing it")
+            #expect(session.mistakes == 0, "\(difficulty) seed \(seed): correct moves only so far")
+
+            // A wrong digit over a correct, revealed one — the placed cell
+            // drops out of view until it is erased.
+            let wrong = derived.digit == 9 ? 8 : derived.digit + 1
+            _ = session.place(wrong, at: derived.cell, autoCleanNotes: false)
+            expectStepInView(after: "overwriting a correct digit")
+            _ = session.clear(at: derived.cell)
+            expectStepInView(after: "erasing the wrong digit")
+            #expect(session.mistakes == 1, "\(difficulty) seed \(seed): one deliberate mistake")
+        }
     }
 
     @Test func autoRevealIsDeterministicAndSurvivesRestore() {
