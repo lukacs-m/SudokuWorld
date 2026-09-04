@@ -233,7 +233,9 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 ## Testing
 
 Tests across four packages (`make test`, macOS host, 237 tests; the Domain
-suite alone runs ~50 s):
+suite alone runs ~2.5 min — 143–160 s under `make test`'s parallel package
+load, most of it the fog-of-war logic-only proof that plays 50 generated
+Expert/Master boards to completion):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
   (uniqueness re-verified from scratch, cage partitions, parity, determinism,
