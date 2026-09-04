@@ -71,6 +71,12 @@ public final class GameViewModel {
     /// their lookup tables on every construction; set alongside `session`.
     public private(set) var topology: GridTopology?
 
+    /// Only fair fog lifts a window on its own, so only it reserves the
+    /// cue's slot under the board.
+    public var usesFairFog: Bool {
+        session?.usesFairFog ?? false
+    }
+
     public var canRequestHint: Bool {
         guard let session else { return false }
         return session.mode.allowsHints && phase == .playing

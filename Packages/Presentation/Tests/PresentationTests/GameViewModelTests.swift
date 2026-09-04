@@ -83,6 +83,8 @@ struct GameViewModelTests {
         )))
         await viewModel.start()
         #expect(viewModel.fogLiftSequence == 0)
+        // Only fair fog reserves the cue's slot under the board.
+        #expect(viewModel.usesFairFog)
 
         guard let session = viewModel.session, let step = session.logicalFogPlacement() else {
             Issue.record("No logical fog move")

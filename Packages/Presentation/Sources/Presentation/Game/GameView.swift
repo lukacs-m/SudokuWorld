@@ -158,10 +158,13 @@ struct GameView: View {
                 BoardView(viewModel: viewModel)
                     .padding(.horizontal, 8)
                     .opacity(viewModel.phase == .paused ? 0.05 : 1)
-                // Always laid out so the board never shifts when it appears.
-                FogLiftCueView(theme: theme)
-                    .opacity(showsFogLiftCue ? 1 : 0)
-                    .accessibilityHidden(!showsFogLiftCue)
+                if viewModel.usesFairFog {
+                    // Always laid out so the board never shifts when it
+                    // appears — but only where a lift can happen.
+                    FogLiftCueView(theme: theme)
+                        .opacity(showsFogLiftCue ? 1 : 0)
+                        .accessibilityHidden(!showsFogLiftCue)
+                }
                 Spacer(minLength: 0)
                 DigitPadView(viewModel: viewModel)
                     .padding(.horizontal, 12)

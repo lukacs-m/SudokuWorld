@@ -105,20 +105,35 @@ public struct GameSession: Equatable, Sendable {
         puzzle.variant == .fogOfWar && !revealedCells.contains(index)
     }
 
+    /// Fair fog (Expert and Master): a correct digit lifts whole houses and
+    /// the never-stuck rule can lift a window on its own.
+    public var usesFairFog: Bool {
+        FogOfWar.isFair(puzzle)
+    }
+
     /// The never-stuck rule (fair fog only): lifts seeded windows until the
-    /// visible position has a logical step within the puzzle's grade.
+    /// visible position has a logical step within the puzzle's grade. Runs
+    /// after every move that can shrink the visible position — a placement
+    /// the ladder could not derive may be taken back again.
     private mutating func liftFogWhileStuck() {
         guard FogOfWar.isFair(puzzle), !isSolved else { return }
-        while !hasVisibleLogicalStep {
-            let window = FogOfWar.autoReveal(puzzle: puzzle, board: board, revealed: revealedCells)
+        let solver = FogOfWar.solverContext(for: puzzle)
+        while FogOfWar.firstVisiblePlacement(
+            puzzle: puzzle,
+            board: board,
+            revealed: revealedCells,
+            context: solver,
+        ) == nil {
+            let window = FogOfWar.autoReveal(
+                puzzle: puzzle,
+                board: board,
+                revealed: revealedCells,
+                context: solver,
+            )
             guard !window.isEmpty else { return }
             revealedCells.formUnion(window)
             fogAutoReveals += 1
         }
-    }
-
-    private var hasVisibleLogicalStep: Bool {
-        logicalFogPlacement() != nil
     }
 
     /// The easiest placement the technique ladder (capped at the puzzle's
@@ -231,6 +246,7 @@ public struct GameSession: Equatable, Sendable {
         board[index] = after
         undoStack.append(Move(index: index, before: before, after: after))
         redoStack = []
+        liftFogWhileStuck()
         return .placed
     }
 
@@ -268,6 +284,7 @@ public struct GameSession: Equatable, Sendable {
             board[peer].notes = notes
         }
         redoStack.append(move)
+        liftFogWhileStuck()
         return true
     }
 
@@ -281,6 +298,7 @@ public struct GameSession: Equatable, Sendable {
             }
         }
         undoStack.append(move)
+        liftFogWhileStuck()
         return true
     }
 

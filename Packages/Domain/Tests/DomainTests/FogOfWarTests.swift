@@ -170,6 +170,30 @@ struct FogOfWarTests {
         }
     }
 
+    /// Taking back a correct digit the ladder had not derived shrinks the
+    /// visible position, so the never-stuck rule has to run there too.
+    @Test func erasingAPlacementLeavesALogicalStepInView() {
+        var session = fairSession()
+        guard let derived = logicalPlacement(session) else {
+            Issue.record("stuck")
+            return
+        }
+        guard let lucky = session.revealedCells.sorted().first(where: {
+            $0 != derived.cell && session.puzzle.givens[$0] == nil && session.board[$0].value == nil
+        }) else {
+            Issue.record("no second open revealed cell")
+            return
+        }
+
+        _ = session.place(session.puzzle.solution[lucky], at: lucky, autoCleanNotes: false)
+        _ = session.clear(at: lucky)
+        #expect(session.logicalFogPlacement() != nil, "stuck after erasing")
+
+        _ = session.place(session.puzzle.solution[lucky], at: lucky, autoCleanNotes: false)
+        session.undo()
+        #expect(session.logicalFogPlacement() != nil, "stuck after undo")
+    }
+
     @Test func autoRevealIsDeterministicAndSurvivesRestore() {
         var session = fairSession()
         let saved = session.savedGame(at: Date(timeIntervalSince1970: 60))

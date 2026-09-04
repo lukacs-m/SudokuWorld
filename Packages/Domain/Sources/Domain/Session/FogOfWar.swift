@@ -111,10 +111,11 @@ enum FogOfWar {
         puzzle: PuzzleDefinition,
         board: Board,
         revealed: Set<Int>,
+        context: SolverContext? = nil,
     ) -> (cell: Int, digit: Int)? {
         let visible = visibleValues(board: board, puzzle: puzzle, revealed: revealed)
-        let context = SolverContext(topology: TopologyFactory.topology(for: puzzle))
-        var grid = SolverGrid(context: context, givens: visible)
+        let solver = context ?? solverContext(for: puzzle)
+        var grid = SolverGrid(context: solver, givens: visible)
         let cap = Grader.maxRank(for: puzzle.gradedDifficulty)
         while true {
             guard grid.propagate(maxRank: cap) else { return nil }
@@ -128,14 +129,32 @@ enum FogOfWar {
         }
     }
 
+    /// Built once per never-stuck run and threaded through every candidate
+    /// so the peer and house-pair precomputation is not repeated per solve.
+    static func solverContext(for puzzle: PuzzleDefinition) -> SolverContext {
+        SolverContext(topology: TopologyFactory.topology(for: puzzle))
+    }
+
+    /// How many candidate windows the solver is run against. The scan is
+    /// synchronous on the caller's actor and each test is a full capped
+    /// solve, so only the best-scoring windows are worth trying.
+    static let scannedWindows = 12
+
     /// The window the never-stuck rule lifts next: candidate windows are
     /// walked in an order seeded from the puzzle seed and the reveal count
-    /// (so a restored save makes the same choice). Among those that unlock
-    /// a step, the one exposing the most hidden givens wins — hidden givens
-    /// are what starves logic, and this measurably needs fewer lifts than
-    /// taking the first unlocking window. When none unlocks, the first
-    /// window showing anything new. Empty once the whole board is visible.
-    static func autoReveal(puzzle: PuzzleDefinition, board: Board, revealed: Set<Int>) -> Set<Int> {
+    /// (so a restored save makes the same choice), then ranked by how many
+    /// hidden givens they expose — hidden givens are what starves logic,
+    /// and this measurably needs fewer lifts than taking the first
+    /// unlocking window. The best `scannedWindows` are tested, and the
+    /// first that unlocks a step wins. When none unlocks (or none is
+    /// tested), the first window showing anything new. Empty once the
+    /// whole board is visible.
+    static func autoReveal(
+        puzzle: PuzzleDefinition,
+        board: Board,
+        revealed: Set<Int>,
+        context: SolverContext? = nil,
+    ) -> Set<Int> {
         let size = gridSize(of: puzzle)
         var origins: [(row: Int, col: Int)] = []
         for row in 0 ..< (size - 2) {
@@ -152,19 +171,28 @@ enum FogOfWar {
             .filter { !$0.isSubset(of: revealed) }
         guard let fallback = candidates.first else { return [] }
 
-        // Stable sort: ties keep the seeded order.
-        let byHiddenGivens = candidates
-            .map { ($0, $0.subtracting(revealed).count { puzzle.givens[$0] != nil }) }
-            .sorted { $0.1 > $1.1 }
-            .map(\.0)
-        let unlocking = byHiddenGivens.first { candidate in
+        let hiddenGivens: [Int] = candidates.map { cells in
+            cells.count { cell in !revealed.contains(cell) && puzzle.givens[cell] != nil }
+        }
+        // `sorted(by:)` is not guaranteed stable, so the seeded position is
+        // part of the key: ties keep the shuffle's order.
+        let ranked = candidates.indices.sorted {
+            hiddenGivens[$0] == hiddenGivens[$1]
+                ? $0 < $1
+                : hiddenGivens[$0] > hiddenGivens[$1]
+        }
+        .prefix(scannedWindows)
+
+        let solver = context ?? solverContext(for: puzzle)
+        let unlocking = ranked.first { candidate in
             firstVisiblePlacement(
                 puzzle: puzzle,
                 board: board,
-                revealed: revealed.union(candidate),
+                revealed: revealed.union(candidates[candidate]),
+                context: solver,
             ) != nil
         }
-        return unlocking ?? fallback
+        return unlocking.map { candidates[$0] } ?? fallback
     }
 
     // MARK: - Geometry
