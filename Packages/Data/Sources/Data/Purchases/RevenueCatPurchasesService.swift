@@ -77,7 +77,14 @@ public struct RevenueCatPurchasesService: PurchasesService {
             if result.userCancelled {
                 throw DomainError.purchaseCancelled
             }
-            return Self.map(result.customerInfo)
+            let entitlements = Self.map(result.customerInfo)
+            if !entitlements.isPremium {
+                let active = result.customerInfo.entitlements.active.keys.sorted()
+                Log.error(
+                    "RevenueCat: purchase \(productID) did not grant premium; active: \(active)",
+                )
+            }
+            return entitlements
         } catch let error as DomainError {
             throw error
         } catch {
