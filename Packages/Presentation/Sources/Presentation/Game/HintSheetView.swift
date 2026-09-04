@@ -17,68 +17,70 @@ struct HintSheetView: View {
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "lightbulb.fill")
-                    .foregroundStyle(theme.accent)
-                    .accessibilityHidden(true)
-                Text(verbatim: titleText)
-                    .font(.headline)
-                Spacer()
-                Button {
-                    onDismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(theme.textSecondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Image(systemName: "lightbulb.fill")
+                        .foregroundStyle(theme.accent)
+                        .accessibilityHidden(true)
+                    Text(verbatim: titleText)
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        onDismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(theme.textSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("common.close", bundle: .module))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("common.close", bundle: .module))
-            }
 
-            Text(GameAccessibility.hintExplanation(hint, variant: variant))
-                .font(.body)
-                .foregroundStyle(theme.textPrimary)
-                .fixedSize(horizontal: false, vertical: true)
+                Text(GameAccessibility.hintExplanation(hint, variant: variant))
+                    .font(.body)
+                    .foregroundStyle(theme.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            PrimaryButton("hint.apply", systemImage: "checkmark") {
-                onApply()
-            }
+                PrimaryButton("hint.apply", systemImage: "checkmark") {
+                    onApply()
+                }
 
-            if case let .logical(technique) = hint.kind {
-                Button {
-                    onReveal()
-                } label: {
-                    Text("hint.revealInstead", bundle: .module)
-                        .font(.subheadline)
+                if case let .logical(technique) = hint.kind {
+                    Button {
+                        onReveal()
+                    } label: {
+                        Text("hint.revealInstead", bundle: .module)
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(theme.textSecondary)
+
+                    Button {
+                        showLesson = true
+                    } label: {
+                        Label {
+                            Text("hint.learnMore", bundle: .module)
+                        } icon: {
+                            Image(systemName: "graduationcap")
+                        }
+                        .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(theme.textSecondary)
-
-                Button {
-                    showLesson = true
-                } label: {
-                    Label {
-                        Text("hint.learnMore", bundle: .module)
-                    } icon: {
-                        Image(systemName: "graduationcap")
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 8)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(theme.accent)
-                .sheet(isPresented: $showLesson) {
-                    LessonSheet(technique: technique)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(theme.accent)
+                    .sheet(isPresented: $showLesson) {
+                        LessonSheet(technique: technique)
+                    }
                 }
             }
+            .padding(20)
         }
-        .padding(20)
-        .presentationDetents([.height(320), .medium])
+        .presentationDetents([.height(320), .medium, .large])
         .presentationDragIndicator(.visible)
     }
 

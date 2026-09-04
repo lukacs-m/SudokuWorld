@@ -69,7 +69,7 @@ private struct LessonFigureRenderer {
             theme: theme,
             cellSize: cellSize,
         )
-        for index in figure.regionCells {
+        for index in Set(figure.regionCells) {
             fill(context, index, theme.relatedHighlight)
         }
         for index in figure.focusCells {
