@@ -167,6 +167,13 @@ Helper scripts live in `scripts/`; invoke them via `make`, not directly.
 - If adding a new layer, add it to the Makefile's `PACKAGES` list.
 - `Package.resolved` is committed to pin versions.
 
+## Adding a solving technique
+
+A new `Technique` case must land with a lesson: a `TechniqueFigure` in
+`Packages/Model/Sources/Model/Game/TechniqueFigure.swift` (replayed through the
+solver ladder by `DomainTests/TechniqueFigureTests`) and `learn.<technique>.*`
+strings in English and French (pinned by `PresentationTests/LessonCatalogTests`).
+
 ## Verification before claiming done
 
 - `make test` passes (or, if no toolchain, state explicitly that the change is
@@ -174,3 +181,10 @@ Helper scripts live in `scripts/`; invoke them via `make`, not directly.
 - New public API has correct `public import` lines.
 - No layer-boundary violation was introduced.
 - Existentials use `any`.
+
+## Maintaining this file
+
+Keep this file for knowledge useful to almost every future agent session in this project.
+Do not repeat what the codebase already shows; point to the authoritative file or command instead.
+Prefer rewriting or pruning existing entries over appending new ones.
+When updating this file, preserve this bar for all agents and keep entries concise.

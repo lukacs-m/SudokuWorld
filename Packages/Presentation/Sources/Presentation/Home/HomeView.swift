@@ -12,6 +12,8 @@ struct HomeView: View {
     @State private var softWall: SoftWallContext?
     @State private var hardcoreDefault = false
     @State private var launchHooksHandled = false
+    @State private var showLearn = false
+    @State private var hookLesson: Technique?
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -48,6 +50,7 @@ struct HomeView: View {
                             difficulty: slot.difficulty,
                         )))
                     }
+                    LearnCard { showLearn = true }
                 } else {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -57,6 +60,12 @@ struct HomeView: View {
             .padding(20)
         }
         .background(theme.screenBackground)
+        .navigationDestination(isPresented: $showLearn) {
+            LearnView()
+        }
+        .navigationDestination(item: $hookLesson) { technique in
+            LessonView(technique: technique)
+        }
         .navigationTitle(Text("app.title", bundle: .module))
         .toolbarTitleDisplayMode(.inline)
         .task { await viewModel.refresh() }
@@ -114,6 +123,12 @@ struct HomeView: View {
             }
             if LaunchHooks.openPaywall {
                 showPaywall = true
+            }
+            if LaunchHooks.openLearn {
+                showLearn = true
+            }
+            if let slug = LaunchHooks.lessonTechnique {
+                hookLesson = Technique(rawValue: slug)
             }
             if let start = LaunchHooks.autostart,
                let variant = SudokuVariant(rawValue: start.variantSlug),
