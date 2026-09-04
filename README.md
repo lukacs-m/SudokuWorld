@@ -48,9 +48,8 @@ French localization.
   pan on boards larger than 9×9, Fog of War reveal (seeded windows; each
   correct digit clears its neighborhood, or on Expert and Master its whole
   row, column and box, with the fog lifting on its own whenever the visible
-  board has no logical move), confetti on wins, a
-  system-decided rating prompt after the confetti, haptics via
-  `.sensoryFeedback`.
+  board has no logical move), confetti on wins, a system-decided rating
+  prompt after the confetti, haptics via `.sensoryFeedback`.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
   win streaks, fastest/average times; daily-challenge streaks; Swift Charts
   (30-day activity, win rate by difficulty, best-vs-average times, variant
@@ -87,7 +86,7 @@ Requirements: Xcode 26.x (Swift 6.3 toolchain), plus `xcodegen`, `swiftlint`,
 ```bash
 make setup      # install XcodeGen and generate SudokuWorld.xcodeproj
 make open       # open in Xcode — select the SudokuWorld scheme and run
-make test       # run every package's test suite (229 tests; Domain alone ~50 s)
+make test       # run every package's test suite (see "Testing" below)
 make build      # build for the iOS simulator from the CLI
 make lint       # SwiftLint
 make format     # SwiftFormat (in place)
@@ -233,7 +232,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 229 tests; the Domain
+Tests across four packages (`make test`, macOS host, 237 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
