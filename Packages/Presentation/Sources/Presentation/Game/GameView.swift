@@ -38,6 +38,11 @@ struct GameView: View {
             if let cell = LaunchHooks.selectCell {
                 viewModel.tapCell(cell)
             }
+            #if DEBUG
+                if LaunchHooks.openHint {
+                    await viewModel.requestHint()
+                }
+            #endif
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
