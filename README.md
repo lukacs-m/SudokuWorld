@@ -45,8 +45,10 @@ French localization.
   highlighting, conflict auto-check, hardcore mode (3 mistakes, no hints,
   losses count), pause that hides the board, autosave on every move and on
   backgrounding, a clock that never counts suspended time, pinch-to-zoom and
-  pan on boards larger than 9×9, Fog of War reveal (three seeded 3×3 windows,
-  each correct digit clears its neighborhood), confetti on wins, a
+  pan on boards larger than 9×9, Fog of War reveal (seeded windows; each
+  correct digit clears its neighborhood, or on Expert and Master its whole
+  row, column and box, with the fog lifting on its own whenever the visible
+  board has no logical move), confetti on wins, a
   system-decided rating prompt after the confetti, haptics via
   `.sensoryFeedback`.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,

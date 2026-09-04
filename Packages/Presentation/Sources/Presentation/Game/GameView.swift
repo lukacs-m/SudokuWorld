@@ -11,6 +11,8 @@ struct GameView: View {
     @State private var viewModel: GameViewModel
     @State private var showExitDialog = false
     @State private var softWall: SoftWallContext?
+    @State private var showsFogLiftCue = false
+    @State private var fogLiftCueTask: Task<Void, Never>?
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -38,6 +40,19 @@ struct GameView: View {
             case .active: viewModel.sceneBecameActive()
             case .inactive, .background: viewModel.sceneLeftForeground()
             @unknown default: break
+            }
+        }
+        .onChange(of: viewModel.fogLiftSequence) { _, _ in
+            withAnimation(.easeOut(duration: 0.3)) {
+                showsFogLiftCue = true
+            }
+            fogLiftCueTask?.cancel()
+            fogLiftCueTask = Task {
+                try? await Task.sleep(for: .seconds(2.5))
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeIn(duration: 0.4)) {
+                    showsFogLiftCue = false
+                }
             }
         }
         .onChange(of: viewModel.phase) { _, newPhase in
@@ -143,6 +158,10 @@ struct GameView: View {
                 BoardView(viewModel: viewModel)
                     .padding(.horizontal, 8)
                     .opacity(viewModel.phase == .paused ? 0.05 : 1)
+                // Always laid out so the board never shifts when it appears.
+                FogLiftCueView(theme: theme)
+                    .opacity(showsFogLiftCue ? 1 : 0)
+                    .accessibilityHidden(!showsFogLiftCue)
                 Spacer(minLength: 0)
                 DigitPadView(viewModel: viewModel)
                     .padding(.horizontal, 12)
