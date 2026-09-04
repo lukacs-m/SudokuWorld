@@ -103,7 +103,7 @@ public struct RevenueCatPurchasesService: PurchasesService {
 
     // MARK: - Mapping
 
-    private static func map(_ info: CustomerInfo) -> Entitlements {
+    static func map(_ info: CustomerInfo) -> Entitlements {
         guard let entitlement = info.entitlements[PremiumProducts.entitlementID],
               entitlement.isActive
         else { return .free }

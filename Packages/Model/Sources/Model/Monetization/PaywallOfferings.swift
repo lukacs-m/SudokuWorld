@@ -19,7 +19,7 @@ public struct PaywallProduct: Identifiable, Equatable, Sendable {
         case lifetime
     }
 
-    /// Store product identifier, e.g. "sudokuworld.premium.yearly".
+    /// Store product identifier, e.g. "yearly".
     public let id: String
     public let kind: Kind
     public let title: String

@@ -197,14 +197,17 @@ incremental percent automatically:
 ### RevenueCat
 
 1. Create App Store Connect in-app purchases: auto-renewing subscriptions
-   `sudokuworld.premium.monthly` and `sudokuworld.premium.yearly` (7-day intro
-   trial on yearly only) and non-consumable `sudokuworld.premium.lifetime`
-   (IDs pinned in `PremiumProducts`,
-   [`PurchasesService.swift`](Packages/Domain/Sources/Domain/Services/PurchasesService.swift)).
-2. In the RevenueCat dashboard: create an entitlement named **`premium`**,
-   attach all three products, and add them to the *current* Offering as the
-   standard *monthly*, *annual*, and *lifetime* packages (the paywall maps by
-   package type, and all gating checks the entitlement — never product IDs).
+   `monthly` and `yearly` (7-day intro trial on yearly only) and
+   non-consumable `lifetime` (IDs pinned in `PremiumProducts`,
+   [`PurchasesService.swift`](Packages/Domain/Sources/Domain/Services/PurchasesService.swift);
+   the lifetime ID decides whether premium is reported as lifetime or
+   subscription).
+2. In the RevenueCat dashboard: create an entitlement named
+   **`SudokuWorld Pro`** (exactly what `PremiumProducts.entitlementID`
+   holds — a different name makes every purchase succeed while the app stays
+   free), attach all three products, and add them to the *current* Offering
+   as the standard *monthly*, *annual*, and *lifetime* packages (the paywall
+   maps by package type, and all gating checks the entitlement).
 3. Paste your public Apple API key (`appl_…`) into
    `AppSecrets.revenueCatAPIKey`, replacing the committed `test_…` sandbox
    key.
