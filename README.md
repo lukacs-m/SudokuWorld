@@ -69,7 +69,7 @@ French localization.
   difficulty per ISO week, cumulative points on a recurring leaderboard).
 - **Monetization** — fair freemium, no ads: classic play, all difficulties,
   hints, and undo are free forever; any variant in today's lineup is free
-  to play that day. The `premium` entitlement (RevenueCat
+  to play that day. The `SudokuWorld Pro` entitlement (RevenueCat
   monthly/annual/lifetime) unlocks unlimited variant play, the daily archive
   (free players can only resume a game they already started there), and
   premium themes. Soft wall with the variant's next daily date instead of

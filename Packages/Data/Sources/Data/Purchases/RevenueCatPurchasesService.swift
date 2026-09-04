@@ -104,9 +104,14 @@ public struct RevenueCatPurchasesService: PurchasesService {
     // MARK: - Mapping
 
     static func map(_ info: CustomerInfo) -> Entitlements {
-        guard let entitlement = info.entitlements[PremiumProducts.entitlementID],
-              entitlement.isActive
-        else { return .free }
+        let expected = PremiumProducts.entitlementID
+        guard let entitlement = info.entitlements[expected], entitlement.isActive else {
+            let active = info.entitlements.active.keys.sorted()
+            if !active.isEmpty {
+                Log.error("RevenueCat: entitlement \"\(expected)\" not active; active: \(active)")
+            }
+            return .free
+        }
         let source: Entitlements.Source = entitlement.productIdentifier == PremiumProducts
             .lifetimeID
             ? .lifetime
