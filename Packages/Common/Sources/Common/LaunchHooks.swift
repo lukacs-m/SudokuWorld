@@ -83,6 +83,12 @@ public enum LaunchHooks {
         public static var lessonTechnique: String? {
             UserDefaults.standard.string(forKey: "uiHookLesson")
         }
+
+        /// Request a hint as soon as an autostarted game finishes loading, so
+        /// the hint sheet is on screen: `-uiHookVariant classic -uiHookHint YES`.
+        public static var openHint: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookHint")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -95,5 +101,6 @@ public enum LaunchHooks {
         public static let fogAutoplayMoves = 0
         public static let openLearn = false
         public static let lessonTechnique: String? = nil
+        public static let openHint = false
     #endif
 }
