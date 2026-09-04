@@ -272,6 +272,15 @@ struct SettingsView: View {
 
     private func aboutSection(theme: Theme) -> some View {
         Section {
+            NavigationLink {
+                LearnView()
+            } label: {
+                Label {
+                    Text("settings.learn", bundle: .module)
+                } icon: {
+                    Image(systemName: "graduationcap")
+                }
+            }
             Link(destination: Self.appStoreReviewURL) {
                 Label {
                     Text("settings.rate", bundle: .module)

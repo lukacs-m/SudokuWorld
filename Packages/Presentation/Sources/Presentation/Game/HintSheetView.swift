@@ -10,6 +10,8 @@ struct HintSheetView: View {
     let onReveal: () -> Void
     let onDismiss: () -> Void
 
+    @State private var showLesson = false
+
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
@@ -42,18 +44,37 @@ struct HintSheetView: View {
                 onApply()
             }
 
-            if case .logical = hint.kind {
-                Button {
-                    onReveal()
-                } label: {
-                    Text("hint.revealInstead", bundle: .module)
-                        .font(.subheadline)
-                        .frame(maxWidth: .infinity)
+            if case let .logical(technique) = hint.kind {
+                HStack {
+                    Button {
+                        onReveal()
+                    } label: {
+                        Text("hint.revealInstead", bundle: .module)
+                            .font(.subheadline)
+                            .padding(.vertical, 8)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(theme.textSecondary)
+                    Spacer()
+                    Button {
+                        showLesson = true
+                    } label: {
+                        Label {
+                            Text("hint.learnMore", bundle: .module)
+                        } icon: {
+                            Image(systemName: "graduationcap")
+                        }
+                        .font(.subheadline.weight(.semibold))
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(theme.accent)
+                    .sheet(isPresented: $showLesson) {
+                        LessonSheet(technique: technique)
+                    }
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(theme.textSecondary)
             }
         }
         .padding(20)

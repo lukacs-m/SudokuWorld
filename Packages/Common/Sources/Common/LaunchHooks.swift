@@ -72,6 +72,17 @@ public enum LaunchHooks {
         public static var fogAutoplayMoves: Int {
             UserDefaults.standard.integer(forKey: "uiHookFogMoves")
         }
+
+        /// Push the learning section from the home screen: `-uiHookLearn YES`.
+        public static var openLearn: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookLearn")
+        }
+
+        /// Push one lesson from the home screen: `-uiHookLesson <technique>`
+        /// (a `Technique` raw value, e.g. `xWing`).
+        public static var lessonTechnique: String? {
+            UserDefaults.standard.string(forKey: "uiHookLesson")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -82,5 +93,7 @@ public enum LaunchHooks {
         public static let selectCell: Int? = nil
         public static let cubePose: (yaw: Double, pitch: Double)? = nil
         public static let fogAutoplayMoves = 0
+        public static let openLearn = false
+        public static let lessonTechnique: String? = nil
     #endif
 }
