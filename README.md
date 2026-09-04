@@ -87,7 +87,7 @@ Requirements: Xcode 26.x (Swift 6.3 toolchain), plus `xcodegen`, `swiftlint`,
 ```bash
 make setup      # install XcodeGen and generate SudokuWorld.xcodeproj
 make open       # open in Xcode — select the SudokuWorld scheme and run
-make test       # run every package's test suite (248 tests; Domain alone ~50 s)
+make test       # run every package's test suite (Domain alone ~50 s)
 make build      # build for the iOS simulator from the CLI
 make lint       # SwiftLint
 make format     # SwiftFormat (in place)
@@ -236,7 +236,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 248 tests; the Domain
+Tests across four packages (`make test`, macOS host, 253 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
@@ -252,7 +252,9 @@ suite alone runs ~50 s):
   stats/streak edge cases.
 - **Data** — SwiftData roundtrips on in-memory containers (saved-game upserts
   per context, records, per-slot daily completions incl. the on-day streak
-  rule, tournament scores), UserDefaults repositories.
+  rule, tournament scores), UserDefaults repositories, and the RevenueCat
+  `CustomerInfo` → `Entitlements` mapping pinned against the identifiers the
+  dashboard returns.
 - **Presentation** — ViewModels with container-registered mocks
   (`@Suite(.container)`): game flow incl. hardcore loss, unlimited hints,
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall
