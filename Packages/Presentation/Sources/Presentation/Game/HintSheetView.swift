@@ -45,40 +45,40 @@ struct HintSheetView: View {
             }
 
             if case let .logical(technique) = hint.kind {
-                HStack {
-                    Button {
-                        onReveal()
-                    } label: {
-                        Text("hint.revealInstead", bundle: .module)
-                            .font(.subheadline)
-                            .padding(.vertical, 8)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(theme.textSecondary)
-                    Spacer()
-                    Button {
-                        showLesson = true
-                    } label: {
-                        Label {
-                            Text("hint.learnMore", bundle: .module)
-                        } icon: {
-                            Image(systemName: "graduationcap")
-                        }
-                        .font(.subheadline.weight(.semibold))
+                Button {
+                    onReveal()
+                } label: {
+                    Text("hint.revealInstead", bundle: .module)
+                        .font(.subheadline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(theme.textSecondary)
+
+                Button {
+                    showLesson = true
+                } label: {
+                    Label {
+                        Text("hint.learnMore", bundle: .module)
+                    } icon: {
+                        Image(systemName: "graduationcap")
                     }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(theme.accent)
-                    .sheet(isPresented: $showLesson) {
-                        LessonSheet(technique: technique)
-                    }
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(theme.accent)
+                .sheet(isPresented: $showLesson) {
+                    LessonSheet(technique: technique)
                 }
             }
         }
         .padding(20)
-        .presentationDetents([.height(280)])
+        .presentationDetents([.height(320), .medium])
         .presentationDragIndicator(.visible)
     }
 
