@@ -40,6 +40,7 @@ struct TopologyTests {
         (SudokuVariant.fogOfWar, 81, 27),
         (SudokuVariant.killerGT, 81, 27),
         (SudokuVariant.tredoku, 27, 3),
+        (SudokuVariant.cube, 54, 6),
     ])
     func cellAndHouseCounts(variant: SudokuVariant, cellCount: Int, houseCount: Int) {
         let topology = TopologyFactory.topology(for: variant)

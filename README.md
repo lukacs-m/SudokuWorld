@@ -1,7 +1,7 @@
 # SudokuWorld
 
 A complete, production-ready iOS Sudoku game built with SwiftUI on a strict,
-layered MVVM architecture. 35 variants in six catalog groups with a
+layered MVVM architecture. 36 variants in six catalog groups with a
 guaranteed-unique-solution engine, technique-based difficulty grading, hints
 that explain themselves, SwiftData persistence, Game Center leaderboards &
 achievements, daily/weekly events, RevenueCat monetization, and English +
@@ -13,7 +13,7 @@ French localization.
 
 ## Features
 
-- **Variants** — 35, every one fully playable (a `SudokuVariant` case only
+- **Variants** — 36, every one fully playable (a `SudokuVariant` case only
   lands with its engine support; `FeatureFlags` is empty, nothing is gated).
   Grouped as `SudokuVariantGroup` orders the catalog:
   - *Grid sizes* — Mini 4×4, Mini 6×6, Classic 9×9, Dodeka 12×12,
@@ -24,9 +24,10 @@ French localization.
     Sandwich, Skyscraper, Little Killer.
   - *Chess* — Anti-Knight, Anti-King, Miracle.
   - *Multi-grid* — Samurai, Gattai-2, Gattai-3, Gattai-8, Shogun, Sumo.
-  - *Twists* — Even-Odd, Wordoku, Fog of War, Killer GT, Tredoku.
+  - *Twists* — Even-Odd, Wordoku, Fog of War, Killer GT, Tredoku,
+    Cube (a real 3D cube you rotate).
 
-  Fog of War, Killer GT, and Tredoku wear the *New* badge
+  Fog of War, Killer GT, Tredoku, and Cube wear the *New* badge
   (`VariantCatalog.newVariants`).
 - **Six difficulties** (Beginner → Master) graded by the *solving techniques a
   puzzle actually requires* — never by clue count. The ladder: naked singles
@@ -60,11 +61,12 @@ French localization.
   queue, standings in the events hub. Gameplay never blocks on
   authentication.
 - **Events** — three Daily Challenges per day (classic plus one *accessible*
-  and one *complex* variant; the 34 non-classic variants split 17/17 so a
-  seeded shuffle covers the full catalog every 17 days, identical for every
-  player), streak protection reminders (opt-in local notifications), and a
-  Weekly Tournament (themed variant × difficulty per ISO week, cumulative
-  points on a recurring leaderboard).
+  and one *complex* variant; the 35 non-classic variants split 17 accessible
+  / 18 complex and each bucket cycles independently on its own length, so a
+  seeded shuffle covers the accessible bucket every 17 days and the complex
+  one every 18, identical for every player), streak protection reminders
+  (opt-in local notifications), and a Weekly Tournament (themed variant ×
+  difficulty per ISO week, cumulative points on a recurring leaderboard).
 - **Monetization** — fair freemium, no ads: classic play, all difficulties,
   hints, and undo are free forever; any variant in today's lineup is free
   to play that day. The `premium` entitlement (RevenueCat
@@ -85,7 +87,7 @@ Requirements: Xcode 26.x (Swift 6.3 toolchain), plus `xcodegen`, `swiftlint`,
 ```bash
 make setup      # install XcodeGen and generate SudokuWorld.xcodeproj
 make open       # open in Xcode — select the SudokuWorld scheme and run
-make test       # run every package's test suite (229 tests; Domain alone ~50 s)
+make test       # run every package's test suite (248 tests; Domain alone ~50 s)
 make build      # build for the iOS simulator from the CLI
 make lint       # SwiftLint
 make format     # SwiftFormat (in place)
@@ -115,7 +117,7 @@ Packages/
 
 Dependency direction is strictly `Presentation → DI → Data → Domain → Model →
 Common`, enforced by the package manifests. The engine is topology-generic:
-one solver/generator/grader serves all 35 variants — a variant is just a
+one solver/generator/grader serves all 36 variants — a variant is just a
 `GridTopology` (cells + all-different houses: extra regions, jigsaw pieces,
 overlapping grids, tredoku faces) plus optional per-puzzle constraints
 (cages, parity marks, relation marks, thermometers/arrows, outside clues,
@@ -231,19 +233,20 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 229 tests; the Domain
+Tests across four packages (`make test`, macOS host, 248 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
   (uniqueness re-verified from scratch, cage partitions, parity, determinism,
   daily-seed identity) with dedicated suites per family (chess, relation,
   line, outside-clue, irregular/multi-grid topologies, combo, fog of war),
-  daily rotation (full-catalog coverage per 17-day cycle without repeats,
-  accessible/complex pairing, next-appearance scan), technique finders on
-  crafted grids, grader monotonicity, hint engine, `GameSession` rules
-  (mistakes, hardcore loss, undo restoring auto-cleaned notes, pause/resume
-  clock math), `GameCenterIDs` matrix (84/88/16, prefix, no duplicates),
-  achievement evaluator (all 16), stats/streak edge cases.
+  daily rotation (full-bucket coverage per cycle without repeats — 17 days
+  accessible, 18 complex — accessible/complex pairing, next-appearance
+  scan), technique finders on crafted grids, grader monotonicity, hint
+  engine, `GameSession` rules (mistakes, hardcore loss, undo restoring
+  auto-cleaned notes, pause/resume clock math), `GameCenterIDs` matrix
+  (84/88/16, prefix, no duplicates), achievement evaluator (all 16),
+  stats/streak edge cases.
 - **Data** — SwiftData roundtrips on in-memory containers (saved-game upserts
   per context, records, per-slot daily completions incl. the on-day streak
   rule, tournament scores), UserDefaults repositories.
@@ -251,7 +254,8 @@ suite alone runs ~50 s):
   (`@Suite(.container)`): game flow incl. hardcore loss, unlimited hints,
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall
   flows, premium theme gating, events hub; board zoom clamping, outside-clue
-  overlay layout, variant glyphs.
+  overlay layout, variant glyphs, cube geometry (bent lines straight over
+  each fold, tap ray-cast, settle, zoom clamp).
 - **Model** — note bitsets, board invariants, `Codable` roundtrips for
   puzzles and settings.
 

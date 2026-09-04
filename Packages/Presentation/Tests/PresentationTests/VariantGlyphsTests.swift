@@ -71,7 +71,7 @@ private enum TestTopologySizes {
              .antiKnight, .antiKing,
              .greaterThan, .kropki, .xv, .consecutive, .miracle,
              .thermo, .arrow, .sandwich, .skyscraper, .littleKiller,
-             .fogOfWar, .killerGT, .tredoku: 9
+             .fogOfWar, .killerGT, .tredoku, .cube: 9
         }
     }
 }
