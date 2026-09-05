@@ -112,8 +112,7 @@ public struct GameSession: Equatable, Sendable {
     }
 
     /// The never-stuck rule (fair fog only): lifts seeded windows until the
-    /// visible position has a logical step at or below the tier the player
-    /// picked (or the puzzle's grade, when it settled lower). Runs
+    /// visible position has a logical step within the puzzle's grade. Runs
     /// after every move that can shrink the visible position: a placement
     /// the ladder could not derive may be taken back, or overwritten with a
     /// wrong digit, which drops it out of view again.
@@ -138,9 +137,9 @@ public struct GameSession: Equatable, Sendable {
         }
     }
 
-    /// The easiest placement the technique ladder (capped at the tier the
-    /// player picked) can make in the visible position — the never-stuck
-    /// rule's oracle. Nil for other variants, or when logic is stuck.
+    /// The easiest placement the technique ladder (capped at the puzzle's
+    /// grade) can make in the visible position — the never-stuck rule's
+    /// oracle. Nil for other variants, or when logic is stuck.
     public func logicalFogPlacement() -> (cell: Int, digit: Int)? {
         guard puzzle.variant == .fogOfWar else { return nil }
         return FogOfWar.firstVisiblePlacement(

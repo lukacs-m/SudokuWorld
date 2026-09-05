@@ -5,12 +5,12 @@ import Model
 /// patch around itself. Hard, Expert and Master play "fair fog": more windows
 /// start visible, a correct digit lifts its whole row, column and box (the
 /// peers every advanced technique reads), and whenever the visible position
-/// has no logical step at or below the tier the player picked the game lifts
-/// one more window on its own — so the puzzle stays finishable by logic alone.
+/// has no logical step within the puzzle's grade the game lifts one more
+/// window on its own — so the puzzle stays finishable by logic alone.
 enum FogOfWar {
-    /// Keyed on the tier the player picked (and the game screen shows), and
-    /// so is the never-stuck check: the generator can settle a couple of
-    /// ranks above the request, and the promise is made to the request.
+    /// Keyed on the tier the player picked (and the game screen shows);
+    /// the never-stuck check is capped at the graded difficulty, the
+    /// techniques the puzzle actually needs.
     static func isFair(_ puzzle: PuzzleDefinition) -> Bool {
         puzzle.variant == .fogOfWar && puzzle.requestedDifficulty >= .hard
     }
@@ -110,8 +110,7 @@ enum FogOfWar {
         }
     }
 
-    /// The first digit the technique ladder, capped at the tier the player
-    /// picked (or the graded one when the generator settled below it),
+    /// The first digit the technique ladder, capped at the puzzle's grade,
     /// places into a visible empty cell from the visible position — or nil
     /// when logic is stuck there. Deductions about fogged cells are allowed
     /// to feed the chain: the player can reason about a hidden cell even
@@ -125,7 +124,7 @@ enum FogOfWar {
         let visible = visibleValues(board: board, puzzle: puzzle, revealed: revealed)
         let solver = context ?? solverContext(for: puzzle)
         var grid = SolverGrid(context: solver, givens: visible)
-        let cap = Grader.maxRank(for: min(puzzle.requestedDifficulty, puzzle.gradedDifficulty))
+        let cap = Grader.maxRank(for: puzzle.gradedDifficulty)
         while true {
             guard grid.propagate(maxRank: cap) else { return nil }
             for cell in 0 ..< visible.count
