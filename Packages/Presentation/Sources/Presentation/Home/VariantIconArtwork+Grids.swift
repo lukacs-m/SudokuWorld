@@ -2,7 +2,7 @@ import Model
 import SwiftUI
 
 /// Catalog-tile artwork for the grid-shaped variants: classic, the sized
-/// boards, the overlapping-grid family, wordoku, jigsaw, and tredoku.
+/// boards, the overlapping-grid family, wordoku, jigsaw, tredoku, and the cube.
 extension VariantIconArtwork {
     static func classic(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
         grid(9, boldEvery: 3, in: rect, context: &context, theme: theme)
@@ -260,5 +260,47 @@ extension VariantIconArtwork {
         for face in [topFace, leftFace, rightFace] {
             context.stroke(face, with: .color(theme.gridLineBold), lineWidth: 1)
         }
+    }
+
+    static func cube(in rect: CGRect, context: inout GraphicsContext, theme: Theme) {
+        // A whole isometric cube, each visible face ruled into 3×3 cells.
+        let cx = rect.midX
+        let cy = rect.midY
+        let width = rect.width * 0.42
+        let height = rect.height * 0.24
+        let top = CGPoint(x: cx, y: cy - height * 2)
+        let left = CGPoint(x: cx - width, y: cy - height)
+        let right = CGPoint(x: cx + width, y: cy - height)
+        let center = CGPoint(x: cx, y: cy)
+        let bottomLeft = CGPoint(x: cx - width, y: cy + height)
+        let bottomRight = CGPoint(x: cx + width, y: cy + height)
+        let bottom = CGPoint(x: cx, y: cy + height * 2)
+
+        let faces: [(corners: [CGPoint], fill: Color)] = [
+            ([top, right, center, left], theme.cellBackgroundAlternate),
+            ([left, center, bottom, bottomLeft], theme.accent.opacity(0.28)),
+            ([center, right, bottomRight, bottom], theme.accent.opacity(0.5)),
+        ]
+        for face in faces {
+            var outline = Path()
+            outline.addLines(face.corners)
+            outline.closeSubpath()
+            context.fill(outline, with: .color(face.fill))
+            // Interior rulings join thirds of opposite edges.
+            var rulings = Path()
+            let corners = face.corners
+            for third in [1.0 / 3.0, 2.0 / 3.0] {
+                rulings.move(to: lerp(corners[0], corners[1], third))
+                rulings.addLine(to: lerp(corners[3], corners[2], third))
+                rulings.move(to: lerp(corners[0], corners[3], third))
+                rulings.addLine(to: lerp(corners[1], corners[2], third))
+            }
+            context.stroke(rulings, with: .color(theme.gridLine), lineWidth: 0.5)
+            context.stroke(outline, with: .color(theme.gridLineBold), lineWidth: 1)
+        }
+    }
+
+    private static func lerp(_ a: CGPoint, _ b: CGPoint, _ fraction: CGFloat) -> CGPoint {
+        CGPoint(x: a.x + (b.x - a.x) * fraction, y: a.y + (b.y - a.y) * fraction)
     }
 }

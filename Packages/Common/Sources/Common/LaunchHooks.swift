@@ -45,6 +45,27 @@ public enum LaunchHooks {
             UserDefaults.standard.bool(forKey: "uiHookPaywall")
         }
 
+        /// Select a board cell once the game has started: `-uiHookSelectCell 4`.
+        public static var selectCell: Int? {
+            let defaults = UserDefaults.standard
+            guard defaults.object(forKey: "uiHookSelectCell") != nil else { return nil }
+            return defaults.integer(forKey: "uiHookSelectCell")
+        }
+
+        /// Start the cube board turned by yaw then pitch, in degrees:
+        /// `-uiHookCubeYaw 35 -uiHookCubePitch 25` — a leading `-` on the
+        /// value is parsed as another key, so keep both positive.
+        public static var cubePose: (yaw: Double, pitch: Double)? {
+            let defaults = UserDefaults.standard
+            guard defaults.object(forKey: "uiHookCubeYaw") != nil
+                || defaults.object(forKey: "uiHookCubePitch") != nil
+            else { return nil }
+            return (
+                defaults.double(forKey: "uiHookCubeYaw"),
+                defaults.double(forKey: "uiHookCubePitch"),
+            )
+        }
+
         /// Play this many logic-only moves a few seconds after a fog-of-war
         /// game starts, so reveals and the "fog lifts" cue can be screenshotted:
         /// `-uiHookVariant fogofwar -uiHookDifficulty expert -uiHookFogMoves 3`.
@@ -58,6 +79,8 @@ public enum LaunchHooks {
         public static let seedStats = false
         public static let rulesVariant: String? = nil
         public static let openPaywall = false
+        public static let selectCell: Int? = nil
+        public static let cubePose: (yaw: Double, pitch: Double)? = nil
         public static let fogAutoplayMoves = 0
     #endif
 }

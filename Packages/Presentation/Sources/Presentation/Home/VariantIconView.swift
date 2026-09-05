@@ -74,6 +74,7 @@ enum VariantIconArtwork {
         case .fogOfWar: fogOfWar(in: rect, context: &context, theme: theme)
         case .killerGT: killerGT(in: rect, context: &context, theme: theme)
         case .tredoku: tredoku(in: rect, context: &context, theme: theme)
+        case .cube: cube(in: rect, context: &context, theme: theme)
         }
     }
 

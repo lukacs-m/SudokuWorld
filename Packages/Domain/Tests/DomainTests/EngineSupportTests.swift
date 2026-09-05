@@ -104,25 +104,25 @@ struct EventSeedsTests {
         let complex = Set(EventSeeds.complexRotation)
         #expect(accessible.count == EventSeeds.accessibleRotation.count)
         #expect(complex.count == EventSeeds.complexRotation.count)
-        #expect(accessible.count == complex.count)
         #expect(accessible.isDisjoint(with: complex))
         #expect(accessible.union(complex) == Set(SudokuVariant.allCases).subtracting([.classic]))
     }
 
     @Test func cycleCoversTheCatalogWithoutRepeats() {
-        // Walk one full 17-day cycle from the rotation epoch: every
-        // non-classic variant must appear exactly once.
+        // Walk one full cycle of each bucket from the rotation epoch: every
+        // variant of that bucket must appear exactly once in its slot.
         let calendar = EventSeeds.utcCalendar
         let epoch = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
-        var seen: [SudokuVariant] = []
-        for offset in 0 ..< EventSeeds.accessibleRotation.count {
-            let day = calendar.date(byAdding: .day, value: offset, to: epoch)!
-            let slots = EventSeeds.dailySlots(dateKey: EventSeeds.dailyDateKey(for: day))
-            seen.append(contentsOf: slots.dropFirst().map(\.variant))
+        for (slot, bucket) in [(1, EventSeeds.accessibleRotation), (2, EventSeeds.complexRotation)] {
+            var seen: [SudokuVariant] = []
+            for offset in 0 ..< bucket.count {
+                let day = calendar.date(byAdding: .day, value: offset, to: epoch)!
+                let slots = EventSeeds.dailySlots(dateKey: EventSeeds.dailyDateKey(for: day))
+                seen.append(slots[slot].variant)
+            }
+            #expect(seen.count == bucket.count)
+            #expect(Set(seen) == Set(bucket))
         }
-        #expect(seen.count == 34)
-        #expect(Set(seen).count == 34)
-        #expect(Set(seen) == Set(SudokuVariant.allCases).subtracting([.classic]))
     }
 
     @Test func slotsPairAccessibleWithComplex() {

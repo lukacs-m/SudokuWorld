@@ -714,6 +714,108 @@
     "Day" : {
 
     },
+    "cube.face.back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face arrière"
+          }
+        }
+      }
+    },
+    "cube.face.down" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face inférieure"
+          }
+        }
+      }
+    },
+    "cube.face.front" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Front face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face avant"
+          }
+        }
+      }
+    },
+    "cube.face.left" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face gauche"
+          }
+        }
+      }
+    },
+    "cube.face.right" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face droite"
+          }
+        }
+      }
+    },
+    "cube.face.up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face supérieure"
+          }
+        }
+      }
+    },
     "difficulty.beginner" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3176,6 +3278,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "• La règle négative fait l'essentiel : des voisins non marqués diffèrent d'au moins 2.\n• Une seule case résolue propage toute une chaîne — cherchez les ancrages.\n• Un 1 ou un 9 sur une barre n'a qu'une valeur voisine possible (2 ou 8)."
+          }
+        }
+      }
+    },
+    "rules.cube.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 4 in the top row of the front face rules 4 out of that row's three cells on the right face, and out of the three it continues into on the left face."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un 4 dans la rangée du haut de la face avant exclut le 4 des trois cases de cette rangée sur la face droite, et des trois cases où elle se prolonge sur la face gauche."
+          }
+        }
+      }
+    },
+    "rules.cube.howto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudoku on a real cube: six 3×3 faces you turn with one finger. Every face holds 1–9 once, and every row and column runs straight over the edge onto the neighbouring face — the six cells of such a bent line never repeat a digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le sudoku sur un vrai cube : six faces 3×3 que l'on tourne du doigt. Chaque face contient 1 à 9 une fois, et chaque rangée comme chaque colonne se prolonge tout droit par-dessus l'arête sur la face voisine — les six cases d'une telle ligne pliée ne répètent jamais un chiffre."
+          }
+        }
+      }
+    },
+    "rules.cube.tips" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Drag to turn the cube and pinch to zoom; let go and the nearest face squares up.\n• Every line crosses two edges — check both continuations.\n• The rings of four faces are not houses: only faces and bent lines constrain."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Faites glisser pour tourner le cube et pincez pour zoomer ; relâchez et la face la plus proche se remet d'aplomb.\n• Chaque ligne franchit deux arêtes — vérifiez les deux prolongements.\n• Les anneaux de quatre faces ne sont pas des régions : seules les faces et les lignes pliées contraignent."
           }
         }
       }
@@ -6334,6 +6487,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Des barres lient les voisins."
+          }
+        }
+      }
+    },
+    "variant.cube" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cube"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cube"
+          }
+        }
+      }
+    },
+    "variant.cube.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Six faces, one solid cube."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Six faces, un cube entier."
           }
         }
       }
