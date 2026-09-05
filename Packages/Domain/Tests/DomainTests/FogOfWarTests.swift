@@ -140,6 +140,13 @@ struct FogOfWarTests {
         var session = fairSession(difficulty: difficulty)
         #expect(FogOfWar.isFair(session.puzzle))
         let classicStart = FogOfWar.seededWindows(for: session.puzzle, count: 3)
+        let fairStart = FogOfWar.seededWindows(
+            for: session.puzzle,
+            count: difficulty == .hard ? 6 : 5,
+        )
+        #expect(FogOfWar.initialWindows(for: session.puzzle) == fairStart)
+        // Not equality: the never-stuck rule can lift more before move one.
+        #expect(session.revealedCells.isSuperset(of: fairStart))
         #expect(session.revealedCells.isStrictSuperset(of: classicStart))
         #expect(session.revealedCells.count < 81)
 
