@@ -49,9 +49,9 @@ French localization.
   backgrounding, a clock that never counts suspended time, pinch-to-zoom and
   pan on boards larger than 9×9, Fog of War reveal (seeded windows; each
   correct digit clears its neighborhood, or on Hard, Expert and Master its
-  whole row, column and box, with the fog lifting on its own whenever the visible
-  board has no logical move), confetti on wins, a system-decided rating
-  prompt after the confetti, haptics via `.sensoryFeedback`.
+  whole row, column and box, with the fog lifting on its own whenever the
+  visible board has no logical move), confetti on wins, a system-decided
+  rating prompt after the confetti, haptics via `.sensoryFeedback`.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
   win streaks, fastest/average times; daily-challenge streaks; Swift Charts
   (30-day activity, win rate by difficulty, best-vs-average times, variant

@@ -105,8 +105,8 @@ public struct GameSession: Equatable, Sendable {
         puzzle.variant == .fogOfWar && !revealedCells.contains(index)
     }
 
-    /// Fair fog (Hard, Expert and Master): a correct digit lifts whole houses and
-    /// the never-stuck rule can lift a window on its own.
+    /// Fair fog (Hard, Expert and Master): a correct digit lifts whole
+    /// houses and the never-stuck rule can lift a window on its own.
     public var usesFairFog: Bool {
         FogOfWar.isFair(puzzle)
     }
