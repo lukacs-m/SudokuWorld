@@ -13,7 +13,9 @@ struct HomeView: View {
     @State private var hardcoreDefault = false
     @State private var launchHooksHandled = false
     @State private var showLearn = false
-    @State private var hookLesson: Technique?
+    #if DEBUG
+        @State private var hookLesson: Technique?
+    #endif
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -63,9 +65,11 @@ struct HomeView: View {
         .navigationDestination(isPresented: $showLearn) {
             LearnView()
         }
-        .navigationDestination(item: $hookLesson) { technique in
-            LessonView(technique: technique)
-        }
+        #if DEBUG
+            .navigationDestination(item: $hookLesson) { technique in
+                LessonView(technique: technique)
+            }
+        #endif
         .navigationTitle(Text("app.title", bundle: .module))
         .toolbarTitleDisplayMode(.inline)
         .task { await viewModel.refresh() }

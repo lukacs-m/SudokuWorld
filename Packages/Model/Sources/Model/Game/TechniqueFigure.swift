@@ -268,13 +268,16 @@ public extension TechniqueFigure {
             focusCells: [at(0, 0), at(0, 4), at(3, 4), at(3, 8)],
             eliminations: eliminate([1], at: [at(0, 8), at(3, 0)]),
         ),
-        // Three cells summing to 7 can only be 1+2+4, so 3 drops out.
+        // Three cells summing to 7 can only be 1+2+4; with the 1 placed the two
+        // open cells must make 6 out of distinct digits, so 3 drops out. The
+        // anchor cell is a given so no pencil mark sits under the sum label.
         TechniqueFigure(
             technique: .cageArithmetic,
             variant: .killer,
-            candidates: [at(3, 3): [1, 2, 3, 4], at(3, 4): [1, 2, 3, 4], at(4, 3): [1, 2, 3, 4]],
+            givens: [at(3, 3): 1],
+            candidates: [at(3, 4): [2, 3, 4], at(4, 3): [2, 3, 4]],
             focusCells: [at(3, 3), at(3, 4), at(4, 3)],
-            eliminations: eliminate([3], at: [at(3, 3), at(3, 4), at(4, 3)]),
+            eliminations: eliminate([3], at: [at(3, 4), at(4, 3)]),
             cages: [Cage(cells: [at(3, 3), at(3, 4), at(4, 3)], sum: 7)],
         ),
         // A black dot needs a double/half partner: 5, 7 and 9 have none.

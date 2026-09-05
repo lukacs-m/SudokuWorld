@@ -2511,13 +2511,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A 9×9 Killer board with one three-cell cage in the centre box, marked with the sum 7. The three cage cells are highlighted and each shows 1, 2, 3 and 4 with 3 struck through, since 1, 2 and 4 is the only combination."
+            "value" : "A 9×9 Killer board with one three-cell cage in the centre box, marked with the sum 7. The top-left cage cell holds a 1; the other two show 2, 3 and 4 with 3 struck through, since 1, 2 and 4 is the only combination."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une grille Killer 9×9 avec une cage de trois cases dans la région centrale, marquée de la somme 7. Les trois cases de la cage sont surlignées et affichent chacune 1, 2, 3 et 4 avec le 3 barré, puisque 1, 2 et 4 est la seule combinaison."
+            "value" : "Une grille Killer 9×9 avec une cage de trois cases dans la région centrale, marquée de la somme 7. La case en haut à gauche de la cage contient un 1 ; les deux autres affichent 2, 3 et 4 avec le 3 barré, puisque 1, 2 et 4 est la seule combinaison."
           }
         }
       }
