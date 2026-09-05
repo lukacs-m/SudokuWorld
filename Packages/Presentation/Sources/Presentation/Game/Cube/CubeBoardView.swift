@@ -80,6 +80,7 @@ struct CubeBoardView: View {
     /// same math the gesture commits use.
     private func sceneState(session: GameSession, theme: Theme, size: CGSize) -> CubeSceneState {
         let hintCells = Set(viewModel.presentedHint?.cells ?? [])
+        let palette = CubeFaceSnapshot.Palette(theme: theme)
         let snapshots = CubeNet.Face.allCases.map { face in
             CubeFaceSnapshot.make(
                 face: face,
@@ -90,7 +91,7 @@ struct CubeBoardView: View {
                 conflicts: viewModel.conflicts,
                 hintCells: hintCells,
                 settings: viewModel.settings,
-                theme: theme,
+                palette: palette,
             )
         }
         return CubeSceneState(
@@ -149,14 +150,18 @@ struct CubeSceneState: Sendable {
 }
 
 /// Owns the RealityKit entities for the lifetime of the view. Face textures
-/// regenerate only for faces whose snapshot changed; the pose is written
-/// directly while a gesture is live and animated into place on release.
+/// regenerate only for faces whose snapshot changed, off the main actor, and
+/// land on the quads when ready; the pose is written directly while a
+/// gesture is live and animated into place on release.
 @MainActor
 final class CubeScene {
     private let root = Entity()
     private let camera = PerspectiveCamera()
     private var faces: [ModelEntity] = []
-    private var lastSnapshots: [CubeFaceSnapshot?] = Array(repeating: nil, count: 6)
+    private var requested: [CubeFaceSnapshot?] = Array(repeating: nil, count: 6)
+    private var renders: [Task<Void, Never>?] = Array(repeating: nil, count: 6)
+    private var untextured = Set(0 ..< 6)
+    private var hidden = false
     private var isLit = false
     private var settling: AnimationPlaybackController?
 
@@ -193,8 +198,9 @@ final class CubeScene {
 
         // Quads overlap the edges by a hair so no seam shows between faces.
         let mesh = MeshResource.generatePlane(width: 3.01, height: 3.01)
+        let placeholder = Self.placeholder(for: state.snapshots.first?.palette)
         for face in CubeNet.Face.allCases {
-            let quad = ModelEntity(mesh: mesh, materials: [UnlitMaterial(color: .white)])
+            let quad = ModelEntity(mesh: mesh, materials: [placeholder])
             quad.position = CubeGeometry.facePosition(face)
             quad.orientation = CubeGeometry.faceOrientation(face)
             root.addChild(quad)
@@ -206,7 +212,8 @@ final class CubeScene {
 
     func apply(_ state: CubeSceneState) {
         camera.camera.fieldOfViewInDegrees = CubeGeometry.verticalFieldOfView(aspect: state.aspect)
-        root.isEnabled = !state.hidden
+        hidden = state.hidden
+        showIfReady()
         if state.interacting {
             // RealityKit's animation writes `root.transform` every frame, so
             // it has to be stopped or it would overwrite the live gesture.
@@ -218,17 +225,27 @@ final class CubeScene {
         if !isSettling {
             root.transform = Self.transform(orientation: state.orientation, scale: state.scale)
         }
-        for (face, snapshot) in state.snapshots.enumerated() where lastSnapshots[face] != snapshot {
-            guard let image = CubeFaceRenderer.render(snapshot),
-                  let texture = try? TextureResource(
-                      image: image,
-                      withName: nil,
-                      options: .init(semantic: .color),
-                  )
-            else { continue }
-            faces[face].model?.materials = [material(for: texture)]
-            lastSnapshots[face] = snapshot
+        for (face, snapshot) in state.snapshots.enumerated() where requested[face] != snapshot {
+            requested[face] = snapshot
+            renders[face]?.cancel()
+            renders[face] = Task(priority: .userInitiated) { [weak self] in
+                let texture = await Self.texture(for: snapshot)
+                // A newer snapshot for this face cancels the stale render so
+                // textures never land out of order; the newer one owns the slot.
+                guard !Task.isCancelled, let self else { return }
+                if let texture {
+                    faces[face].model?.materials = [material(for: texture)]
+                }
+                untextured.remove(face)
+                showIfReady()
+            }
         }
+    }
+
+    /// The cube appears once every face has had its first texture attempt, so
+    /// no untextured quad flashes on the way in.
+    private func showIfReady() {
+        root.isEnabled = !hidden && untextured.isEmpty
     }
 
     func settle(orientation: simd_quatf, scale: Float) {
@@ -239,6 +256,24 @@ final class CubeScene {
             duration: 0.35,
             timingFunction: .easeOut,
         )
+    }
+
+    private static func texture(for snapshot: CubeFaceSnapshot) async -> TextureResource? {
+        guard let image = await CubeFaceRenderer.render(snapshot), !Task.isCancelled else {
+            return nil
+        }
+        return try? await TextureResource(
+            image: image,
+            withName: nil,
+            options: .init(semantic: .color),
+        )
+    }
+
+    /// What a quad shows until its first texture lands - and keeps if that
+    /// render fails, so a face without a texture is flat and themed.
+    private static func placeholder(for palette: CubeFaceSnapshot.Palette?) -> UnlitMaterial {
+        guard let palette else { return UnlitMaterial(color: .white) }
+        return UnlitMaterial(color: .init(Color(palette.cellBackground)))
     }
 
     private func material(for texture: TextureResource) -> any RealityKit.Material {

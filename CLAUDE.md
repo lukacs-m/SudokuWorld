@@ -31,6 +31,9 @@ Claude-specific emphasis and a fast-path checklist.
   refresh control mid-gesture). The reload path keeps current content.
 - `swift test` builds for macOS, so packages declare `.macOS(.v26)` alongside iOS;
   macOS-unavailable APIs will fail CLI tests even though the app is iOS-only.
+- Work that must leave the main actor in Presentation (the package is MainActor by
+  default) needs `nonisolated` on the value types it touches and `@concurrent` on the
+  entry point; a plain `Task {}` stays on the main actor. See `CubeFaceRenderer`.
 
 ## Working style in this repo
 

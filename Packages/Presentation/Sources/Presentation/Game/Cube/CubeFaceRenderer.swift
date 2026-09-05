@@ -1,13 +1,20 @@
 import CoreGraphics
+import CoreText
 import Domain
+import Foundation
 import Model
 import SwiftUI
+#if canImport(UIKit)
+    import UIKit
+#else
+    import AppKit
+#endif
 
 /// Everything one cube face shows, as plain values. Faces are textured
 /// quads: a face re-renders only when its snapshot changes, and the digits
 /// stay crisp because the texture is drawn at `CubeFaceRenderer.pixels`
 /// per side rather than scaled from a smaller image.
-struct CubeFaceSnapshot: Equatable, Sendable {
+nonisolated struct CubeFaceSnapshot: Equatable, Sendable {
     struct Cell: Equatable, Sendable {
         var value: Int?
         var isGiven = false
@@ -20,8 +27,39 @@ struct CubeFaceSnapshot: Equatable, Sendable {
         var isSelected = false
     }
 
+    /// The theme's board colors resolved to components, so the renderer
+    /// can draw them off the main actor.
+    struct Palette: Equatable, Sendable {
+        let cellBackground: Color.Resolved
+        let gridLine: Color.Resolved
+        let gridLineBold: Color.Resolved
+        let givenText: Color.Resolved
+        let playerText: Color.Resolved
+        let noteText: Color.Resolved
+        let selection: Color.Resolved
+        let relatedHighlight: Color.Resolved
+        let sameDigitHighlight: Color.Resolved
+        let conflict: Color.Resolved
+        let hintHighlight: Color.Resolved
+
+        init(theme: Theme) {
+            let environment = EnvironmentValues()
+            cellBackground = theme.cellBackground.resolve(in: environment)
+            gridLine = theme.gridLine.resolve(in: environment)
+            gridLineBold = theme.gridLineBold.resolve(in: environment)
+            givenText = theme.givenText.resolve(in: environment)
+            playerText = theme.playerText.resolve(in: environment)
+            noteText = theme.noteText.resolve(in: environment)
+            selection = theme.selection.resolve(in: environment)
+            relatedHighlight = theme.relatedHighlight.resolve(in: environment)
+            sameDigitHighlight = theme.sameDigitHighlight.resolve(in: environment)
+            conflict = theme.conflict.resolve(in: environment)
+            hintHighlight = theme.hintHighlight.resolve(in: environment)
+        }
+    }
+
     let cells: [Cell]
-    let theme: Theme
+    let palette: Palette
 
     // swiftlint:disable:next function_parameter_count
     static func make(
@@ -33,7 +71,7 @@ struct CubeFaceSnapshot: Equatable, Sendable {
         conflicts: Set<Int>,
         hintCells: Set<Int>,
         settings: GameSettings,
-        theme: Theme,
+        palette: Palette,
     ) -> Self {
         let faceCells = (0 ..< CubeNet.cellsPerFace).map { offset in
             let index = CubeNet.index(face: face, row: offset / 3, col: offset % 3)
@@ -53,31 +91,45 @@ struct CubeFaceSnapshot: Equatable, Sendable {
                 isSelected: selected == index,
             )
         }
-        return Self(cells: faceCells, theme: theme)
+        return Self(cells: faceCells, palette: palette)
     }
 }
 
 /// Draws a face snapshot into a square bitmap with the flat board's visual
-/// language: base fill, highlight layers, digits, notes, grid lines.
-enum CubeFaceRenderer {
+/// language: base fill, highlight layers, digits, notes, grid lines. Pure
+/// CoreGraphics and CoreText so it can run off the main actor; a tap must
+/// never wait on a texture.
+nonisolated enum CubeFaceRenderer {
     static let pixels = 768
 
-    @MainActor
-    static func render(_ snapshot: CubeFaceSnapshot) -> CGImage? {
-        let side = CGFloat(pixels)
-        let renderer = ImageRenderer(content: Canvas { context, _ in
-            draw(snapshot, into: context, side: side)
-        }
-        .frame(width: side, height: side))
-        renderer.scale = 1
-        return renderer.cgImage
+    @concurrent
+    static func render(_ snapshot: CubeFaceSnapshot) async -> CGImage? {
+        guard !Task.isCancelled else { return nil }
+        return draw(snapshot)
     }
 
-    static func draw(_ snapshot: CubeFaceSnapshot, into context: GraphicsContext, side: CGFloat) {
-        let theme = snapshot.theme
+    static func draw(_ snapshot: CubeFaceSnapshot) -> CGImage? {
+        guard let context = CGContext(
+            data: nil,
+            width: pixels,
+            height: pixels,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue,
+        ) else { return nil }
+        let side = CGFloat(pixels)
+        // Flip to y-down so cells and text sit exactly where the flat board puts them.
+        context.translateBy(x: 0, y: side)
+        context.scaleBy(x: 1, y: -1)
+
+        let palette = snapshot.palette
         let cellSize = side / 3
-        let square = CGRect(x: 0, y: 0, width: side, height: side)
-        context.fill(Path(square), with: .color(theme.cellBackground))
+        let givenFont = font(size: cellSize * 0.55, semibold: true)
+        let playerFont = font(size: cellSize * 0.55, semibold: false)
+        let noteFont = font(size: cellSize * 0.24, semibold: false)
+        context.setFillColor(palette.cellBackground.cgColor)
+        context.fill(CGRect(x: 0, y: 0, width: side, height: side))
 
         for (offset, cell) in snapshot.cells.enumerated() {
             let rect = CGRect(
@@ -89,60 +141,80 @@ enum CubeFaceRenderer {
             // Same stacking order as the flat board: related, same digit,
             // hint, conflict, selection.
             if cell.isRelated {
-                context.fill(Path(rect), with: .color(theme.relatedHighlight))
+                fill(rect, with: palette.relatedHighlight, in: context)
             }
             if cell.isSameDigit {
-                context.fill(Path(rect), with: .color(theme.sameDigitHighlight))
+                fill(rect, with: palette.sameDigitHighlight, in: context)
             }
             if cell.isHint {
-                context.fill(Path(rect), with: .color(theme.hintHighlight))
+                fill(rect, with: palette.hintHighlight, in: context)
             }
             if cell.isConflict {
-                context.fill(Path(rect), with: .color(theme.conflict.opacity(0.18)))
+                fill(rect, with: palette.conflict, opacity: 0.18, in: context)
             }
             if cell.isSelected {
-                context.fill(Path(rect), with: .color(theme.selection))
+                fill(rect, with: palette.selection, in: context)
             }
             if let value = cell.value {
-                drawValue(value, cell: cell, in: rect, context: context, theme: theme)
+                drawValue(
+                    value,
+                    cell: cell,
+                    in: rect,
+                    font: cell.isGiven ? givenFont : playerFont,
+                    context: context,
+                    palette: palette,
+                )
             } else {
-                drawNotes(cell.notes, in: rect, context: context, theme: theme)
+                drawNotes(cell.notes, in: rect, font: noteFont, context: context, palette: palette)
             }
         }
 
-        drawGrid(context: context, side: side, cellSize: cellSize, theme: theme)
+        drawGrid(context: context, side: side, cellSize: cellSize, palette: palette)
+        return context.makeImage()
+    }
+
+    private static func fill(
+        _ rect: CGRect,
+        with color: Color.Resolved,
+        opacity: Float = 1,
+        in context: CGContext,
+    ) {
+        var color = color
+        color.opacity *= opacity
+        context.setFillColor(color.cgColor)
+        context.fill(rect)
     }
 
     private static func drawValue(
         _ value: Int,
         cell: CubeFaceSnapshot.Cell,
         in rect: CGRect,
-        context: GraphicsContext,
-        theme: Theme,
+        font: CTFont,
+        context: CGContext,
+        palette: CubeFaceSnapshot.Palette,
     ) {
-        let color: Color = if cell.isWrong {
-            theme.conflict
+        let color = if cell.isWrong {
+            palette.conflict
         } else if cell.isGiven {
-            theme.givenText
+            palette.givenText
         } else {
-            theme.playerText
+            palette.playerText
         }
-        let text = Text(VariantGlyphs.glyph(value, for: .cube))
-            .font(.system(
-                size: rect.width * 0.55,
-                weight: cell.isGiven ? .semibold : .regular,
-                design: .rounded,
-            ))
-            .foregroundStyle(color)
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        context.draw(context.resolve(text), at: center, anchor: .center)
+        draw(
+            VariantGlyphs.glyph(value, for: .cube),
+            font: font,
+            color: color,
+            at: CGPoint(x: rect.midX, y: rect.midY),
+            in: context,
+        )
     }
 
     private static func drawNotes(
         _ notes: [Int],
         in rect: CGRect,
-        context: GraphicsContext,
-        theme: Theme,
+        font: CTFont,
+        context: CGContext,
+        palette: CubeFaceSnapshot.Palette,
     ) {
         let columns = VariantGlyphs.noteColumns(forSize: 9)
         for digit in notes where digit <= 9 {
@@ -152,33 +224,79 @@ enum CubeFaceRenderer {
                 x: rect.minX + rect.width * (CGFloat(column) + 0.5) / CGFloat(columns),
                 y: rect.minY + rect.height * (CGFloat(row) + 0.5) / CGFloat(columns),
             )
-            let text = Text(VariantGlyphs.glyph(digit, for: .cube))
-                .font(.system(size: rect.width * 0.24, design: .rounded))
-                .foregroundStyle(theme.noteText)
-            context.draw(context.resolve(text), at: point, anchor: .center)
+            draw(
+                VariantGlyphs.glyph(digit, for: .cube),
+                font: font,
+                color: palette.noteText,
+                at: point,
+                in: context,
+            )
         }
     }
 
+    /// The flat board's `.system(size:weight:design: .rounded)`.
+    private static func font(size: CGFloat, semibold: Bool) -> CTFont {
+        #if canImport(UIKit)
+            let base = UIFont.systemFont(ofSize: size, weight: semibold ? .semibold : .regular)
+            let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
+            return UIFont(descriptor: descriptor, size: size) as CTFont
+        #else
+            let base = NSFont.systemFont(ofSize: size, weight: semibold ? .semibold : .regular)
+            let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
+            return (NSFont(descriptor: descriptor, size: size) ?? base) as CTFont
+        #endif
+    }
+
+    /// Centres the line's typographic box on `center`, as
+    /// `GraphicsContext.draw(_:at:anchor: .center)` does on the flat board.
+    private static func draw(
+        _ string: String,
+        font: CTFont,
+        color: Color.Resolved,
+        at center: CGPoint,
+        in context: CGContext,
+    ) {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .init(kCTFontAttributeName as String): font,
+            .init(kCTForegroundColorAttributeName as String): color.cgColor,
+        ]
+        let attributed = NSAttributedString(string: string, attributes: attributes)
+        let line = CTLineCreateWithAttributedString(attributed)
+        var ascent: CGFloat = 0
+        var descent: CGFloat = 0
+        let width = CTLineGetTypographicBounds(line, &ascent, &descent, nil)
+        // Glyphs are drawn upright in the flipped context.
+        context.textMatrix = CGAffineTransform(scaleX: 1, y: -1)
+        context.textPosition = CGPoint(
+            x: center.x - width / 2,
+            y: center.y + (ascent - descent) / 2,
+        )
+        CTLineDraw(line, context)
+    }
+
     private static func drawGrid(
-        context: GraphicsContext,
+        context: CGContext,
         side: CGFloat,
         cellSize: CGFloat,
-        theme: Theme,
+        palette: CubeFaceSnapshot.Palette,
     ) {
-        var inner = Path()
+        context.setStrokeColor(palette.gridLine.cgColor)
+        context.setLineWidth(side * 0.004)
         for line in 1 ..< 3 {
             let offset = CGFloat(line) * cellSize
-            inner.move(to: CGPoint(x: offset, y: 0))
-            inner.addLine(to: CGPoint(x: offset, y: side))
-            inner.move(to: CGPoint(x: 0, y: offset))
-            inner.addLine(to: CGPoint(x: side, y: offset))
+            context.move(to: CGPoint(x: offset, y: 0))
+            context.addLine(to: CGPoint(x: offset, y: side))
+            context.move(to: CGPoint(x: 0, y: offset))
+            context.addLine(to: CGPoint(x: side, y: offset))
         }
-        context.stroke(inner, with: .color(theme.gridLine), lineWidth: side * 0.004)
+        context.strokePath()
         // The face border is the cube's edge: bold, drawn inset so it
         // survives texture sampling at the quad's rim.
         let border = side * 0.012
         let rim = CGRect(x: 0, y: 0, width: side, height: side)
             .insetBy(dx: border / 2, dy: border / 2)
-        context.stroke(Path(rim), with: .color(theme.gridLineBold), lineWidth: border)
+        context.setStrokeColor(palette.gridLineBold.cgColor)
+        context.setLineWidth(border)
+        context.stroke(rim)
     }
 }

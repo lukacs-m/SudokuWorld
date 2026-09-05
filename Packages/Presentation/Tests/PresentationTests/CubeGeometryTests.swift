@@ -162,7 +162,7 @@ struct CubeGeometryTests {
             conflicts: [],
             hintCells: [],
             settings: .standard,
-            theme: theme,
+            palette: CubeFaceSnapshot.Palette(theme: theme),
         )
         let cell = snapshot.cells[target % CubeNet.cellsPerFace]
         #expect(cell.isSelected)

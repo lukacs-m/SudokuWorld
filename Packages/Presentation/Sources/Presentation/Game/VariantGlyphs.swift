@@ -3,7 +3,7 @@ import Model
 /// Maps engine digits (always 1...size) to the symbols a variant displays:
 /// hexadoku shows 0–F, wordoku letters. Exhaustive over `SudokuVariant` on
 /// purpose: adding a case without deciding its glyph set must not compile.
-enum VariantGlyphs {
+nonisolated enum VariantGlyphs {
     static func glyph(_ digit: Int, for variant: SudokuVariant) -> String {
         switch variant {
         case .hexadoku16:
