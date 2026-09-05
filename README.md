@@ -33,11 +33,12 @@ French localization.
   puzzle actually requires* — never by clue count. The ladder: naked singles
   (beginner) → hidden singles & reading relation marks (easy) → pairs, killer
   cage arithmetic, arrow arithmetic (medium) → pointing pairs, box-line
-  reduction, triples, X-wing, outside-clue analysis (hard) → swordfish &
-  XY-wing (expert) → XY-chains (master). Expert and master boards genuinely
-  *require* their techniques (pinned by tests). Every generated puzzle is
-  fully solvable by logic (that's also what guarantees a unique solution) and
-  every hint names and explains its technique.
+  reduction, bent-line locks across folds, triples, X-wing, outside-clue
+  analysis (hard) → swordfish & XY-wing (expert) → XY-chains (master). Expert
+  and master boards genuinely *require* their techniques (pinned by tests).
+  Every generated puzzle is fully solvable by logic (that's also what
+  guarantees a unique solution) and every hint names and explains its
+  technique.
 - **Deterministic generation** — one seed produces a byte-identical puzzle on
   every device. The Daily Challenge derives its seed from the UTC date, so the
   whole world plays the same board.

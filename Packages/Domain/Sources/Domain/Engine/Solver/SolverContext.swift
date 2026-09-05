@@ -12,13 +12,14 @@ struct SolverContext {
         let sharedCells: [Int]
     }
 
-    struct FoldPair {
-        /// Face whose candidates may be confined to its part of the bent line.
+    /// Every bent line meeting one face, grouped by face so a solve scans the
+    /// face's candidates once instead of once per line.
+    struct FoldFace {
+        /// Face whose candidates may be confined to its part of a bent line.
         let face: Int
-        /// The face's cells on the bent line.
-        let lineCells: [Int]
-        /// The line's cells beyond the fold, on the neighbouring face.
-        let continuation: [Int]
+        /// Per bent line: the face's cells on it, then the line's cells beyond
+        /// the fold, on the neighbouring face.
+        let lines: [(cells: [Int], continuation: [Int])]
     }
 
     let topology: GridTopology
@@ -36,8 +37,8 @@ struct SolverContext {
     let parities: [Int: CellParity]
     /// Ordered pairs of distinct houses sharing at least two cells.
     let housePairs: [HousePair]
-    /// Every (face, bent line) meeting on fold variants; empty elsewhere.
-    let foldPairs: [FoldPair]
+    /// Every face met by a bent line on fold variants; empty elsewhere.
+    let foldFaces: [FoldFace]
     /// Bitmask with one bit set per digit 1...size.
     let fullMask: DigitMask
     /// Pairwise constraints (marks plus expanded negatives). Thermometers
@@ -98,7 +99,7 @@ struct SolverContext {
         cageIndexForCell = Self.cageIndexMap(cages: cages, cellCount: cellCount)
         peers = Self.buildPeers(topology: topology, cages: cages)
         housePairs = Self.buildHousePairs(of: topology)
-        foldPairs = Self.buildFoldPairs(of: topology)
+        foldFaces = Self.buildFoldFaces(of: topology)
     }
 
     static func mask(for digit: Int) -> DigitMask {
@@ -264,21 +265,20 @@ struct SolverContext {
     /// bent line is locked out of the continuation. The deduction would be
     /// sound for any clique, but argyle diagonals and chess moves stay
     /// pairwise-only so those variants keep grading as they ship today.
-    private static func buildFoldPairs(of topology: GridTopology) -> [FoldPair] {
+    private static func buildFoldFaces(of topology: GridTopology) -> [FoldFace] {
         guard topology.variant == .cube || topology.variant == .tredoku else { return [] }
-        var pairs: [FoldPair] = []
+        var faces: [FoldFace] = []
         for (face, house) in topology.houses.enumerated() {
             let houseSet = Set(house)
+            var lines: [(cells: [Int], continuation: [Int])] = []
             for clique in topology.cliques {
                 let lineCells = clique.filter(houseSet.contains)
                 guard lineCells.count >= 2, lineCells.count < clique.count else { continue }
-                pairs.append(FoldPair(
-                    face: face,
-                    lineCells: lineCells,
-                    continuation: clique.filter { !houseSet.contains($0) },
-                ))
+                lines.append((cells: lineCells, continuation: clique.filter { !houseSet.contains($0) }))
             }
+            guard !lines.isEmpty else { continue }
+            faces.append(FoldFace(face: face, lines: lines))
         }
-        return pairs
+        return faces
     }
 }
