@@ -1,3 +1,4 @@
+import Common
 import Model
 import SwiftUI
 
@@ -77,6 +78,13 @@ struct HintSheetView: View {
                     .sheet(isPresented: $showLesson) {
                         LessonSheet(technique: technique)
                     }
+                    #if DEBUG
+                    .onAppear {
+                        if LaunchHooks.openHintLesson {
+                            showLesson = true
+                        }
+                    }
+                    #endif
                 }
             }
             .padding(20)

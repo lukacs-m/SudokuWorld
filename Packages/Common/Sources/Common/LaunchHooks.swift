@@ -89,6 +89,12 @@ public enum LaunchHooks {
         public static var openHint: Bool {
             UserDefaults.standard.bool(forKey: "uiHookHint")
         }
+
+        /// Open the lesson for the hint's technique from the hint sheet, as a
+        /// tap on "Learn more" would: `-uiHookHint YES -uiHookHintLesson YES`.
+        public static var openHintLesson: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookHintLesson")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -102,5 +108,6 @@ public enum LaunchHooks {
         public static let openLearn = false
         public static let lessonTechnique: String? = nil
         public static let openHint = false
+        public static let openHintLesson = false
     #endif
 }
