@@ -274,7 +274,10 @@ struct SolverContext {
             for clique in topology.cliques {
                 let lineCells = clique.filter(houseSet.contains)
                 guard lineCells.count >= 2, lineCells.count < clique.count else { continue }
-                lines.append((cells: lineCells, continuation: clique.filter { !houseSet.contains($0) }))
+                lines.append((
+                    cells: lineCells,
+                    continuation: clique.filter { !houseSet.contains($0) },
+                ))
             }
             guard !lines.isEmpty else { continue }
             faces.append(FoldFace(face: face, lines: lines))
