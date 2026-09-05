@@ -149,14 +149,18 @@ struct CubeSceneState: Sendable {
 }
 
 /// Owns the RealityKit entities for the lifetime of the view. Face textures
-/// regenerate only for faces whose snapshot changed; the pose is written
-/// directly while a gesture is live and animated into place on release.
+/// regenerate only for faces whose snapshot changed, off the main actor, and
+/// land on the quads when ready; the pose is written directly while a
+/// gesture is live and animated into place on release.
 @MainActor
 final class CubeScene {
     private let root = Entity()
     private let camera = PerspectiveCamera()
     private var faces: [ModelEntity] = []
-    private var lastSnapshots: [CubeFaceSnapshot?] = Array(repeating: nil, count: 6)
+    private var requested: [CubeFaceSnapshot?] = Array(repeating: nil, count: 6)
+    private var renders: [Task<Void, Never>?] = Array(repeating: nil, count: 6)
+    private var untextured = Set(0 ..< 6)
+    private var hidden = false
     private var isLit = false
     private var settling: AnimationPlaybackController?
 
@@ -206,7 +210,8 @@ final class CubeScene {
 
     func apply(_ state: CubeSceneState) {
         camera.camera.fieldOfViewInDegrees = CubeGeometry.verticalFieldOfView(aspect: state.aspect)
-        root.isEnabled = !state.hidden
+        hidden = state.hidden
+        showIfReady()
         if state.interacting {
             // RealityKit's animation writes `root.transform` every frame, so
             // it has to be stopped or it would overwrite the live gesture.
@@ -218,17 +223,31 @@ final class CubeScene {
         if !isSettling {
             root.transform = Self.transform(orientation: state.orientation, scale: state.scale)
         }
-        for (face, snapshot) in state.snapshots.enumerated() where lastSnapshots[face] != snapshot {
-            guard let image = CubeFaceRenderer.render(snapshot),
-                  let texture = try? TextureResource(
-                      image: image,
-                      withName: nil,
-                      options: .init(semantic: .color),
-                  )
-            else { continue }
-            faces[face].model?.materials = [material(for: texture)]
-            lastSnapshots[face] = snapshot
+        for (face, snapshot) in state.snapshots.enumerated() where requested[face] != snapshot {
+            requested[face] = snapshot
+            renders[face]?.cancel()
+            renders[face] = Task(priority: .userInitiated) { [weak self] in
+                // A newer snapshot for this face cancels the stale render so
+                // textures never land out of order.
+                guard let image = await CubeFaceRenderer.render(snapshot), !Task.isCancelled,
+                      let texture = try? await TextureResource(
+                          image: image,
+                          withName: nil,
+                          options: .init(semantic: .color),
+                      ),
+                      !Task.isCancelled, let self
+                else { return }
+                faces[face].model?.materials = [material(for: texture)]
+                untextured.remove(face)
+                showIfReady()
+            }
         }
+    }
+
+    /// Untextured quads never show: the cube appears once all six faces
+    /// have their first texture.
+    private func showIfReady() {
+        root.isEnabled = !hidden && untextured.isEmpty
     }
 
     func settle(orientation: simd_quatf, scale: Float) {
