@@ -28,8 +28,9 @@ public struct GridTopology: Equatable, Sendable, Codable {
     /// full-length ones may also be houses).
     public let diagonals: [[Int]]
     /// Pairwise-distinct groups that need NOT contain every digit — argyle's
-    /// short diagonals. Unlike houses these never feed hidden-single logic;
-    /// they only widen each member's peer set.
+    /// short diagonals, the cube's and tredoku's bent lines. Unlike houses
+    /// these never feed hidden-single logic; they widen each member's peer
+    /// set, and on fold variants the solver also locks candidates along them.
     public let cliques: [[Int]]
 
     /// Row-major lookup table: position → cell index, -1 where inactive.
