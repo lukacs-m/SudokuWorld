@@ -63,41 +63,41 @@ public struct AppRootView: View {
             NavigationStack { GameView(launch: presentation.launch) }
         }
         #else
-                // fullScreenCover doesn't exist on macOS (test builds only).
+        // fullScreenCover doesn't exist on macOS (test builds only).
         .sheet(item: $router.game) { presentation in
-                    NavigationStack { GameView(launch: presentation.launch) }
-                }
+            NavigationStack { GameView(launch: presentation.launch) }
+        }
         #endif
-                .environment(router)
-                .environment(themeStore)
-                .environment(premiumGate)
-                .tint(themeStore.theme(for: colorScheme).accent)
-                .preferredColorScheme(themeStore.preferredColorScheme)
-                .onChange(of: scenePhase) { _, phase in
-                    if phase == .active {
-                        Task { await premiumGate.refresh() }
-                    }
+        .environment(router)
+        .environment(themeStore)
+        .environment(premiumGate)
+        .tint(themeStore.theme(for: colorScheme).accent)
+        .preferredColorScheme(themeStore.preferredColorScheme)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { await premiumGate.refresh() }
+            }
+        }
+        .task {
+            guard !launched else { return }
+            launched = true
+            #if DEBUG
+                switch LaunchHooks.initialTab {
+                case "events": router.selectedTab = .events
+                case "stats": router.selectedTab = .stats
+                case "settings": router.selectedTab = .settings
+                default: break
                 }
-                .task {
-                    guard !launched else { return }
-                    launched = true
-                    #if DEBUG
-                        switch LaunchHooks.initialTab {
-                        case "events": router.selectedTab = .events
-                        case "stats": router.selectedTab = .stats
-                        case "settings": router.selectedTab = .settings
-                        default: break
-                        }
-                        if LaunchHooks.seedStats {
-                            await DebugSeeder.seed()
-                        }
-                    #endif
-                    await themeStore.load()
-                    await LaunchTasks.run()
-                    // Never returns: follows entitlement changes for the
-                    // app's lifetime, after purchases are configured.
-                    await premiumGate.start()
+                if LaunchHooks.seedStats {
+                    await DebugSeeder.seed()
                 }
+            #endif
+            await themeStore.load()
+            await LaunchTasks.run()
+            // Never returns: follows entitlement changes for the
+            // app's lifetime, after purchases are configured.
+            await premiumGate.start()
+        }
     }
 }
 

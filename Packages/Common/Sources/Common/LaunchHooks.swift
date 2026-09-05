@@ -65,6 +65,23 @@ public enum LaunchHooks {
                 defaults.double(forKey: "uiHookCubePitch"),
             )
         }
+
+        /// Push the learning section from the home screen: `-uiHookLearn YES`.
+        public static var openLearn: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookLearn")
+        }
+
+        /// Push one lesson from the home screen: `-uiHookLesson <technique>`
+        /// (a `Technique` raw value, e.g. `xWing`).
+        public static var lessonTechnique: String? {
+            UserDefaults.standard.string(forKey: "uiHookLesson")
+        }
+
+        /// Request a hint as soon as an autostarted game finishes loading, so
+        /// the hint sheet is on screen: `-uiHookVariant classic -uiHookHint YES`.
+        public static var openHint: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookHint")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -74,5 +91,8 @@ public enum LaunchHooks {
         public static let openPaywall = false
         public static let selectCell: Int? = nil
         public static let cubePose: (yaw: Double, pitch: Double)? = nil
+        public static let openLearn = false
+        public static let lessonTechnique: String? = nil
+        public static let openHint = false
     #endif
 }

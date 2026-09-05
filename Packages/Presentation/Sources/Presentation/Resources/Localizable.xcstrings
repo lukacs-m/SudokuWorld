@@ -1657,6 +1657,23 @@
         }
       }
     },
+    "hint.learnMore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn more"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En savoir plus"
+          }
+        }
+      }
+    },
     "hint.mistake" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2188,6 +2205,40 @@
         }
       }
     },
+    "home.learn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apprendre"
+          }
+        }
+      }
+    },
+    "home.learn.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every solving technique, explained"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les techniques de résolution, expliquées"
+          }
+        }
+      }
+    },
     "home.newGame" : {
       "localizations" : {
         "en" : {
@@ -2297,6 +2348,1281 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Série de %d victoires"
+          }
+        }
+      }
+    },
+    "learn.arrowArithmetic.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On an arrow, the digits along the shaft add up to the digit in the circle. Arrow arithmetic bounds the circle by the smallest and largest sums the shaft can still make, and bounds each shaft cell by what the circle leaves after the other cells. Little Killer diagonals work the same way with a fixed total."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur une flèche, les chiffres le long du fût s'additionnent pour donner le chiffre du cercle. L'arithmétique de flèche encadre le cercle entre la plus petite et la plus grande somme que le fût peut encore faire, et encadre chaque case du fût par ce que le cercle laisse après les autres cases. Les diagonales du Little Killer fonctionnent de même avec un total fixe."
+          }
+        }
+      }
+    },
+    "learn.arrowArithmetic.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 Arrow board with a circled cell in the centre and a two-cell shaft to its right. The first shaft cell holds a 4. The circle shows 2, 3, 5, 6, 7 and 8 with 2 and 3 struck through, because the shaft sums to at least 5."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille Flèche 9×9 avec une case cerclée au centre et un fût de deux cases à sa droite. La première case du fût contient un 4. Le cercle affiche 2, 3, 5, 6, 7 et 8 avec 2 et 3 barrés, car le fût totalise au moins 5."
+          }
+        }
+      }
+    },
+    "learn.arrowArithmetic.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every shaft cell is at least 1, so the circle is always at least the shaft's length; and no shaft cell can exceed the circle minus the other cells."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque case du fût vaut au moins 1, donc le cercle vaut toujours au moins la longueur du fût ; et aucune case du fût ne peut dépasser le cercle moins les autres cases."
+          }
+        }
+      }
+    },
+    "learn.arrowArithmetic.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look at arrows with a placed digit on the shaft or in the circle, and at long shafts: a three-cell shaft inside one line already needs a circle of 6 or more."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regardez les flèches avec un chiffre placé sur le fût ou dans le cercle, et les longs fûts : un fût de trois cases dans une même ligne exige déjà un cercle de 6 ou plus."
+          }
+        }
+      }
+    },
+    "learn.boxLineReduction.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Box-line reduction is the mirror of the pointing pair. When a digit's only candidates in a row or column all fall inside one box, the line must take the digit there, so the digit can be removed from the other cells of that box."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La réduction région-ligne est le miroir de la paire pointante. Quand les seuls candidats d'un chiffre dans une ligne ou une colonne tombent tous dans une même région, la ligne doit y placer ce chiffre ; on peut donc le retirer des autres cases de cette région."
+          }
+        }
+      }
+    },
+    "learn.boxLineReduction.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In row 4, the digit 6 fits only in the first two cells, which are highlighted and lie in the middle-left box. Two other cells of that box show a struck-through 6."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans la ligne 4, le chiffre 6 ne tient que dans les deux premières cases, surlignées, situées dans la région du milieu à gauche. Deux autres cases de cette région affichent un 6 barré."
+          }
+        }
+      }
+    },
+    "learn.boxLineReduction.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A line with several givens and a digit squeezed into one box segment is the classic trigger."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une ligne avec plusieurs indices et un chiffre coincé dans un seul segment de région est le déclencheur classique."
+          }
+        }
+      }
+    },
+    "learn.boxLineReduction.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For each row or column and each missing digit, note which boxes its candidates touch. If they touch only one, clean that box."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour chaque ligne ou colonne et chaque chiffre manquant, notez quelles régions ses candidats touchent. S'ils n'en touchent qu'une, nettoyez cette région."
+          }
+        }
+      }
+    },
+    "learn.cageArithmetic.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Killer sudoku, the digits inside a cage are distinct and add up to the cage's sum. Cage arithmetic lists the combinations that fit the sum and the number of cells, and removes every digit that appears in none of them. When one cell of a cage is left, it takes whatever completes the sum."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Au Killer, les chiffres d'une cage sont distincts et leur somme vaut le total de la cage. L'arithmétique de cage liste les combinaisons compatibles avec la somme et le nombre de cases, puis retire tout chiffre absent de chacune d'elles. Quand il ne reste qu'une case dans la cage, elle prend ce qui complète la somme."
+          }
+        }
+      }
+    },
+    "learn.cageArithmetic.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 Killer board with one three-cell cage in the centre box, marked with the sum 7. The top-left cage cell holds a 1; the other two show 2, 3 and 4 with 3 struck through, since 1, 2 and 4 is the only combination."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille Killer 9×9 avec une cage de trois cases dans la région centrale, marquée de la somme 7. La case en haut à gauche de la cage contient un 1 ; les deux autres affichent 2, 3 et 4 avec le 3 barré, puisque 1, 2 et 4 est la seule combinaison."
+          }
+        }
+      }
+    },
+    "learn.cageArithmetic.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn the unique combinations by heart; they solve the first moves of most Killer puzzles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apprenez par cœur les combinaisons uniques ; elles résolvent les premiers coups de la plupart des Killer."
+          }
+        }
+      }
+    },
+    "learn.cageArithmetic.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start with small cages and extreme sums: two cells adding to 3, 4, 16 or 17 and three cells adding to 6, 7, 23 or 24 have a single combination. Placed digits shrink the remaining sum and narrow later cages."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencez par les petites cages et les sommes extrêmes : deux cases totalisant 3, 4, 16 ou 17 et trois cases totalisant 6, 7, 23 ou 24 n'ont qu'une seule combinaison. Les chiffres placés réduisent la somme restante et resserrent les cages suivantes."
+          }
+        }
+      }
+    },
+    "learn.figure.legend.eliminations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highlighted cells form the pattern; struck-through pencil marks are the candidates it eliminates."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cases surlignées forment le motif ; les notes barrées sont les candidats qu'il élimine."
+          }
+        }
+      }
+    },
+    "learn.figure.legend.placement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Highlighted cells form the pattern; the coloured digit is the placement it proves."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cases surlignées forment le motif ; le chiffre en couleur est le placement qu'il prouve."
+          }
+        }
+      }
+    },
+    "learn.group.advanced" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancé"
+          }
+        }
+      }
+    },
+    "learn.group.basics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basics"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bases"
+          }
+        }
+      }
+    },
+    "learn.group.intermediate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intermediate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intermédiaire"
+          }
+        }
+      }
+    },
+    "learn.group.variant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variant-specific"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifiques aux variantes"
+          }
+        }
+      }
+    },
+    "learn.hiddenPair.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A hidden pair is two digits that can only go in the same two cells of a house. Those cells may show other candidates, but the two digits claim them, so everything else in the two cells can be removed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une paire cachée est formée de deux chiffres qui ne peuvent aller que dans les deux mêmes cases d'une unité. Ces cases peuvent afficher d'autres candidats, mais les deux chiffres les réclament ; tout le reste peut donc être retiré de ces deux cases."
+          }
+        }
+      }
+    },
+    "learn.hiddenPair.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In row 7, the fourth and fifth cells are highlighted: they are the only cells in the row where 2 and 9 fit. Their other marks, 1 and 5 in one and 5 and 8 in the other, are struck through."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans la ligne 7, les quatrième et cinquième cases sont surlignées : ce sont les seules de la ligne où 2 et 9 peuvent aller. Leurs autres notes, 1 et 5 dans l'une, 5 et 8 dans l'autre, sont barrées."
+          }
+        }
+      }
+    },
+    "learn.hiddenPair.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden pairs hide in cells with many pencil marks. Work digit by digit rather than cell by cell to uncover them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les paires cachées se dissimulent dans les cases pleines de notes. Raisonnez chiffre par chiffre plutôt que case par case pour les débusquer."
+          }
+        }
+      }
+    },
+    "learn.hiddenPair.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For each house, count where each missing digit can go. When two digits each fit only in the same two cells, you have found the pair even if the cells look crowded."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour chaque unité, comptez où chaque chiffre manquant peut aller. Quand deux chiffres ne tiennent chacun que dans les deux mêmes cases, la paire est trouvée, même si ces cases paraissent chargées."
+          }
+        }
+      }
+    },
+    "learn.hiddenSingle.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A hidden single is a digit that has only one possible cell left in a row, column or box. The cell may still show several candidates, but every other cell of that house is blocked for the digit, so it must go there."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un single caché est un chiffre qui n'a plus qu'une seule case possible dans une ligne, une colonne ou une région. La case peut encore afficher plusieurs candidats, mais toutes les autres cases de cette unité sont bloquées pour ce chiffre : il doit donc y aller."
+          }
+        }
+      }
+    },
+    "learn.hiddenSingle.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board with four 5s placed outside the centre box, one each in rows 4 and 6 and columns 4 and 6. The centre box is shaded; its middle cell is the only one left for 5 and is filled with 5."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9 avec quatre 5 placés hors de la région centrale, un dans chacune des lignes 4 et 6 et des colonnes 4 et 6. La région centrale est ombrée ; sa case du milieu est la seule encore possible pour 5 et reçoit un 5."
+          }
+        }
+      }
+    },
+    "learn.hiddenSingle.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the same-digit highlight: tap a digit and see which cells of a box its copies leave free."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servez-vous du surlignage des chiffres identiques : touchez un chiffre pour voir quelles cases d'une région ses copies laissent libres."
+          }
+        }
+      }
+    },
+    "learn.hiddenSingle.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a digit and a house it is missing from. Look at the same digit elsewhere on the board: each one blocks a row or column running through the house. If only one cell survives, place the digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un chiffre et une unité où il manque. Repérez ce chiffre ailleurs sur la grille : chacun bloque une ligne ou une colonne qui traverse l'unité. S'il ne reste qu'une case, placez le chiffre."
+          }
+        }
+      }
+    },
+    "learn.hiddenTriple.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A hidden triple is three digits that can only go in the same three cells of a house. The cells may carry extra candidates, but the three digits need all three cells, so every other candidate in them can be removed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un triplet caché est formé de trois chiffres qui ne peuvent aller que dans les trois mêmes cases d'une unité. Ces cases peuvent porter des candidats supplémentaires, mais les trois chiffres ont besoin des trois cases ; tout autre candidat peut donc en être retiré."
+          }
+        }
+      }
+    },
+    "learn.hiddenTriple.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. The digits 1, 2 and 3 in rows 2 and 3 force those digits into the first three cells of row 1, which are highlighted. Their extra marks, 6 and 7, 7 and 8, and 8 and 9, are struck through."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Les chiffres 1, 2 et 3 des lignes 2 et 3 forcent ces chiffres dans les trois premières cases de la ligne 1, qui sont surlignées. Leurs notes en trop, 6 et 7, 7 et 8, puis 8 et 9, sont barrées."
+          }
+        }
+      }
+    },
+    "learn.hiddenTriple.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Givens of the same digits in the neighbouring boxes often push three digits into one box segment: that is where hidden triples live."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des indices identiques dans les régions voisines poussent souvent trois chiffres dans un même segment de région : c'est là que vivent les triplets cachés."
+          }
+        }
+      }
+    },
+    "learn.hiddenTriple.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In a house with many pencil marks, list the possible cells of each missing digit. Three digits sharing the same three cells form the triple, even if no cell shows all three."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans une unité chargée de notes, listez les cases possibles de chaque chiffre manquant. Trois chiffres partageant les trois mêmes cases forment le triplet, même si aucune case n'affiche les trois."
+          }
+        }
+      }
+    },
+    "learn.nakedPair.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A naked pair is two cells in the same house that hold exactly the same two candidates. Between them they must use both digits, so those digits can be removed from every other cell of that house."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une paire nue est formée de deux cases d'une même unité qui contiennent exactement les deux mêmes candidats. À elles deux, elles occupent forcément ces deux chiffres ; on peut donc les retirer de toutes les autres cases de l'unité."
+          }
+        }
+      }
+    },
+    "learn.nakedPair.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In row 3, the first two cells both show only 4 and 7 and are highlighted. Two other cells of the row show 3, 4, 7 and 8, with 4 and 7 struck through."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans la ligne 3, les deux premières cases n'affichent que 4 et 7 et sont surlignées. Deux autres cases de la ligne affichent 3, 4, 7 et 8, avec 4 et 7 barrés."
+          }
+        }
+      }
+    },
+    "learn.nakedPair.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cells with only two candidates are the raw material of most intermediate techniques. Notice them as soon as they appear."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cases à deux candidats sont la matière première de la plupart des techniques intermédiaires. Repérez-les dès qu'elles apparaissent."
+          }
+        }
+      }
+    },
+    "learn.nakedPair.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan each row, column and box for two cells showing the same two pencil marks. The pair may also share a second house (a row and a box, say), and then it eliminates in both."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parcourez chaque ligne, colonne et région à la recherche de deux cases affichant les deux mêmes notes. La paire peut aussi partager une seconde unité (une ligne et une région, par exemple) et elle élimine alors dans les deux."
+          }
+        }
+      }
+    },
+    "learn.nakedSingle.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A naked single is a cell with only one candidate left. Its row, column and box already contain the other eight digits, so that digit must go there. It is the most basic placement in sudoku."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un single nu est une case où il ne reste qu'un seul candidat. Sa ligne, sa colonne et sa région contiennent déjà les huit autres chiffres ; ce chiffre doit donc y aller. C'est le placement le plus élémentaire du sudoku."
+          }
+        }
+      }
+    },
+    "learn.nakedSingle.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. The centre cell is highlighted. Its row holds 1, 2 and 3, its column holds 4 and 5, and its box holds 6, 7 and 8, so the cell is filled with 9."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. La case centrale est surlignée. Sa ligne contient 1, 2 et 3, sa colonne 4 et 5, et sa région 6, 7 et 8 ; la case reçoit donc un 9."
+          }
+        }
+      }
+    },
+    "learn.nakedSingle.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep pencil marks tidy. A cell showing a single mark is a naked single waiting to be written in."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gardez des notes propres. Une case qui n'affiche qu'une seule note est un single nu qui n'attend que d'être inscrit."
+          }
+        }
+      }
+    },
+    "learn.nakedSingle.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look at cells surrounded by many givens: scan the cell's row, column and box and cross off every digit you see. Cells in crowded areas run out of options first."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regardez les cases entourées de nombreux indices : parcourez leur ligne, leur colonne et leur région et rayez chaque chiffre déjà présent. Les cases des zones chargées épuisent leurs options en premier."
+          }
+        }
+      }
+    },
+    "learn.nakedTriple.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A naked triple is three cells in one house whose candidates, taken together, are only three digits. Each cell need not show all three. The three cells must use those digits between them, so the digits can be removed from the rest of the house."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un triplet nu est formé de trois cases d'une même unité dont les candidats, réunis, ne font que trois chiffres. Chaque case n'a pas besoin d'afficher les trois. Les trois cases se partagent forcément ces chiffres ; on peut donc les retirer du reste de l'unité."
+          }
+        }
+      }
+    },
+    "learn.nakedTriple.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. The first three cells of row 1 are highlighted and show 1 and 2, 2 and 3, and 1 and 3. Other cells of row 1 show struck-through 1, 3 and 2 marks."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Les trois premières cases de la ligne 1 sont surlignées et affichent 1 et 2, 2 et 3, puis 1 et 3. D'autres cases de la ligne 1 affichent des notes 1, 3 et 2 barrées."
+          }
+        }
+      }
+    },
+    "learn.nakedTriple.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triples often appear as {1,2}, {2,3}, {1,3}: three pairs that chain into one set."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les triplets prennent souvent la forme {1,2}, {2,3}, {1,3} : trois paires qui s'enchaînent en un seul ensemble."
+          }
+        }
+      }
+    },
+    "learn.nakedTriple.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look in houses with three or more unsolved cells showing two or three marks each. Combine their marks: if the union is three digits, you have a triple."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cherchez dans les unités comptant au moins trois cases vides affichant deux ou trois notes chacune. Réunissez leurs notes : si l'union fait trois chiffres, c'est un triplet."
+          }
+        }
+      }
+    },
+    "learn.outsideClueAnalysis.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outside clues sit at the edge of the grid and describe the row or column they face. A Skyscraper clue counts the digits visible from that edge, each taller digit hiding the smaller ones behind it. A Sandwich clue gives the sum of the digits between the 1 and the 9. Outside-clue analysis turns each clue into caps and forced placements along its line."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les indices extérieurs se placent au bord de la grille et décrivent la ligne ou la colonne qu'ils regardent. Un indice Gratte-ciel compte les chiffres visibles depuis ce bord, chaque chiffre plus grand cachant les plus petits derrière lui. Un indice Sandwich donne la somme des chiffres situés entre le 1 et le 9. L'analyse des indices de bord traduit chaque indice en plafonds et en placements forcés le long de sa ligne."
+          }
+        }
+      }
+    },
+    "learn.outsideClueAnalysis.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 Skyscraper board with the clue 3 printed to the left of row 5, which is shaded. The first cell of the row shows 1 to 9 with 8 and 9 struck through, because two taller buildings must still be visible behind it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille Gratte-ciel 9×9 avec l'indice 3 imprimé à gauche de la ligne 5, qui est ombrée. La première case de la ligne affiche 1 à 9 avec 8 et 9 barrés, car deux immeubles plus hauts doivent encore être visibles derrière elle."
+          }
+        }
+      }
+    },
+    "learn.outsideClueAnalysis.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Think of the digits as building heights and stand at the clue: the first cell must leave room for the taller buildings still to come."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voyez les chiffres comme des hauteurs d'immeubles et placez-vous à l'indice : la première case doit laisser de la place aux immeubles plus hauts encore à venir."
+          }
+        }
+      }
+    },
+    "learn.outsideClueAnalysis.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start with the extreme clues: a Skyscraper 1 puts the 9 on the edge, a 9 forces the whole line to count up, and a Sandwich 0 makes the 1 and 9 neighbours. Then bound the first cells: with a clue of N, the edge cell is at most 10 minus N."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencez par les indices extrêmes : un Gratte-ciel 1 met le 9 au bord, un 9 force toute la ligne à monter, et un Sandwich 0 rend le 1 et le 9 voisins. Encadrez ensuite les premières cases : avec un indice N, la case du bord vaut au plus 10 moins N."
+          }
+        }
+      }
+    },
+    "learn.pointingPair.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A pointing pair (or triple) is a digit whose only candidates inside a box all lie on one row or column. The box must take the digit on that line, so the digit can be removed from the rest of the line outside the box."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une paire pointante (ou un triplet) est un chiffre dont les seuls candidats dans une région sont alignés sur une même ligne ou colonne. La région doit placer ce chiffre sur cet alignement ; on peut donc le retirer du reste de la ligne hors de la région."
+          }
+        }
+      }
+    },
+    "learn.pointingPair.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In the top-left box, the digit 1 can only go in the first two cells of row 1, which are highlighted. Further along row 1, the fourth cell shows a struck-through 1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans la région en haut à gauche, le chiffre 1 ne peut aller que dans les deux premières cases de la ligne 1, qui sont surlignées. Plus loin sur la ligne 1, la quatrième case affiche un 1 barré."
+          }
+        }
+      }
+    },
+    "learn.pointingPair.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two or three marks of the same digit lined up inside a box are pointing at something: follow the line out of the box."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux ou trois notes d'un même chiffre alignées dans une région pointent quelque chose : suivez la ligne hors de la région."
+          }
+        }
+      }
+    },
+    "learn.pointingPair.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For each box and each missing digit, check whether the candidates line up. Boxes that are nearly full, or that have the digit blocked by neighbouring givens, are the best places to look."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour chaque région et chaque chiffre manquant, vérifiez si les candidats sont alignés. Les régions presque pleines, ou dont le chiffre est bloqué par des indices voisins, sont les meilleurs endroits où chercher."
+          }
+        }
+      }
+    },
+    "learn.relationAnalysis.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relation marks between two neighbouring cells (Kropki dots, XV letters, inequality signs, consecutive bars) restrict which digits the pair can hold. Relation analysis keeps only the digits of one cell that have a compatible partner in the other. Where the variant uses a negative convention, a missing mark is a constraint too."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les marques relationnelles entre deux cases voisines (points Kropki, lettres XV, signes d'inégalité, barres de consécutifs) limitent les chiffres que la paire peut contenir. L'analyse relationnelle ne garde, dans une case, que les chiffres qui ont un partenaire compatible dans l'autre. Quand la variante applique une convention négative, l'absence de marque est aussi une contrainte."
+          }
+        }
+      }
+    },
+    "learn.relationAnalysis.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 Kropki board with a black dot between two highlighted cells in the middle of row 5. The left cell shows 3, 5, 7 and 9 with 5, 7 and 9 struck through, because only 3 has a double."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille Kropki 9×9 avec un point noir entre deux cases surlignées au milieu de la ligne 5. La case de gauche affiche 3, 5, 7 et 9 avec 5, 7 et 9 barrés, car seul 3 possède un double."
+          }
+        }
+      }
+    },
+    "learn.relationAnalysis.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On a black dot, 5, 7 and 9 are impossible: nothing in 1 to 9 is their double or half."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur un point noir, 5, 7 et 9 sont impossibles : rien entre 1 et 9 n'est leur double ni leur moitié."
+          }
+        }
+      }
+    },
+    "learn.relationAnalysis.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check every marked pair whenever one of its cells changes. A black dot needs a digit and its double; a white dot or bar needs consecutive digits; X and V need sums of 10 and 5; an inequality points at the smaller digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez chaque paire marquée dès qu'une de ses cases change. Un point noir exige un chiffre et son double ; un point blanc ou une barre exige des chiffres consécutifs ; X et V exigent des sommes de 10 et 5 ; une inégalité pointe vers le plus petit chiffre."
+          }
+        }
+      }
+    },
+    "learn.section.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What it is"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Principe"
+          }
+        }
+      }
+    },
+    "learn.section.example" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Example"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exemple"
+          }
+        }
+      }
+    },
+    "learn.section.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotting tip"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Astuce"
+          }
+        }
+      }
+    },
+    "learn.section.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where to look"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où chercher"
+          }
+        }
+      }
+    },
+    "learn.swordfish.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A swordfish extends the X-Wing to three lines. When a digit's candidates in three rows stay within the same three columns, those columns must take the digit from those rows, so it can be removed from the columns everywhere else. Each row may use two or three of the columns."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'espadon étend le X-Wing à trois lignes. Quand les candidats d'un chiffre dans trois lignes restent dans les trois mêmes colonnes, ces colonnes doivent prendre le chiffre dans ces lignes ; on peut donc le retirer partout ailleurs dans les colonnes. Chaque ligne peut utiliser deux ou trois des colonnes."
+          }
+        }
+      }
+    },
+    "learn.swordfish.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In rows 2, 5 and 8, the digit 3 fits only in columns 2, 5 and 8; the six candidate cells are highlighted. Four other cells in those columns show a struck-through 3."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans les lignes 2, 5 et 8, le chiffre 3 ne tient que dans les colonnes 2, 5 et 8 ; les six cases candidates sont surlignées. Quatre autres cases de ces colonnes affichent un 3 barré."
+          }
+        }
+      }
+    },
+    "learn.swordfish.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swordfish are rare. Only hunt for them once pairs, pointing pairs and X-Wings are exhausted."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les espadons sont rares. Ne les traquez qu'une fois les paires, paires pointantes et X-Wings épuisés."
+          }
+        }
+      }
+    },
+    "learn.swordfish.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a digit with few candidates left. List the rows where it has two or three candidates and look for three rows whose columns overlap into a set of just three."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un chiffre auquel il reste peu de candidats. Listez les lignes où il a deux ou trois candidats et cherchez trois lignes dont les colonnes se recoupent en un ensemble de trois seulement."
+          }
+        }
+      }
+    },
+    "learn.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apprendre"
+          }
+        }
+      }
+    },
+    "learn.xWing.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An X-Wing is a digit that, in two rows, can only go in the same two columns. The four cells form a rectangle, and the digit must occupy two opposite corners. Either way both columns get their digit from the rectangle, so it can be removed from the rest of those columns. The same works with rows and columns swapped."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un X-Wing est un chiffre qui, dans deux lignes, ne peut aller que dans les deux mêmes colonnes. Les quatre cases forment un rectangle, et le chiffre doit occuper deux coins opposés. Dans les deux cas, chaque colonne reçoit son chiffre du rectangle ; on peut donc le retirer du reste de ces colonnes. Cela marche aussi en échangeant lignes et colonnes."
+          }
+        }
+      }
+    },
+    "learn.xWing.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. In rows 2 and 8, the digit 4 fits only in columns 3 and 7; the four corner cells are highlighted. Two cells in each of columns 3 and 7 show a struck-through 4."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. Dans les lignes 2 et 8, le chiffre 4 ne tient que dans les colonnes 3 et 7 ; les quatre cases d'angle sont surlignées. Deux cases de chacune des colonnes 3 et 7 affichent un 4 barré."
+          }
+        }
+      }
+    },
+    "learn.xWing.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Draw the rectangle in your head: the corners are the candidates, the eliminations run along the sides."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dessinez le rectangle dans votre tête : les coins sont les candidats, les éliminations courent le long des côtés."
+          }
+        }
+      }
+    },
+    "learn.xWing.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick a digit and find rows where it has exactly two candidates. If two such rows use the same pair of columns, check those columns for eliminations."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un chiffre et trouvez les lignes où il n'a que deux candidats. Si deux de ces lignes utilisent la même paire de colonnes, cherchez des éliminations dans ces colonnes."
+          }
+        }
+      }
+    },
+    "learn.xyChain.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An XY-Chain links two-candidate cells so that each cell sees the next and shares a digit with it. If the first cell is not some digit A, the chain forces the last cell to be A. So one of the two ends is A, and A can be removed from every cell that sees both ends. An XY-Wing is the shortest such chain."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une chaîne XY relie des cases à deux candidats de sorte que chaque case voit la suivante et partage un chiffre avec elle. Si la première case n'est pas un certain chiffre A, la chaîne force la dernière case à être A. L'une des deux extrémités est donc A, et A peut être retiré de toute case qui voit les deux extrémités. Un XY-Wing est la plus courte de ces chaînes."
+          }
+        }
+      }
+    },
+    "learn.xyChain.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board with four highlighted two-candidate cells forming a chain: 1 and 2 at the top-left corner, 2 and 3 further along row 1, 3 and 4 below it in row 4, and 1 and 4 at the end of row 4. The two cells that see both ends of the chain show a struck-through 1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9 avec quatre cases surlignées à deux candidats formant une chaîne : 1 et 2 dans le coin supérieur gauche, 2 et 3 plus loin sur la ligne 1, 3 et 4 en dessous dans la ligne 4, et 1 et 4 au bout de la ligne 4. Les deux cases qui voient les deux extrémités de la chaîne affichent un 1 barré."
+          }
+        }
+      }
+    },
+    "learn.xyChain.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write the chain down as pairs, {1,2}-{2,3}-{3,4}-{4,1}: the digit shared by both ends is the one to eliminate."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notez la chaîne sous forme de paires, {1,2}-{2,3}-{3,4}-{4,1} : le chiffre commun aux deux extrémités est celui à éliminer."
+          }
+        }
+      }
+    },
+    "learn.xyChain.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When a puzzle has many two-candidate cells, pick one, assume it is not one of its digits, and follow the forced values from cell to cell. Watch for a chain whose far end lands on the digit you started with."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand une grille compte beaucoup de cases à deux candidats, choisissez-en une, supposez qu'elle n'est pas l'un de ses chiffres et suivez les valeurs forcées de case en case. Guettez une chaîne dont l'extrémité retombe sur le chiffre de départ."
+          }
+        }
+      }
+    },
+    "learn.xyWing.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An XY-Wing is three cells with two candidates each: a pivot holding X and Y, and two pincers that see the pivot, one holding X and Z, the other Y and Z. Whatever the pivot takes, one pincer is forced to Z, so Z can be removed from any cell that sees both pincers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un XY-Wing est formé de trois cases à deux candidats : un pivot contenant X et Y, et deux pinces qui voient le pivot, l'une contenant X et Z, l'autre Y et Z. Quelle que soit la valeur du pivot, une pince est forcée à Z ; on peut donc retirer Z de toute case qui voit les deux pinces."
+          }
+        }
+      }
+    },
+    "learn.xyWing.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A 9×9 board. The centre cell shows 1 and 2 and is highlighted as the pivot. A highlighted cell to its right in the same row shows 1 and 3, and one below it in the same column shows 2 and 3. The cell at their intersection shows 3, 5 and 8 with 3 struck through."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une grille 9×9. La case centrale affiche 1 et 2 et est surlignée comme pivot. Une case surlignée à sa droite dans la même ligne affiche 1 et 3, et une autre en dessous dans la même colonne affiche 2 et 3. La case à leur intersection affiche 3, 5 et 8 avec le 3 barré."
+          }
+        }
+      }
+    },
+    "learn.xyWing.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The pincers need not see each other; only the cells you eliminate from must see both."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les pinces n'ont pas besoin de se voir ; seules les cases dont vous éliminez doivent voir les deux."
+          }
+        }
+      }
+    },
+    "learn.xyWing.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start from a cell with two candidates and look along its row, column and box for other two-candidate cells sharing one digit with it. Two such cells that share their remaining digit complete the wing."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partez d'une case à deux candidats et cherchez, dans sa ligne, sa colonne et sa région, d'autres cases à deux candidats qui partagent un chiffre avec elle. Deux telles cases qui partagent leur chiffre restant complètent l'aile."
           }
         }
       }
@@ -5079,6 +6405,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mode de saisie"
+          }
+        }
+      }
+    },
+    "settings.learn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solving techniques"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Techniques de résolution"
           }
         }
       }
