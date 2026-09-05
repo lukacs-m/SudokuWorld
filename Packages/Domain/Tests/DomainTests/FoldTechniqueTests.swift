@@ -84,7 +84,7 @@ struct FoldTechniqueTests {
         var techniques = Set<Technique>()
         while !grid.isSolved, let step = TechniqueLadder.nextStep(in: grid) {
             techniques.insert(step.technique)
-            step.apply(to: &grid)
+            guard step.apply(to: &grid) else { break }
         }
         #expect(grid.isSolved)
         #expect(techniques.contains(.bentLine))
