@@ -19,8 +19,8 @@ make build
 # Resolve THIS worktree's build dir — DerivedData holds one per worktree and
 # `find | head -1` happily returns another worker's stale app.
 APP=$(xcodebuild -showBuildSettings -project SudokuWorld.xcodeproj -scheme SudokuWorld \
-  -destination 'platform=iOS Simulator,name=iPhone 17' 2>/dev/null \
-  | awk '/ BUILT_PRODUCTS_DIR =/ {print $3}')/SudokuWorld.app
+  -destination "id=$SIM" 2>/dev/null \
+  | awk '/ BUILT_PRODUCTS_DIR =/ {print $3; exit}')/SudokuWorld.app
 xcrun simctl install $SIM "$APP"
 xcrun simctl terminate $SIM com.mlukacs.sudokuWorld 2>/dev/null
 # Straight into a game (slugs = SudokuVariant / Difficulty raw values):
