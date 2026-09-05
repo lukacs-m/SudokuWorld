@@ -71,7 +71,7 @@ nonisolated struct CubeFaceSnapshot: Equatable, Sendable {
         conflicts: Set<Int>,
         hintCells: Set<Int>,
         settings: GameSettings,
-        theme: Theme,
+        palette: Palette,
     ) -> Self {
         let faceCells = (0 ..< CubeNet.cellsPerFace).map { offset in
             let index = CubeNet.index(face: face, row: offset / 3, col: offset % 3)
@@ -91,7 +91,7 @@ nonisolated struct CubeFaceSnapshot: Equatable, Sendable {
                 isSelected: selected == index,
             )
         }
-        return Self(cells: faceCells, palette: Palette(theme: theme))
+        return Self(cells: faceCells, palette: palette)
     }
 }
 
@@ -124,6 +124,8 @@ nonisolated enum CubeFaceRenderer {
 
         let palette = snapshot.palette
         let cellSize = side / 3
+        let givenFont = font(size: cellSize * 0.55, semibold: true)
+        let playerFont = font(size: cellSize * 0.55, semibold: false)
         context.setFillColor(palette.cellBackground.cgColor)
         context.fill(CGRect(x: 0, y: 0, width: side, height: side))
 
@@ -152,7 +154,14 @@ nonisolated enum CubeFaceRenderer {
                 fill(rect, with: palette.selection, in: context)
             }
             if let value = cell.value {
-                drawValue(value, cell: cell, in: rect, context: context, palette: palette)
+                drawValue(
+                    value,
+                    cell: cell,
+                    in: rect,
+                    font: cell.isGiven ? givenFont : playerFont,
+                    context: context,
+                    palette: palette,
+                )
             } else {
                 drawNotes(cell.notes, in: rect, context: context, palette: palette)
             }
@@ -178,6 +187,7 @@ nonisolated enum CubeFaceRenderer {
         _ value: Int,
         cell: CubeFaceSnapshot.Cell,
         in rect: CGRect,
+        font: CTFont,
         context: CGContext,
         palette: CubeFaceSnapshot.Palette,
     ) {
@@ -190,7 +200,7 @@ nonisolated enum CubeFaceRenderer {
         }
         draw(
             VariantGlyphs.glyph(value, for: .cube),
-            font: font(size: rect.width * 0.55, semibold: cell.isGiven),
+            font: font,
             color: color,
             at: CGPoint(x: rect.midX, y: rect.midY),
             in: context,

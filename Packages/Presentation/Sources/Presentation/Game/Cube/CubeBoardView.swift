@@ -80,6 +80,7 @@ struct CubeBoardView: View {
     /// same math the gesture commits use.
     private func sceneState(session: GameSession, theme: Theme, size: CGSize) -> CubeSceneState {
         let hintCells = Set(viewModel.presentedHint?.cells ?? [])
+        let palette = CubeFaceSnapshot.Palette(theme: theme)
         let snapshots = CubeNet.Face.allCases.map { face in
             CubeFaceSnapshot.make(
                 face: face,
@@ -90,7 +91,7 @@ struct CubeBoardView: View {
                 conflicts: viewModel.conflicts,
                 hintCells: hintCells,
                 settings: viewModel.settings,
-                theme: theme,
+                palette: palette,
             )
         }
         return CubeSceneState(
@@ -227,25 +228,24 @@ final class CubeScene {
             requested[face] = snapshot
             renders[face]?.cancel()
             renders[face] = Task(priority: .userInitiated) { [weak self] in
+                let texture = await Self.texture(for: snapshot)
                 // A newer snapshot for this face cancels the stale render so
-                // textures never land out of order.
-                guard let image = await CubeFaceRenderer.render(snapshot), !Task.isCancelled,
-                      let texture = try? await TextureResource(
-                          image: image,
-                          withName: nil,
-                          options: .init(semantic: .color),
-                      ),
-                      !Task.isCancelled, let self
-                else { return }
-                faces[face].model?.materials = [material(for: texture)]
+                // textures never land out of order; the newer one owns the slot.
+                guard !Task.isCancelled, let self else { return }
+                if let texture {
+                    faces[face].model?.materials = [material(for: texture)]
+                } else {
+                    // Releasing the slot lets the next apply retry this face.
+                    requested[face] = nil
+                }
                 untextured.remove(face)
                 showIfReady()
             }
         }
     }
 
-    /// Untextured quads never show: the cube appears once all six faces
-    /// have their first texture.
+    /// The cube appears once every face has had its first texture attempt, so
+    /// no untextured quad flashes on the way in.
     private func showIfReady() {
         root.isEnabled = !hidden && untextured.isEmpty
     }
@@ -257,6 +257,17 @@ final class CubeScene {
             relativeTo: nil,
             duration: 0.35,
             timingFunction: .easeOut,
+        )
+    }
+
+    private static func texture(for snapshot: CubeFaceSnapshot) async -> TextureResource? {
+        guard let image = await CubeFaceRenderer.render(snapshot), !Task.isCancelled else {
+            return nil
+        }
+        return try? await TextureResource(
+            image: image,
+            withName: nil,
+            options: .init(semantic: .color),
         )
     }
 
