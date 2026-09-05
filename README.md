@@ -53,8 +53,9 @@ French localization.
   visible board has no logical move), confetti on wins, a system-decided
   rating prompt after the confetti, haptics via `.sensoryFeedback`.
 - **Learn** — a free, illustrated lesson for each of the engine's 16 solving
-  techniques (Naked Single to XY-Chain), reachable from Home, Settings, and
-  every hint's "Learn more" link; each figure is validated against the solver.
+  techniques (Naked Single to XY-Chain), reachable from Home, Settings, and the
+  "Learn more" link on every technique hint; each figure is validated against
+  the solver.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
   win streaks, fastest/average times; daily-challenge streaks; Swift Charts
   (30-day activity, win rate by difficulty, best-vs-average times, variant
