@@ -58,13 +58,17 @@ struct FoldTechniqueTests {
     @Test func otherCliqueVariantsKeepCliquesPairwiseOnly() {
         for variant in [SudokuVariant.argyle, .antiKnight, .antiKing, .miracle, .classic] {
             let context = SolverContext(topology: TopologyFactory.topology(for: variant))
-            #expect(context.foldPairs.isEmpty, "\(variant)")
+            #expect(context.foldFaces.isEmpty, "\(variant)")
         }
     }
 
     @Test func cubeAndTredokuMeetEveryBentLineFromBothFaces() {
-        #expect(SolverContext(topology: TopologyFactory.topology(for: .cube)).foldPairs.count == 72)
-        #expect(SolverContext(topology: TopologyFactory.topology(for: .tredoku)).foldPairs.count == 12)
+        func lineCount(_ variant: SudokuVariant) -> Int {
+            SolverContext(topology: TopologyFactory.topology(for: variant))
+                .foldFaces.reduce(0) { $0 + $1.lines.count }
+        }
+        #expect(lineCount(.cube) == 72)
+        #expect(lineCount(.tredoku) == 12)
     }
 
     /// Hard is genuinely reachable on the fold variants now: these seeds
