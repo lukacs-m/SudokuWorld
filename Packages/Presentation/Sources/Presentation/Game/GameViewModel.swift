@@ -1,3 +1,4 @@
+import Common
 import DI
 public import Domain
 public import Foundation
@@ -32,6 +33,9 @@ public final class GameViewModel {
     public private(set) var settings: GameSettings = .standard
     /// Drives `.sensoryFeedback` in the view; bumped on every applied move.
     public private(set) var feedback: MoveFeedback?
+    /// Bumped each time a move makes the fog lift on its own (fair fog's
+    /// never-stuck rule); the view shows the "fog lifts" cue on change.
+    public private(set) var fogLiftSequence = 0
 
     public struct MoveFeedback: Equatable {
         public let result: MoveResult
@@ -53,6 +57,7 @@ public final class GameViewModel {
     private let launch: GameLaunch
     private var autosaveTask: Task<Void, Never>?
     private var feedbackSequence = 0
+    private var knownFogAutoReveals = 0
     /// Peer lookup for selection highlighting, derived from the topology.
     private var peersByCell: [[Int]] = []
 
@@ -65,6 +70,12 @@ public final class GameViewModel {
     /// Stored (not computed) because per-puzzle shapes (jigsaw) rebuild
     /// their lookup tables on every construction; set alongside `session`.
     public private(set) var topology: GridTopology?
+
+    /// Only fair fog lifts a window on its own, so only it reserves the
+    /// cue's slot under the board.
+    public var usesFairFog: Bool {
+        session?.usesFairFog ?? false
+    }
 
     public var canRequestHint: Bool {
         guard let session else { return false }
@@ -112,9 +123,27 @@ public final class GameViewModel {
         session = newSession
         topology = TopologyFactory.topology(for: newSession.puzzle)
         peersByCell = Self.buildPeers(for: newSession.puzzle)
+        knownFogAutoReveals = newSession.fogAutoReveals
         conflicts = []
         phase = .playing
+        #if DEBUG
+            if LaunchHooks.fogAutoplayMoves > 0 {
+                Task { await debugAutoplayFog(moves: LaunchHooks.fogAutoplayMoves) }
+            }
+        #endif
     }
+
+    #if DEBUG
+        /// Screenshot tooling: plays logic-only fog moves a beat after the
+        /// board is on screen, so the "fog lifts" cue is photographable.
+        private func debugAutoplayFog(moves: Int) async {
+            try? await Task.sleep(for: .seconds(3))
+            for _ in 0 ..< moves {
+                guard let step = session?.logicalFogPlacement() else { return }
+                apply(digit: step.digit, at: step.cell)
+            }
+        }
+    #endif
 
     // MARK: - Input
 
@@ -178,6 +207,10 @@ public final class GameViewModel {
         conflicts = session.conflicts()
         feedbackSequence += 1
         feedback = MoveFeedback(result: result, sequence: feedbackSequence)
+        if session.fogAutoReveals > knownFogAutoReveals {
+            knownFogAutoReveals = session.fogAutoReveals
+            fogLiftSequence += 1
+        }
         scheduleAutosave()
 
         switch result {

@@ -1462,6 +1462,23 @@
         }
       }
     },
+    "game.fogLifts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The fog lifts"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le brouillard se lève"
+          }
+        }
+      }
+    },
     "game.hint.button" : {
       "localizations" : {
         "en" : {
@@ -3475,13 +3492,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solve what you can see: a visible row missing one digit is still a gift — placing it may reveal a whole new region to work in."
+            "value" : "Solve what you can see: a visible row missing one digit is still a gift — placing it may reveal a whole new region to work in. On Expert and Master, that placement also clears its entire row, column and box."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Résolvez ce qui est visible : une ligne à laquelle il ne manque qu'un chiffre reste un cadeau — le placer peut révéler toute une nouvelle zone."
+            "value" : "Résolvez ce qui est visible : une ligne à laquelle il ne manque qu'un chiffre reste un cadeau — le placer peut révéler toute une nouvelle zone. En Expert et Maître, ce placement dégage aussi toute sa ligne, sa colonne et sa région."
           }
         }
       }
@@ -3492,13 +3509,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Classic rules under fog: only the area around the given digits starts visible. Placing a correct digit lifts the fog around it, gradually revealing the rest of the board."
+            "value" : "Classic rules under fog: only a few windows of the board start visible, hidden givens included. Placing a correct digit lifts the fog around it. On Expert and Master, a correct digit clears its whole row, column and box, more of the board starts visible, and whenever no logical move is left in view, the fog lifts one more window on its own."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Règles classiques sous le brouillard : seule la zone autour des chiffres donnés est visible au départ. Chaque chiffre correct dissipe le brouillard autour de lui, révélant peu à peu la grille."
+            "value" : "Règles classiques sous le brouillard : seules quelques fenêtres de la grille sont visibles au départ, chiffres donnés cachés compris. Chaque chiffre correct dissipe le brouillard autour de lui. En Expert et Maître, un chiffre correct dégage toute sa ligne, sa colonne et sa région, une plus grande partie de la grille est visible dès le départ, et dès qu'aucun coup logique n'est possible à la vue, le brouillard se lève d'une fenêtre de plus tout seul."
           }
         }
       }
@@ -3509,13 +3526,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "• Every correct placement is also a torch — prioritise moves near the fog line.\n• Standard eliminations still apply to hidden cells; the rules don't change, only your view.\n• Wrong guesses don't lift fog — accuracy is the lantern."
+            "value" : "• Every correct placement is also a torch — prioritise moves near the fog line.\n• Standard eliminations still apply to hidden cells; the rules don't change, only your view.\n• Wrong guesses don't lift fog — accuracy is the lantern.\n• On Expert and Master you never need to guess: if the visible board has no logical move, the fog lifts another window by itself."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "• Chaque placement correct est aussi une torche — privilégiez les coups près de la lisière du brouillard.\n• Les éliminations classiques s'appliquent aussi aux cases cachées ; seules votre vue change, pas les règles.\n• Les erreurs ne dissipent rien — la précision est la lanterne."
+            "value" : "• Chaque placement correct est aussi une torche — privilégiez les coups près de la lisière du brouillard.\n• Les éliminations classiques s'appliquent aussi aux cases cachées ; seules votre vue change, pas les règles.\n• Les erreurs ne dissipent rien — la précision est la lanterne.\n• En Expert et Maître, inutile de deviner : si la partie visible n'offre aucun coup logique, le brouillard se lève d'une fenêtre de plus tout seul."
           }
         }
       }

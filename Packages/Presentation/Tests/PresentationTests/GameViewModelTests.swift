@@ -69,6 +69,37 @@ struct GameViewModelTests {
         #expect(count >= 1)
     }
 
+    @Test func fogLiftCueFiresWhenTheNeverStuckRuleReveals() async {
+        // Expert fog, seed 3: the opening has exactly one logical move, and
+        // taking it leaves logic stuck, so the session lifts a window.
+        // Generated off the main actor so the suite's timing-based tests
+        // are not starved while this one builds its board.
+        let puzzle = await PuzzleGenerator().generate(variant: .fogOfWar, difficulty: .expert, seed: 3)
+        _ = registerBaseMocks(startPuzzle: puzzle)
+        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
+            variant: .fogOfWar,
+            difficulty: .expert,
+            mode: .normal,
+        )))
+        await viewModel.start()
+        #expect(viewModel.fogLiftSequence == 0)
+        // Only fair fog reserves the cue's slot under the board.
+        #expect(viewModel.usesFairFog)
+
+        guard let session = viewModel.session, let step = session.logicalFogPlacement() else {
+            Issue.record("No logical fog move")
+            return
+        }
+        let liftsBefore = session.fogAutoReveals
+        viewModel.tapCell(step.cell)
+        viewModel.tapDigit(step.digit)
+
+        #expect(viewModel.session?.fogAutoReveals == liftsBefore + 1)
+        #expect(viewModel.fogLiftSequence == 1)
+        // The cue is for reveals the game made, not the player's own.
+        #expect(viewModel.session?.isFogged(step.cell) == false)
+    }
+
     @Test func noteModeTogglesNotes() async {
         _ = registerBaseMocks()
         let viewModel = GameViewModel(launch: GameLaunch(kind: .new(

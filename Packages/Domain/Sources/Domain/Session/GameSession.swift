@@ -25,10 +25,14 @@ public struct GameSession: Equatable, Sendable {
     public private(set) var lastResume: Date?
 
     /// Fog-of-war reveal state: cells the player can see. Starts as a few
-    /// seeded windows; every correct placement lifts the fog around itself.
-    /// Reveals never revert — not even through undo. Empty for other
-    /// variants.
+    /// seeded windows; every correct placement lifts the fog around itself
+    /// (see `FogOfWar` for the per-tier rules). Reveals never revert — not
+    /// even through undo. Empty for other variants.
     public private(set) var revealedCells: Set<Int>
+    /// Windows the never-stuck rule has lifted on its own this session
+    /// (fair fog only). Not persisted — it only drives the UI cue, and the
+    /// rule itself is re-derived from `revealedCells`.
+    public private(set) var fogAutoReveals: Int
 
     private let detector: ConflictDetector
 
@@ -49,8 +53,10 @@ public struct GameSession: Equatable, Sendable {
         isLost = false
         accumulated = 0
         lastResume = startedAt
-        revealedCells = Self.initialFog(for: puzzle)
+        revealedCells = FogOfWar.initialWindows(for: puzzle)
+        fogAutoReveals = 0
         detector = ConflictDetector(puzzle: puzzle)
+        liftFogWhileStuck()
     }
 
     /// Restores a saved game, paused — call `resume(at:)` when play begins.
@@ -71,21 +77,25 @@ public struct GameSession: Equatable, Sendable {
         if let restored = saved.revealedCells {
             revealedCells = Set(restored)
         } else {
-            // Saves that predate the field: re-derive deterministically —
-            // the seeded windows plus the fog lifted by every correct
-            // placement already on the board.
-            var reveals = Self.initialFog(for: saved.puzzle)
+            // Saves that predate the field: re-derive deterministically
+            // under the current rules — the seeded windows plus the fog
+            // lifted by every correct placement already on the board.
+            var reveals = FogOfWar.initialWindows(for: saved.puzzle)
             if saved.puzzle.variant == .fogOfWar {
                 for index in 0 ..< saved.board.count
                     where !saved.board[index].isGiven
                     && saved.board[index].value == saved.puzzle.solution[index]
                 {
-                    reveals.formUnion(Self.fogNeighborhood(of: index, puzzle: saved.puzzle))
+                    reveals.formUnion(FogOfWar.reveal(around: index, puzzle: saved.puzzle))
                 }
             }
             revealedCells = reveals
         }
+        fogAutoReveals = 0
         detector = ConflictDetector(puzzle: puzzle)
+        // Also covers saves made under the pre-fair-fog rules, whose
+        // visible position may be stuck.
+        liftFogWhileStuck()
     }
 
     // MARK: - Fog of war
@@ -95,40 +105,48 @@ public struct GameSession: Equatable, Sendable {
         puzzle.variant == .fogOfWar && !revealedCells.contains(index)
     }
 
-    /// Three seeded 3×3 windows give the player a foothold.
-    static func initialFog(for puzzle: PuzzleDefinition) -> Set<Int> {
-        guard puzzle.variant == .fogOfWar else { return [] }
-        let size = Int(Double(puzzle.solution.count).squareRoot())
-        var rng = SplitMix64(seed: puzzle.seed)
-        var revealed = Set<Int>()
-        for _ in 0 ..< 3 {
-            let originRow = Int(rng.next() % UInt64(size - 2))
-            let originCol = Int(rng.next() % UInt64(size - 2))
-            for row in originRow ..< (originRow + 3) {
-                for col in originCol ..< (originCol + 3) {
-                    revealed.insert(row * size + col)
-                }
-            }
-        }
-        return revealed
+    /// Fair fog (Expert and Master): a correct digit lifts whole houses and
+    /// the never-stuck rule can lift a window on its own.
+    public var usesFairFog: Bool {
+        FogOfWar.isFair(puzzle)
     }
 
-    /// The 3×3 neighborhood a correct placement reveals.
-    static func fogNeighborhood(of index: Int, puzzle: PuzzleDefinition) -> Set<Int> {
-        let size = Int(Double(puzzle.solution.count).squareRoot())
-        let row = index / size
-        let col = index % size
-        var cells = Set<Int>()
-        for rowDelta in -1 ... 1 {
-            for colDelta in -1 ... 1 {
-                let neighborRow = row + rowDelta
-                let neighborCol = col + colDelta
-                guard neighborRow >= 0, neighborRow < size,
-                      neighborCol >= 0, neighborCol < size else { continue }
-                cells.insert(neighborRow * size + neighborCol)
-            }
+    /// The never-stuck rule (fair fog only): lifts seeded windows until the
+    /// visible position has a logical step within the puzzle's grade. Runs
+    /// after every move that can shrink the visible position: a placement
+    /// the ladder could not derive may be taken back, or overwritten with a
+    /// wrong digit, which drops it out of view again.
+    private mutating func liftFogWhileStuck() {
+        guard FogOfWar.isFair(puzzle), !isSolved else { return }
+        let solver = FogOfWar.solverContext(for: puzzle)
+        while FogOfWar.firstVisiblePlacement(
+            puzzle: puzzle,
+            board: board,
+            revealed: revealedCells,
+            context: solver,
+        ) == nil {
+            let window = FogOfWar.autoReveal(
+                puzzle: puzzle,
+                board: board,
+                revealed: revealedCells,
+                context: solver,
+            )
+            guard !window.isEmpty else { return }
+            revealedCells.formUnion(window)
+            fogAutoReveals += 1
         }
-        return cells
+    }
+
+    /// The easiest placement the technique ladder (capped at the puzzle's
+    /// grade) can make in the visible position — the never-stuck rule's
+    /// oracle. Nil for other variants, or when logic is stuck.
+    public func logicalFogPlacement() -> (cell: Int, digit: Int)? {
+        guard puzzle.variant == .fogOfWar else { return nil }
+        return FogOfWar.firstVisiblePlacement(
+            puzzle: puzzle,
+            board: board,
+            revealed: revealedCells,
+        )
     }
 
     // MARK: - State
@@ -186,14 +204,16 @@ public struct GameSession: Equatable, Sendable {
                 isLost = true
                 return .hardcoreLoss
             }
+            liftFogWhileStuck()
             return .mistake(total: mistakes)
         }
         if puzzle.variant == .fogOfWar {
-            revealedCells.formUnion(Self.fogNeighborhood(of: index, puzzle: puzzle))
+            revealedCells.formUnion(FogOfWar.reveal(around: index, puzzle: puzzle))
         }
         if isSolved {
             return .solved
         }
+        liftFogWhileStuck()
         return .placed
     }
 
@@ -228,6 +248,7 @@ public struct GameSession: Equatable, Sendable {
         board[index] = after
         undoStack.append(Move(index: index, before: before, after: after))
         redoStack = []
+        liftFogWhileStuck()
         return .placed
     }
 
@@ -265,6 +286,7 @@ public struct GameSession: Equatable, Sendable {
             board[peer].notes = notes
         }
         redoStack.append(move)
+        liftFogWhileStuck()
         return true
     }
 
@@ -278,6 +300,7 @@ public struct GameSession: Equatable, Sendable {
             }
         }
         undoStack.append(move)
+        liftFogWhileStuck()
         return true
     }
 

@@ -46,10 +46,11 @@ French localization.
   highlighting, conflict auto-check, hardcore mode (3 mistakes, no hints,
   losses count), pause that hides the board, autosave on every move and on
   backgrounding, a clock that never counts suspended time, pinch-to-zoom and
-  pan on boards larger than 9×9, Fog of War reveal (three seeded 3×3 windows,
-  each correct digit clears its neighborhood), confetti on wins, a
-  system-decided rating prompt after the confetti, haptics via
-  `.sensoryFeedback`.
+  pan on boards larger than 9×9, Fog of War reveal (seeded windows; each
+  correct digit clears its neighborhood, or on Expert and Master its whole
+  row, column and box, with the fog lifting on its own whenever the visible
+  board has no logical move), confetti on wins, a system-decided rating
+  prompt after the confetti, haptics via `.sensoryFeedback`.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
   win streaks, fastest/average times; daily-challenge streaks; Swift Charts
   (30-day activity, win rate by difficulty, best-vs-average times, variant
@@ -87,7 +88,7 @@ Requirements: Xcode 26.x (Swift 6.3 toolchain), plus `xcodegen`, `swiftlint`,
 ```bash
 make setup      # install XcodeGen and generate SudokuWorld.xcodeproj
 make open       # open in Xcode — select the SudokuWorld scheme and run
-make test       # run every package's test suite (Domain alone ~50 s)
+make test       # run every package's test suite (see "Testing" below)
 make build      # build for the iOS simulator from the CLI
 make lint       # SwiftLint
 make format     # SwiftFormat (in place)
@@ -236,8 +237,10 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 253 tests; the Domain
-suite alone runs ~50 s):
+Tests across four packages (`make test`, macOS host, 261 tests; the Domain
+suite alone runs ~2.5 min — 143–160 s under `make test`'s parallel package
+load, most of it the fog-of-war logic-only proof that plays 50 generated
+Expert/Master boards to completion):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
   (uniqueness re-verified from scratch, cage partitions, parity, determinism,

@@ -65,6 +65,13 @@ public enum LaunchHooks {
                 defaults.double(forKey: "uiHookCubePitch"),
             )
         }
+
+        /// Play this many logic-only moves a few seconds after a fog-of-war
+        /// game starts, so reveals and the "fog lifts" cue can be screenshotted:
+        /// `-uiHookVariant fogofwar -uiHookDifficulty expert -uiHookFogMoves 3`.
+        public static var fogAutoplayMoves: Int {
+            UserDefaults.standard.integer(forKey: "uiHookFogMoves")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -74,5 +81,6 @@ public enum LaunchHooks {
         public static let openPaywall = false
         public static let selectCell: Int? = nil
         public static let cubePose: (yaw: Double, pitch: Double)? = nil
+        public static let fogAutoplayMoves = 0
     #endif
 }
