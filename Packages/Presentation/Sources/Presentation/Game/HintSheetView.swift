@@ -2,7 +2,8 @@ import Model
 import SwiftUI
 
 /// The hint explanation sheet: names the technique, explains the step, and
-/// offers to apply it (or reveal the selected cell instead).
+/// offers to apply it, reveal the selected cell instead, or open the
+/// technique's lesson.
 struct HintSheetView: View {
     let hint: Hint
     let variant: SudokuVariant
