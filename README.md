@@ -48,8 +48,8 @@ French localization.
   losses count), pause that hides the board, autosave on every move and on
   backgrounding, a clock that never counts suspended time, pinch-to-zoom and
   pan on boards larger than 9×9, Fog of War reveal (seeded windows; each
-  correct digit clears its neighborhood, or on Expert and Master its whole
-  row, column and box, with the fog lifting on its own whenever the visible
+  correct digit clears its neighborhood, or on Hard, Expert and Master its
+  whole row, column and box, with the fog lifting on its own whenever the visible
   board has no logical move), confetti on wins, a system-decided rating
   prompt after the confetti, haptics via `.sensoryFeedback`.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
@@ -239,9 +239,9 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 ## Testing
 
 Tests across four packages (`make test`, macOS host, 268 tests; the Domain
-suite alone runs ~2.5 min — 143–160 s under `make test`'s parallel package
-load, most of it the fog-of-war logic-only proof that plays 50 generated
-Expert/Master boards to completion):
+suite alone runs ~3 min — around 180 s under `make test`'s parallel package
+load, most of it the fog-of-war logic-only proof that plays 75 generated
+Hard/Expert/Master boards to completion):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
   (uniqueness re-verified from scratch, cage partitions, parity, determinism,

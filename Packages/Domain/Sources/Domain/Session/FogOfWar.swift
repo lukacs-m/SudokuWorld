@@ -1,8 +1,8 @@
 import Model
 
-/// The fog-of-war session rules. Beginner to Hard play the original
+/// The fog-of-war session rules. Beginner to Medium play the original
 /// mechanic: three seeded 3×3 windows, and a correct digit lifts the 3×3
-/// patch around itself. Expert and Master play "fair fog": more windows
+/// patch around itself. Hard, Expert and Master play "fair fog": more windows
 /// start visible, a correct digit lifts its whole row, column and box (the
 /// peers every advanced technique reads), and whenever the visible position
 /// has no logical step within the puzzle's grade the game lifts one more
@@ -12,21 +12,27 @@ enum FogOfWar {
     /// the never-stuck check is capped at the graded difficulty, the
     /// techniques the puzzle actually needs.
     static func isFair(_ puzzle: PuzzleDefinition) -> Bool {
-        puzzle.variant == .fogOfWar && puzzle.requestedDifficulty >= .expert
+        puzzle.variant == .fogOfWar && puzzle.requestedDifficulty >= .hard
     }
 
     static let classicWindowCount = 3
     /// Chosen from the logic-only simulation in `FogOfWarTests`: fewer
     /// windows leave most Expert/Master openings stuck before the first
-    /// move, more mostly just shrink the fog.
-    static let fairWindowCount = 5
+    /// move, more mostly just shrink the fog. Hard's shallower technique
+    /// cap starves logic sooner, so it needs one more window to keep the
+    /// auto-reveals per game at or below Expert's.
+    static func fairWindowCount(for difficulty: Difficulty) -> Int {
+        difficulty == .hard ? 6 : 5
+    }
 
     // MARK: - Starting windows
 
     /// The windows a fresh game starts with.
     static func initialWindows(for puzzle: PuzzleDefinition) -> Set<Int> {
         guard puzzle.variant == .fogOfWar else { return [] }
-        let count = isFair(puzzle) ? fairWindowCount : classicWindowCount
+        let count = isFair(puzzle)
+            ? fairWindowCount(for: puzzle.requestedDifficulty)
+            : classicWindowCount
         return seededWindows(for: puzzle, count: count)
     }
 
