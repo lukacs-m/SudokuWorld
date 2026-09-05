@@ -230,9 +230,9 @@ All copy lives in the string catalog.
 ## Localization
 
 `Packages/Presentation/Sources/Presentation/Resources/Localizable.xcstrings`
-carries **English and French** (~450 keys: UI, variant and technique names,
-hint explanations, notifications, paywall; only symbols and a few chart axis
-labels have no French entry). Shipping French-first is a
+carries **English and French** (~540 keys: UI, variant and technique names,
+hint explanations, lesson copy, notifications, paywall; only symbols and a few
+chart axis labels have no French entry). Shipping French-first is a
 `CFBundleDevelopmentRegion` flip in `project.yml`. Test at runtime with:
 
 ```bash
@@ -241,7 +241,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 268 tests; the Domain
+Tests across four packages (`make test`, macOS host, 275 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):
@@ -253,7 +253,8 @@ Hard/Expert/Master boards to completion):
   daily rotation (full-bucket coverage per cycle without repeats — 17 days
   accessible, 18 complex — accessible/complex pairing, next-appearance
   scan), technique finders on crafted grids, grader monotonicity, hint
-  engine, `GameSession` rules (mistakes, hardcore loss, undo restoring
+  engine, `TechniqueFigureTests` (every lesson figure replayed through the
+  solver ladder), `GameSession` rules (mistakes, hardcore loss, undo restoring
   auto-cleaned notes, pause/resume clock math), `GameCenterIDs` matrix
   (84/88/16, prefix, no duplicates), achievement evaluator (all 16),
   stats/streak edge cases.
@@ -269,7 +270,8 @@ Hard/Expert/Master boards to completion):
   overlay layout, variant glyphs, cube geometry (bent lines straight over
   each fold, tap ray-cast, settle, zoom clamp), cube face texture rendering
   off the main actor (highlight blending over the cell background, given and
-  note ink).
+  note ink); `LessonCatalogTests` (technique coverage, rank order, English and
+  French key presence).
 - **Model** — note bitsets, board invariants, `Codable` roundtrips for
   puzzles and settings.
 
