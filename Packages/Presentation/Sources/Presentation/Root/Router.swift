@@ -17,8 +17,19 @@ public struct GameLaunch: Hashable, Sendable {
 
     public let kind: Kind
 
+    /// A `.new` launch is normalised to the variant's nearest offered tier, so
+    /// no entry point (play again on a pre-update save, debug menu, launch
+    /// hook) can start a fresh game on a hidden tier.
     public init(kind: Kind) {
-        self.kind = kind
+        guard case let .new(variant, difficulty, mode) = kind else {
+            self.kind = kind
+            return
+        }
+        self.kind = .new(
+            variant: variant,
+            difficulty: variant.nearestOfferedDifficulty(to: difficulty),
+            mode: mode,
+        )
     }
 }
 

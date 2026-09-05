@@ -180,8 +180,11 @@ struct EventSeedsTests {
     }
 
     @Test func tredokuDailyMediumSnapsToEasy() {
-        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-07-04", variant: .tredoku) != .medium)
-        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-07-04", variant: .cube) != .expert)
+        // Dates chosen because their raw table pick really is Medium: tredoku
+        // does not offer it and lands on Easy (the tie with Hard resolves
+        // easier), while cube offers it and keeps it.
+        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-01-10", variant: .tredoku) == .easy)
+        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-01-10", variant: .cube) == .medium)
     }
 
     @Test func nextDailyResetIsUTCMidnight() {
