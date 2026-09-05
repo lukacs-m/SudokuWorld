@@ -95,7 +95,7 @@ public struct Grader: Sendable {
         case ..<1: .beginner // naked singles only
         case 1: .easy // hidden singles
         case 2 ... 4: .medium // pairs, cage arithmetic
-        case 5 ... 9: .hard // locked candidates, triples, x-wing
+        case 5 ... 9: .hard // locked candidates, bent lines, triples, x-wing
         case 10 ... 11: .expert // swordfish, xy-wing
         default: .master // xy-chains
         }

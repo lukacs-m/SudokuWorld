@@ -15,7 +15,8 @@ enum TechniqueLadder {
     }
 
     /// Easiest first. Locked candidates yields pointing (5) or box-line (6);
-    /// the grade bands never split that pair, so one gate covers both.
+    /// the grade bands never split that pair, so one gate covers both. The
+    /// bent-line lock is pointing over a fold, so it rides at the same gate.
     private static let rungs: [Rung] = [
         Rung(gate: Technique.nakedSingle.rank) { Techniques.nakedSingle(in: $0) },
         Rung(gate: Technique.hiddenSingle.rank) { Techniques.hiddenSingle(in: $0) },
@@ -25,6 +26,7 @@ enum TechniqueLadder {
         Rung(gate: Technique.cageArithmetic.rank) { Techniques.cageArithmetic(in: $0) },
         Rung(gate: Technique.arrowArithmetic.rank) { Techniques.arrowArithmetic(in: $0) },
         Rung(gate: Technique.pointingPair.rank) { Techniques.lockedCandidates(in: $0) },
+        Rung(gate: Technique.bentLine.rank) { Techniques.bentLineLock(in: $0) },
         Rung(gate: Technique.nakedTriple.rank) { Techniques.nakedSubset(in: $0, subsetSize: 3) },
         Rung(gate: Technique.hiddenTriple.rank) { Techniques.hiddenSubset(in: $0, subsetSize: 3) },
         Rung(gate: Technique.xWing.rank) { Techniques.xWing(in: $0) },

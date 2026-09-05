@@ -1740,6 +1740,23 @@
         }
       }
     },
+    "hint.technique.bentLine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On the highlighted face, %1$@ only fits along one line. That line continues over the fold, so %1$@ can be removed from its cells on the neighbouring face."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sur la face surlignée, %1$@ ne peut se placer que sur une seule ligne. Cette ligne se prolonge au-delà du pli : %1$@ peut donc être retiré de ses cases sur la face voisine."
+          }
+        }
+      }
+    },
     "hint.technique.boxLineReduction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5835,6 +5852,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arithmétique de flèche"
+          }
+        }
+      }
+    },
+    "technique.bentLine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bent-Line Lock"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrou de ligne pliée"
           }
         }
       }
