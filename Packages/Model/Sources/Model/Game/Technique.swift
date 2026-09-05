@@ -14,6 +14,7 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
     case outsideClueAnalysis = "outsideClueAnalysis"
     case pointingPair = "pointingPair"
     case boxLineReduction = "boxLineReduction"
+    case bentLine = "bentLine"
     case nakedTriple = "nakedTriple"
     case hiddenTriple = "hiddenTriple"
     case xWing = "xWing"
@@ -40,6 +41,8 @@ public enum Technique: String, CaseIterable, Equatable, Sendable, Codable {
         case .outsideClueAnalysis: 9
         case .pointingPair: 5
         case .boxLineReduction: 6
+        // Pointing across a fold is the same spotting work as a pointing pair.
+        case .bentLine: 5
         case .nakedTriple: 7
         case .hiddenTriple: 8
         case .xWing: 9
