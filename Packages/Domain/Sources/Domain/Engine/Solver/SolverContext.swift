@@ -224,8 +224,8 @@ struct SolverContext {
             }
         }
         // Cliques (argyle's short diagonals, chess-move pairs) are
-        // pairwise-distinct only: they widen peer sets but never
-        // participate in house logic.
+        // pairwise-distinct only: they widen peer sets. Bent lines are the
+        // one exception, read as house logic in `buildFoldFaces` below.
         for clique in topology.cliques {
             for cell in clique {
                 peerSets[cell].formUnion(clique)
