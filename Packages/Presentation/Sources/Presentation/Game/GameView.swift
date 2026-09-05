@@ -52,6 +52,9 @@ struct GameView: View {
             withAnimation(.easeOut(duration: 0.3)) {
                 showsFogLiftCue = true
             }
+            AccessibilityNotification
+                .Announcement(String(localized: "game.fogLifts", bundle: .module))
+                .post()
             fogLiftCueTask?.cancel()
             fogLiftCueTask = Task {
                 try? await Task.sleep(for: .seconds(2.5))
