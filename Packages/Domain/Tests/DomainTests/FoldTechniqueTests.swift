@@ -17,7 +17,7 @@ struct FoldTechniqueTests {
 
     @Test func locksDigitOutOfTheContinuationOnTheCube() {
         // Rows 1-2 of the front face hold 2...7, so digit 1 in that face is
-        // confined to row 0 — a line that continues onto the left face's
+        // confined to row 0, a line that continues onto the left face's
         // row 0 (the first fold met) and the right face's row 0.
         let front = CubeNet.Face.front
         let grid = grid(.cube, [
@@ -69,7 +69,7 @@ struct FoldTechniqueTests {
 
     /// Hard is genuinely reachable on the fold variants now: these seeds
     /// were vetted in a 30-seed sweep (cube 30/30 hard, tredoku 5/30) and
-    /// need the bent-line lock — nothing else in the hard band fires on
+    /// need the bent-line lock; nothing else in the hard band fires on
     /// faces-only topologies.
     @Test(arguments: [
         (SudokuVariant.cube, UInt64(1)), (.cube, 2), (.cube, 3),

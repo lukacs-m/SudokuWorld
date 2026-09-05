@@ -5,7 +5,7 @@ extension Techniques {
     /// every digit, so when a digit's candidates in a face all sit on one
     /// line that continues over the fold, the digit cannot appear in that
     /// line's continuation on the neighbouring face. Only this direction is
-    /// sound — a bent line is a clique, not a house, so a digit confined to
+    /// sound: a bent line is a clique, not a house, so a digit confined to
     /// one face *on the line* need not be on the line at all.
     static func bentLineLock(in grid: SolverGrid) -> SolveStep? {
         let context = grid.context
