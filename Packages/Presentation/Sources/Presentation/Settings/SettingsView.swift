@@ -74,6 +74,15 @@ struct SettingsView: View {
             toggle("settings.mistakeHighlighting", value: \.mistakeHighlighting)
             toggle("settings.autoCheck", value: \.autoCheck)
             toggle("settings.hardcoreDefault", value: \.hardcoreByDefault)
+            NavigationLink {
+                LearnView()
+            } label: {
+                Label {
+                    Text("settings.learn", bundle: .module)
+                } icon: {
+                    Image(systemName: "graduationcap")
+                }
+            }
         } header: {
             Text("settings.section.assistance", bundle: .module)
         } footer: {
@@ -272,15 +281,6 @@ struct SettingsView: View {
 
     private func aboutSection(theme: Theme) -> some View {
         Section {
-            NavigationLink {
-                LearnView()
-            } label: {
-                Label {
-                    Text("settings.learn", bundle: .module)
-                } icon: {
-                    Image(systemName: "graduationcap")
-                }
-            }
             Link(destination: Self.appStoreReviewURL) {
                 Label {
                     Text("settings.rate", bundle: .module)
