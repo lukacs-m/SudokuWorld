@@ -126,6 +126,7 @@ nonisolated enum CubeFaceRenderer {
         let cellSize = side / 3
         let givenFont = font(size: cellSize * 0.55, semibold: true)
         let playerFont = font(size: cellSize * 0.55, semibold: false)
+        let noteFont = font(size: cellSize * 0.24, semibold: false)
         context.setFillColor(palette.cellBackground.cgColor)
         context.fill(CGRect(x: 0, y: 0, width: side, height: side))
 
@@ -163,7 +164,7 @@ nonisolated enum CubeFaceRenderer {
                     palette: palette,
                 )
             } else {
-                drawNotes(cell.notes, in: rect, context: context, palette: palette)
+                drawNotes(cell.notes, in: rect, font: noteFont, context: context, palette: palette)
             }
         }
 
@@ -210,11 +211,11 @@ nonisolated enum CubeFaceRenderer {
     private static func drawNotes(
         _ notes: [Int],
         in rect: CGRect,
+        font: CTFont,
         context: CGContext,
         palette: CubeFaceSnapshot.Palette,
     ) {
         let columns = VariantGlyphs.noteColumns(forSize: 9)
-        let font = font(size: rect.width * 0.24, semibold: false)
         for digit in notes where digit <= 9 {
             let column = (digit - 1) % columns
             let row = (digit - 1) / columns

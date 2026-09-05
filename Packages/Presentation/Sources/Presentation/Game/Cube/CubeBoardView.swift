@@ -198,8 +198,9 @@ final class CubeScene {
 
         // Quads overlap the edges by a hair so no seam shows between faces.
         let mesh = MeshResource.generatePlane(width: 3.01, height: 3.01)
+        let placeholder = Self.placeholder(for: state.snapshots.first?.palette)
         for face in CubeNet.Face.allCases {
-            let quad = ModelEntity(mesh: mesh, materials: [UnlitMaterial(color: .white)])
+            let quad = ModelEntity(mesh: mesh, materials: [placeholder])
             quad.position = CubeGeometry.facePosition(face)
             quad.orientation = CubeGeometry.faceOrientation(face)
             root.addChild(quad)
@@ -234,9 +235,6 @@ final class CubeScene {
                 guard !Task.isCancelled, let self else { return }
                 if let texture {
                     faces[face].model?.materials = [material(for: texture)]
-                } else {
-                    // Releasing the slot lets the next apply retry this face.
-                    requested[face] = nil
                 }
                 untextured.remove(face)
                 showIfReady()
@@ -269,6 +267,13 @@ final class CubeScene {
             withName: nil,
             options: .init(semantic: .color),
         )
+    }
+
+    /// What a quad shows until its first texture lands - and keeps if that
+    /// render fails, so a face without a texture is flat and themed.
+    private static func placeholder(for palette: CubeFaceSnapshot.Palette?) -> UnlitMaterial {
+        guard let palette else { return UnlitMaterial(color: .white) }
+        return UnlitMaterial(color: .init(Color(palette.cellBackground)))
     }
 
     private func material(for texture: TextureResource) -> any RealityKit.Material {
