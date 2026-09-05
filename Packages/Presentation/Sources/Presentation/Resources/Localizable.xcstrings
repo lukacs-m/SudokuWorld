@@ -3242,13 +3242,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Relation marks between two neighbouring cells (Kropki dots, XV letters, inequality signs, consecutive bars) restrict which digits the pair can hold. Relation analysis keeps only the digits of one cell that have a compatible partner in the other. Where the variant uses a negative convention, a missing mark is a constraint too."
+            "value" : "Relation marks between two neighbouring cells (Kropki dots, XV letters, inequality signs, consecutive bars) restrict which digits the pair can hold, and a thermometer is a chain of such marks: digits strictly increase from the bulb, so each cell must be larger than the one before it and smaller than the one after. Relation analysis keeps only the digits of one cell that have a compatible partner in the other. Where the variant uses a negative convention, a missing mark is a constraint too."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les marques relationnelles entre deux cases voisines (points Kropki, lettres XV, signes d'inégalité, barres de consécutifs) limitent les chiffres que la paire peut contenir. L'analyse relationnelle ne garde, dans une case, que les chiffres qui ont un partenaire compatible dans l'autre. Quand la variante applique une convention négative, l'absence de marque est aussi une contrainte."
+            "value" : "Les marques relationnelles entre deux cases voisines (points Kropki, lettres XV, signes d'inégalité, barres de consécutifs) limitent les chiffres que la paire peut contenir, et un thermomètre est une chaîne de telles marques : les chiffres croissent strictement depuis le bulbe, donc chaque case doit être plus grande que la précédente et plus petite que la suivante. L'analyse relationnelle ne garde, dans une case, que les chiffres qui ont un partenaire compatible dans l'autre. Quand la variante applique une convention négative, l'absence de marque est aussi une contrainte."
           }
         }
       }
@@ -3293,13 +3293,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check every marked pair whenever one of its cells changes. A black dot needs a digit and its double; a white dot or bar needs consecutive digits; X and V need sums of 10 and 5; an inequality points at the smaller digit."
+            "value" : "Check every marked pair whenever one of its cells changes. A black dot needs a digit and its double; a white dot or bar needs consecutive digits; X and V need sums of 10 and 5; an inequality points at the smaller digit; along a thermometer, a cell can never be lower than its position from the bulb nor higher than 9 minus its distance from the tip."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérifiez chaque paire marquée dès qu'une de ses cases change. Un point noir exige un chiffre et son double ; un point blanc ou une barre exige des chiffres consécutifs ; X et V exigent des sommes de 10 et 5 ; une inégalité pointe vers le plus petit chiffre."
+            "value" : "Vérifiez chaque paire marquée dès qu'une de ses cases change. Un point noir exige un chiffre et son double ; un point blanc ou une barre exige des chiffres consécutifs ; X et V exigent des sommes de 10 et 5 ; une inégalité pointe vers le plus petit chiffre ; le long d'un thermomètre, une case ne peut jamais être plus basse que son rang depuis le bulbe ni plus haute que 9 moins sa distance à la pointe."
           }
         }
       }
