@@ -237,7 +237,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 253 tests; the Domain
+Tests across four packages (`make test`, macOS host, 259 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
