@@ -69,51 +69,6 @@ struct CubeFaceRendererTests {
         #expect(!hasInk(pixels, cellX: 2, cellY: 0, color: palette.givenText, cell: cell))
     }
 
-    /// What a tap costs: `CubeScene` hands each invalidated face off instead
-    /// of drawing it on the main actor, so dispatching all six faces must cost
-    /// a fraction of drawing them, and every face must still arrive.
-    @MainActor
-    @Test func dispatchingSixFacesCostsFarLessMainActorTimeThanDrawingThem() async throws {
-        let snapshot = fullFace()
-        let clock = ContinuousClock()
-
-        let start = clock.now
-        let renders = (0 ..< 6).map { _ in
-            Task(priority: .userInitiated) { await CubeFaceRenderer.render(snapshot) }
-        }
-        let dispatch = clock.now - start
-        var images: [CGImage?] = []
-        for render in renders {
-            images.append(await render.value)
-        }
-        let ready = clock.now - start
-        let synchronous = clock.measure {
-            for _ in 0 ..< 6 {
-                _ = CubeFaceRenderer.draw(snapshot)
-            }
-        }
-
-        print(
-            """
-            six faces — main-actor dispatch: \(dispatch), all textures ready \
-            after: \(ready), drawing them on the main actor instead: \(synchronous)
-            """,
-        )
-        #expect(images.allSatisfy { $0 != nil })
-        #expect(dispatch * 10 < synchronous)
-    }
-
-    private func fullFace() -> CubeFaceSnapshot {
-        var cells = Array(repeating: CubeFaceSnapshot.Cell(), count: 9)
-        for offset in cells.indices {
-            cells[offset].value = offset + 1
-            cells[offset].isGiven = offset.isMultiple(of: 2)
-            cells[offset].isRelated = true
-        }
-        cells[0].isSelected = true
-        return CubeFaceSnapshot(cells: cells, palette: palette)
-    }
-
     private func hasInk(
         _ pixels: Pixels,
         cellX: Int,

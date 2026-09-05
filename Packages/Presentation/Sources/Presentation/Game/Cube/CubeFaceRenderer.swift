@@ -104,7 +104,8 @@ nonisolated enum CubeFaceRenderer {
 
     @concurrent
     static func render(_ snapshot: CubeFaceSnapshot) async -> CGImage? {
-        draw(snapshot)
+        guard !Task.isCancelled else { return nil }
+        return draw(snapshot)
     }
 
     static func draw(_ snapshot: CubeFaceSnapshot) -> CGImage? {
