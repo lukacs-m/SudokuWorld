@@ -13,6 +13,12 @@ struct VariantCatalogTests {
         #expect(VariantCatalog.badge(for: .classic) == .popular)
     }
 
+    @Test func difficultyStepListsOnlyTheOfferedTiers() {
+        #expect(VariantCatalog.difficulties(for: .tredoku) == [.beginner, .easy, .hard])
+        #expect(VariantCatalog.difficulties(for: .cube) == [.beginner, .easy, .medium, .hard])
+        #expect(VariantCatalog.difficulties(for: .classic) == Difficulty.allCases)
+    }
+
     @Test func everyVariantAppearsInExactlyOneSection() {
         let listed = VariantCatalog.sections.flatMap(\.variants)
         #expect(listed.count == SudokuVariant.allCases.count)

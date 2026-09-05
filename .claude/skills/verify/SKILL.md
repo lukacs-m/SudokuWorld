@@ -27,6 +27,7 @@ xcrun simctl terminate $SIM com.mlukacs.sudokuWorld 2>/dev/null
 # Straight into a game (slugs = SudokuVariant / Difficulty raw values):
 xcrun simctl launch $SIM com.mlukacs.sudokuWorld -uiHookVariant littlekiller -uiHookDifficulty easy
 # Or open the New Game sheet: ... -uiHookNewGameSheet YES
+#   straight to its difficulty step: ... -uiHookNewGameSheet YES -uiHookDifficultyStep tredoku
 # Fog of War: ... -uiHookVariant fogofwar -uiHookDifficulty expert -uiHookFogMoves 5
 #   plays N logic-only moves 3 s after the board appears (reveals + "fog lifts" cue).
 sleep 6   # let generation finish before screenshotting

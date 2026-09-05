@@ -39,6 +39,12 @@ public enum LaunchHooks {
             UserDefaults.standard.string(forKey: "uiHookRules")
         }
 
+        /// Jump to the difficulty step of the New Game sheet for a variant:
+        /// `-uiHookNewGameSheet YES -uiHookDifficultyStep <variant-slug>`.
+        public static var difficultyStepVariant: String? {
+            UserDefaults.standard.string(forKey: "uiHookDifficultyStep")
+        }
+
         /// Present the paywall immediately on the home screen:
         /// `-uiHookPaywall YES`.
         public static var openPaywall: Bool {
@@ -101,6 +107,7 @@ public enum LaunchHooks {
         public static let initialTab: String? = nil
         public static let seedStats = false
         public static let rulesVariant: String? = nil
+        public static let difficultyStepVariant: String? = nil
         public static let openPaywall = false
         public static let selectCell: Int? = nil
         public static let cubePose: (yaw: Double, pitch: Double)? = nil

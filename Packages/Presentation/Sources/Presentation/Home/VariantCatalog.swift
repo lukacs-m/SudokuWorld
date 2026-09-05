@@ -32,6 +32,11 @@ enum VariantCatalog {
         }
     }
 
+    /// The tiers the difficulty step lists for `variant`.
+    static func difficulties(for variant: SudokuVariant) -> [Difficulty] {
+        variant.offeredDifficulties
+    }
+
     /// Curated, not derived: badges are merchandising, moved by hand as the
     /// catalog evolves.
     static func badge(for variant: SudokuVariant) -> Badge? {

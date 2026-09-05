@@ -85,6 +85,12 @@ struct NewGameSheet: View {
                     variant = hooked
                     showRules = true
                 }
+                if let slug = LaunchHooks.difficultyStepVariant,
+                   let hooked = SudokuVariant(rawValue: slug)
+                {
+                    variant = hooked
+                    openDifficultyStep()
+                }
             #endif
         }
         #if os(iOS)
@@ -155,7 +161,7 @@ struct NewGameSheet: View {
                     moduleString("variant.\(variant.slug)"),
                 ),
             ) {
-                showDifficulty = true
+                openDifficultyStep()
             }
 
         case let .playToday(slot):
@@ -185,6 +191,12 @@ struct NewGameSheet: View {
 
     // MARK: - Step 2 · difficulty
 
+    /// The tier picked for a previous variant may be hidden for this one.
+    private func openDifficultyStep() {
+        difficulty = variant.nearestOfferedDifficulty(to: difficulty)
+        showDifficulty = true
+    }
+
     private func difficultyStep(theme: Theme) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -192,7 +204,7 @@ struct NewGameSheet: View {
                     .font(.subheadline)
                     .foregroundStyle(theme.textSecondary)
                 VStack(spacing: 8) {
-                    ForEach(Difficulty.allCases, id: \.self) { candidate in
+                    ForEach(VariantCatalog.difficulties(for: variant), id: \.self) { candidate in
                         difficultyRow(candidate, theme: theme)
                     }
                 }

@@ -94,13 +94,15 @@ public enum EventSeeds {
     }
 
     /// Difficulty weighted toward the easy end so dailies stay broadly
-    /// playable; classic gets the wider beginner...hard band.
+    /// playable; classic gets the wider beginner...hard band. A tier the
+    /// variant does not offer snaps to its nearest offered one, which keeps
+    /// every fully-offered variant's history byte-for-byte unchanged.
     static func dailyDifficulty(dateKey: String, variant: SudokuVariant) -> Difficulty {
         let table: [Difficulty] = variant == .classic
             ? [.beginner, .easy, .easy, .medium, .medium, .hard]
             : [.easy, .easy, .medium, .medium, .hard]
         let index = Int(fnv1a("dailydiff:\(dateKey):\(variant.slug)") % UInt64(table.count))
-        return table[index]
+        return variant.nearestOfferedDifficulty(to: table[index])
     }
 
     /// Whole days between the fixed rotation epoch (2026-01-01 UTC) and the
@@ -169,7 +171,8 @@ public enum EventSeeds {
             (.killer, .hard),
         ]
         let index = Int(fnv1a("weekly:\(weekKey)") % UInt64(rotation.count))
-        return rotation[index]
+        let (variant, difficulty) = rotation[index]
+        return (variant, variant.nearestOfferedDifficulty(to: difficulty))
     }
 
     /// The end of the ISO week containing `date` (next Monday 00:00 UTC).
