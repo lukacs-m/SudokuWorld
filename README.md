@@ -228,9 +228,9 @@ All copy lives in the string catalog.
 ## Localization
 
 `Packages/Presentation/Sources/Presentation/Resources/Localizable.xcstrings`
-carries **English and French** (~450 keys: UI, variant and technique names,
-hint explanations, notifications, paywall; only symbols and a few chart axis
-labels have no French entry). Shipping French-first is a
+carries **English and French** (~540 keys: UI, variant and technique names,
+hint explanations, lesson copy, notifications, paywall; only symbols and a few
+chart axis labels have no French entry). Shipping French-first is a
 `CFBundleDevelopmentRegion` flip in `project.yml`. Test at runtime with:
 
 ```bash
@@ -239,7 +239,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 253 tests; the Domain
+Tests across four packages (`make test`, macOS host, 260 tests; the Domain
 suite alone runs ~50 s):
 
 - **Domain** — solver correctness on known fixtures, per-variant generation
@@ -249,7 +249,8 @@ suite alone runs ~50 s):
   daily rotation (full-bucket coverage per cycle without repeats — 17 days
   accessible, 18 complex — accessible/complex pairing, next-appearance
   scan), technique finders on crafted grids, grader monotonicity, hint
-  engine, `GameSession` rules (mistakes, hardcore loss, undo restoring
+  engine, `TechniqueFigureTests` (every lesson figure replayed through the
+  solver ladder), `GameSession` rules (mistakes, hardcore loss, undo restoring
   auto-cleaned notes, pause/resume clock math), `GameCenterIDs` matrix
   (84/88/16, prefix, no duplicates), achievement evaluator (all 16),
   stats/streak edge cases.
@@ -263,7 +264,8 @@ suite alone runs ~50 s):
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall
   flows, premium theme gating, events hub; board zoom clamping, outside-clue
   overlay layout, variant glyphs, cube geometry (bent lines straight over
-  each fold, tap ray-cast, settle, zoom clamp).
+  each fold, tap ray-cast, settle, zoom clamp); `LessonCatalogTests`
+  (technique coverage, rank order, English and French key presence).
 - **Model** — note bitsets, board invariants, `Codable` roundtrips for
   puzzles and settings.
 
