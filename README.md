@@ -237,7 +237,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 261 tests; the Domain
+Tests across four packages (`make test`, macOS host, 262 tests; the Domain
 suite alone runs ~2.5 min — 143–160 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 50 generated
 Expert/Master boards to completion):
@@ -263,7 +263,9 @@ Expert/Master boards to completion):
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall
   flows, premium theme gating, events hub; board zoom clamping, outside-clue
   overlay layout, variant glyphs, cube geometry (bent lines straight over
-  each fold, tap ray-cast, settle, zoom clamp).
+  each fold, tap ray-cast, settle, zoom clamp), cube face texture rendering
+  off the main actor (highlight blending over the cell background, given and
+  note ink).
 - **Model** — note bitsets, board invariants, `Codable` roundtrips for
   puzzles and settings.
 
