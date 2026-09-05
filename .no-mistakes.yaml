@@ -1,0 +1,3 @@
+# Pin the pipeline's Test step to the real suite; without this it fell back to an open-ended agent sweep that timed out.
+commands:
+  test: 'make test'
