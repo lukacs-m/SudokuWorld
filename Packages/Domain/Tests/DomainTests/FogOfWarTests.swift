@@ -118,15 +118,6 @@ struct FogOfWarTests {
         )
     }
 
-    /// The easiest logical placement available in the visible position.
-    private func logicalPlacement(_ session: GameSession) -> (cell: Int, digit: Int)? {
-        FogOfWar.firstVisiblePlacement(
-            puzzle: session.puzzle,
-            board: session.board,
-            revealed: session.revealedCells,
-        )
-    }
-
     @Test func hardKeepsTheClassicMechanic() {
         var session = fairSession(difficulty: .hard)
         #expect(!FogOfWar.isFair(session.puzzle))
@@ -152,7 +143,7 @@ struct FogOfWarTests {
         #expect(session.revealedCells.isStrictSuperset(of: classicStart))
         #expect(session.revealedCells.count < 81)
 
-        guard let step = logicalPlacement(session) else {
+        guard let step = session.logicalFogPlacement() else {
             Issue.record("fresh fair game has no logical step")
             return
         }
@@ -166,7 +157,7 @@ struct FogOfWarTests {
     @Test func fairGamesNeverStartStuck() {
         for seed in 1 ... 10 as ClosedRange<UInt64> {
             let session = fairSession(difficulty: .master, seed: seed)
-            #expect(logicalPlacement(session) != nil, "seed \(seed)")
+            #expect(session.logicalFogPlacement() != nil, "seed \(seed)")
         }
     }
 
@@ -240,7 +231,7 @@ struct FogOfWarTests {
         // The same logic-only moves on both copies must lift exactly the
         // same fog, auto-reveals included.
         for _ in 0 ..< 8 {
-            guard let step = logicalPlacement(session) else {
+            guard let step = session.logicalFogPlacement() else {
                 Issue.record("stuck")
                 return
             }
@@ -263,7 +254,7 @@ struct FogOfWarTests {
 
     @Test func legacySavesRederiveUnderTheCurrentRules() {
         var session = fairSession()
-        guard let step = logicalPlacement(session) else {
+        guard let step = session.logicalFogPlacement() else {
             Issue.record("stuck")
             return
         }
@@ -290,7 +281,7 @@ struct FogOfWarTests {
         let rederived = GameSession(restoring: legacy)
         #expect(rederived.revealedCells.isSuperset(of: FogOfWar.initialWindows(for: session.puzzle)))
         #expect(rederived.revealedCells.isSuperset(of: FogOfWar.houses(of: step.cell, puzzle: session.puzzle)))
-        #expect(logicalPlacement(rederived) != nil)
+        #expect(rederived.logicalFogPlacement() != nil)
     }
 
     /// The proof: a logic-only player — always the easiest step the
@@ -303,7 +294,7 @@ struct FogOfWarTests {
         for seed in 1 ... 25 as ClosedRange<UInt64> {
             var session = fairSession(difficulty: difficulty, seed: seed)
             while !session.isSolved {
-                guard let step = logicalPlacement(session) else {
+                guard let step = session.logicalFogPlacement() else {
                     Issue.record("seed \(seed): stuck by logic with \(session.board.filledCount) cells")
                     break
                 }

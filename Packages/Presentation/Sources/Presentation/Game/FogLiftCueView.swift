@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// The small "the fog lifts" pill shown over the board when fair fog's
-/// never-stuck rule reveals a window on its own.
+/// The small "the fog lifts" pill shown in its own slot under the board —
+/// never covering cells — when fair fog's never-stuck rule reveals a window
+/// on its own.
 struct FogLiftCueView: View {
     let theme: Theme
 
