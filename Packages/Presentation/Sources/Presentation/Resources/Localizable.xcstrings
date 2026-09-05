@@ -1752,7 +1752,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sur la face surlignée, %1$@ ne peut se placer que sur une seule ligne. Cette ligne se prolonge au-delà du pli : %1$@ peut donc être retiré de ses cases sur la face voisine."
+            "value" : "Sur la face surlignée, %1$@ ne peut se placer que sur une seule ligne. Cette ligne se prolonge au-delà de la pliure : %1$@ peut donc être retiré de ses cases sur la face voisine."
           }
         }
       }
