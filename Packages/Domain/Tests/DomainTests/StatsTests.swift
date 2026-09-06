@@ -154,6 +154,24 @@ struct StatsAggregatorTests {
         #expect(overview.perVariant.first?.difficulty == .hard)
     }
 
+    @Test func historyOnAHiddenTierStaysVisible() {
+        // Tiers a fold variant no longer offers still have records from
+        // before they were hidden; aggregation must keep showing them.
+        let overview = aggregator.overview(
+            records: [
+                record(outcome: .won, variant: .tredoku, difficulty: .expert, duration: 400),
+                record(outcome: .won, variant: .cube, difficulty: .master, duration: 600),
+            ],
+            dailyCompletionKeys: [],
+            today: day("2026-07-04"),
+        )
+        #expect(overview.perVariant.count == 2)
+        #expect(overview.winRateByDifficulty.map(\.difficulty) == [.expert, .master])
+        #expect(overview.timesByDifficulty.map(\.fastest) == [400, 600])
+        let shared = overview.variantShares.map(\.variant).sorted { $0.slug < $1.slug }
+        #expect(shared == [.cube, .tredoku])
+    }
+
     @Test func gamesPerDayCoversThirtyDayWindow() {
         let overview = aggregator.overview(
             records: [
