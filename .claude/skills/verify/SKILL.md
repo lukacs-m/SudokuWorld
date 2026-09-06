@@ -9,9 +9,10 @@ The app is iOS 26-only. Use the iPhone 17 Pro simulator
 (`1E8D8069-8A97-47EE-9C99-A29A5A684394`), not the iOS 18 devices.
 There are no tap-automation tools on this machine (no idb/axe) — use the
 DEBUG-only launch hooks instead (`Packages/Common/Sources/Common/LaunchHooks.swift`,
-handled in `HomeView.handleLaunchHooks`, in-game ones in `GameView` and
-`HintSheetView`, except `-uiHookFogMoves`, which `GameViewModel.start` drives;
-compiled out of release builds).
+handled by whichever screen each one targets — e.g. `-uiHookVariant` in
+`HomeView.handleLaunchHooks`, `-uiHookDifficultyStep` in `NewGameSheet`,
+the in-game ones in `GameView` and `HintSheetView`, `-uiHookFogMoves` in
+`GameViewModel.start`; compiled out of release builds).
 
 ```bash
 SIM=1E8D8069-8A97-47EE-9C99-A29A5A684394
