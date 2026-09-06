@@ -89,7 +89,7 @@ struct NewGameSheet: View {
                    let hooked = SudokuVariant(rawValue: slug)
                 {
                     variant = hooked
-                    openDifficultyStep()
+                    showDifficulty = true
                 }
             #endif
         }
@@ -161,7 +161,7 @@ struct NewGameSheet: View {
                     moduleString("variant.\(variant.slug)"),
                 ),
             ) {
-                openDifficultyStep()
+                showDifficulty = true
             }
 
         case let .playToday(slot):
@@ -191,10 +191,11 @@ struct NewGameSheet: View {
 
     // MARK: - Step 2 · difficulty
 
-    /// The tier picked for a previous variant may be hidden for this one.
-    private func openDifficultyStep() {
-        difficulty = variant.nearestOfferedDifficulty(to: difficulty)
-        showDifficulty = true
+    /// `difficulty` remembers what the player last tapped, which the current
+    /// variant may not offer; only the tier shown and started is snapped, so
+    /// browsing a fold variant does not downgrade the remembered choice.
+    private var effectiveDifficulty: Difficulty {
+        variant.nearestOfferedDifficulty(to: difficulty)
     }
 
     private func difficultyStep(theme: Theme) -> some View {
@@ -228,12 +229,12 @@ struct NewGameSheet: View {
                 PrimaryButton(
                     verbatim: String(
                         format: String(localized: "newGame.startWith", bundle: .module),
-                        moduleString("difficulty.\(difficulty.slug)"),
+                        moduleString("difficulty.\(effectiveDifficulty.slug)"),
                     ),
                     systemImage: "play.fill",
                 ) {
                     dismiss()
-                    onStart(variant, difficulty, hardcore ? .hardcore : .normal)
+                    onStart(variant, effectiveDifficulty, hardcore ? .hardcore : .normal)
                 }
             }
         }
@@ -244,7 +245,7 @@ struct NewGameSheet: View {
     }
 
     private func difficultyRow(_ candidate: Difficulty, theme: Theme) -> some View {
-        let selected = candidate == difficulty
+        let selected = candidate == effectiveDifficulty
         let best = viewModel.bestTime(variant: variant, difficulty: candidate)
         return Button {
             difficulty = candidate

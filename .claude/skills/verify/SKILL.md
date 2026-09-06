@@ -27,6 +27,9 @@ xcrun simctl install $SIM "$APP"
 xcrun simctl terminate $SIM com.mlukacs.sudokuWorld 2>/dev/null
 # Straight into a game (slugs = SudokuVariant / Difficulty raw values):
 xcrun simctl launch $SIM com.mlukacs.sudokuWorld -uiHookVariant littlekiller -uiHookDifficulty easy
+#   A tier the variant does not offer is clamped in GameLaunch with nothing on
+#   screen saying so, e.g. `-uiHookVariant tredoku -uiHookDifficulty master`
+#   launches a Hard board — check SudokuVariant.offeredDifficulties first.
 # Or open the New Game sheet: ... -uiHookNewGameSheet YES
 #   straight to its difficulty step: ... -uiHookNewGameSheet YES -uiHookDifficultyStep tredoku
 # Fog of War: ... -uiHookVariant fogofwar -uiHookDifficulty expert -uiHookFogMoves 5
