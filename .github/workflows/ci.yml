@@ -43,8 +43,28 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen swiftformat swiftlint
 
+      # The preinstalled SwiftFormat version varies between runner images, and
+      # `brew install` is a no-op when one is present, so the format check would
+      # otherwise depend on which image the job lands on. Pin the exact release
+      # the sources are formatted with and put it ahead of the image's copy.
+      - name: Install pinned SwiftFormat
+        env:
+          SWIFTFORMAT_VERSION: 0.63.0
+          SWIFTFORMAT_SHA256: 28c7802e11fa5ae113d903066439c6bb1be20a8ac1ad9709c42616a7e273fb0f
+        run: |
+          curl -fsSL -o swiftformat.zip \
+            "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat.zip"
+          echo "${SWIFTFORMAT_SHA256}  swiftformat.zip" | shasum -a 256 -c -
+          mkdir -p "${RUNNER_TEMP}/swiftformat"
+          unzip -o -q swiftformat.zip -d "${RUNNER_TEMP}/swiftformat"
+          rm swiftformat.zip
+          echo "${RUNNER_TEMP}/swiftformat" >> "$GITHUB_PATH"
+
       - name: Check formatting
-        run: make format-check
+        run: |
+          which swiftformat
+          swiftformat --version
+          make format-check
 
       - name: Lint
         run: make lint
