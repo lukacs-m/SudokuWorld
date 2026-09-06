@@ -106,7 +106,7 @@ struct FogOfWarTests {
         }
     }
 
-    // MARK: - Fair fog (Expert and Master)
+    // MARK: - Fair fog (Hard, Expert and Master)
 
     private func fairSession(difficulty: Difficulty = .expert, seed: UInt64 = 3) -> GameSession {
         let puzzle = PuzzleGenerator().generateNow(variant: .fogOfWar, difficulty: difficulty, seed: seed)
@@ -118,8 +118,8 @@ struct FogOfWarTests {
         )
     }
 
-    @Test func hardKeepsTheClassicMechanic() {
-        var session = fairSession(difficulty: .hard)
+    @Test func mediumKeepsTheClassicMechanic() {
+        var session = fairSession(difficulty: .medium)
         #expect(!FogOfWar.isFair(session.puzzle))
         #expect(session.revealedCells == FogOfWar.seededWindows(for: session.puzzle, count: 3))
         #expect(session.fogAutoReveals == 0)
@@ -135,11 +135,18 @@ struct FogOfWarTests {
         #expect(session.revealedCells == before.union(FogOfWar.neighborhood(of: cell, puzzle: session.puzzle)))
     }
 
-    @Test(arguments: [Difficulty.expert, .master])
+    @Test(arguments: [Difficulty.hard, .expert, .master])
     func fairGamesStartWiderAndRevealWholeHouses(difficulty: Difficulty) {
         var session = fairSession(difficulty: difficulty)
         #expect(FogOfWar.isFair(session.puzzle))
         let classicStart = FogOfWar.seededWindows(for: session.puzzle, count: 3)
+        let fairStart = FogOfWar.seededWindows(
+            for: session.puzzle,
+            count: difficulty == .hard ? 6 : 5,
+        )
+        #expect(FogOfWar.initialWindows(for: session.puzzle) == fairStart)
+        // Not equality: the never-stuck rule can lift more before move one.
+        #expect(session.revealedCells.isSuperset(of: fairStart))
         #expect(session.revealedCells.isStrictSuperset(of: classicStart))
         #expect(session.revealedCells.count < 81)
 
@@ -167,7 +174,7 @@ struct FogOfWarTests {
     /// across all of those paths. A board that is provably stuck after one
     /// of them is not constructible from a generated puzzle, so this asserts
     /// the property rather than a specific failure.
-    @Test(arguments: [Difficulty.expert, .master])
+    @Test(arguments: [Difficulty.hard, .expert, .master])
     func shrinkingMovesKeepALogicalStepInView(difficulty: Difficulty) {
         for seed in 1 ... 6 as ClosedRange<UInt64> {
             var session = fairSession(difficulty: difficulty, seed: seed)
@@ -286,9 +293,9 @@ struct FogOfWarTests {
 
     /// The proof: a logic-only player — always the easiest step the
     /// technique ladder finds in the visible position, never a guess —
-    /// finishes every Expert and Master game. Prints the auto-reveal
+    /// finishes every Hard, Expert and Master game. Prints the auto-reveal
     /// counts the PR reports.
-    @Test(arguments: [Difficulty.expert, .master])
+    @Test(arguments: [Difficulty.hard, .expert, .master])
     func logicOnlyPlayerFinishesEveryFairGame(difficulty: Difficulty) {
         var autoReveals: [UInt64: Int] = [:]
         for seed in 1 ... 25 as ClosedRange<UInt64> {
