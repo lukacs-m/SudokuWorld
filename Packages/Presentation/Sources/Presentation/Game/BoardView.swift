@@ -372,16 +372,9 @@ private struct BoardRenderer {
     }
 
     private func drawNotes(_ context: GraphicsContext, cell: BoardCell, index: Int) {
-        let noteColumns = VariantGlyphs.noteColumns(forSize: topology.size)
-        let noteRows = (topology.size + noteColumns - 1) / noteColumns
         let rect = BoardDecorations.cellRect(index, topology: topology, cellSize: cellSize)
         for digit in cell.notes.digits where digit <= topology.size {
-            let column = (digit - 1) % noteColumns
-            let row = (digit - 1) / noteColumns
-            let point = CGPoint(
-                x: rect.minX + cellSize * (CGFloat(column) + 0.5) / CGFloat(noteColumns),
-                y: rect.minY + cellSize * (CGFloat(row) + 0.5) / CGFloat(noteRows),
-            )
+            let point = BoardDecorations.notePoint(for: digit, in: rect, size: topology.size)
             let glyph = VariantGlyphs.glyph(digit, for: session.puzzle.variant)
             let text = Text(glyph)
                 .font(.system(

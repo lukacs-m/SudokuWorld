@@ -3,8 +3,8 @@ import Foundation
 import Model
 import SwiftUI
 
-/// The home screen: continue, new game, daily challenge, and entries into
-/// events, stats, and settings.
+/// The home screen: continue, new game, daily challenge, the learning
+/// section, and entries into events, stats, and settings.
 struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var showNewGame = false
@@ -12,6 +12,11 @@ struct HomeView: View {
     @State private var softWall: SoftWallContext?
     @State private var hardcoreDefault = false
     @State private var launchHooksHandled = false
+    @State private var showLearn = false
+
+    #if DEBUG
+        @State private var hookLesson: Technique?
+    #endif
 
     @Environment(Router.self) private var router
     @Environment(ThemeStore.self) private var themeStore
@@ -48,6 +53,7 @@ struct HomeView: View {
                             difficulty: slot.difficulty,
                         )))
                     }
+                    LearnCard { showLearn = true }
                 } else {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -57,6 +63,14 @@ struct HomeView: View {
             .padding(20)
         }
         .background(theme.screenBackground)
+        .navigationDestination(isPresented: $showLearn) {
+            LearnView()
+        }
+        #if DEBUG
+        .navigationDestination(item: $hookLesson) { technique in
+            LessonView(technique: technique)
+        }
+        #endif
         .navigationTitle(Text("app.title", bundle: .module))
         .toolbarTitleDisplayMode(.inline)
         .task { await viewModel.refresh() }
@@ -114,6 +128,12 @@ struct HomeView: View {
             }
             if LaunchHooks.openPaywall {
                 showPaywall = true
+            }
+            if LaunchHooks.openLearn {
+                showLearn = true
+            }
+            if let slug = LaunchHooks.lessonTechnique {
+                hookLesson = Technique(rawValue: slug)
             }
             if let start = LaunchHooks.autostart,
                let variant = SudokuVariant(rawValue: start.variantSlug),

@@ -169,4 +169,17 @@ enum BoardDecorations {
         let rect = cellRect(index, topology: topology, cellSize: cellSize)
         return CGPoint(x: rect.midX, y: rect.midY)
     }
+
+    /// Where a pencil mark sits inside its cell: marks fill a small grid,
+    /// three per row on 9×9 boards and wider on big grids.
+    static func notePoint(for digit: Int, in rect: CGRect, size: Int) -> CGPoint {
+        let noteColumns = VariantGlyphs.noteColumns(forSize: size)
+        let noteRows = (size + noteColumns - 1) / noteColumns
+        let column = (digit - 1) % noteColumns
+        let row = (digit - 1) / noteColumns
+        return CGPoint(
+            x: rect.minX + rect.width * (CGFloat(column) + 0.5) / CGFloat(noteColumns),
+            y: rect.minY + rect.height * (CGFloat(row) + 0.5) / CGFloat(noteRows),
+        )
+    }
 }
