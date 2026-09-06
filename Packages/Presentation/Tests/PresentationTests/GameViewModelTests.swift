@@ -43,13 +43,12 @@ struct GameViewModelTests {
         #expect(viewModel.topology?.cellCount == 81)
     }
 
-    @Test func correctPlacementUpdatesBoardAndSchedulesAutosave() async throws {
+    @Test func correctPlacementUpdatesBoardAndSchedulesAutosave() async {
         let (saves, _) = registerBaseMocks()
-        let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
-            variant: .classic,
-            difficulty: .easy,
-            mode: .normal,
-        )))
+        let viewModel = GameViewModel(
+            launch: GameLaunch(kind: .new(variant: .classic, difficulty: .easy, mode: .normal)),
+            clock: ImmediateClock(),
+        )
         await viewModel.start()
 
         guard let session = viewModel.session else {
@@ -63,10 +62,9 @@ struct GameViewModelTests {
         #expect(viewModel.session?.board[index].value == session.puzzle.solution[index])
         #expect(viewModel.feedback?.result == .placed)
 
-        // The debounced autosave fires after ~500 ms.
-        try await Task.sleep(for: .milliseconds(900))
+        await viewModel.autosaveTask?.value
         let count = await saves.snapshots.count
-        #expect(count >= 1)
+        #expect(count == 1)
     }
 
     @Test func fogLiftCueFiresWhenTheNeverStuckRuleReveals() async {
@@ -122,7 +120,7 @@ struct GameViewModelTests {
         #expect(viewModel.session?.board[index].notes.contains(5) == true)
     }
 
-    @Test func hardcoreLossCompletesAsLost() async throws {
+    @Test func hardcoreLossCompletesAsLost() async {
         let (_, completions) = registerBaseMocks()
         let viewModel = GameViewModel(launch: GameLaunch(kind: .new(
             variant: .classic,
@@ -144,8 +142,7 @@ struct GameViewModelTests {
             viewModel.tapDigit(wrong)
             viewModel.eraseTapped()
         }
-        // The finish flow runs in a Task; give it a beat.
-        try await Task.sleep(for: .milliseconds(300))
+        await viewModel.completionTask?.value
 
         let outcomes = await completions.outcomes
         #expect(outcomes == [.lost])
@@ -156,7 +153,7 @@ struct GameViewModelTests {
         }
     }
 
-    @Test func solvingRunsCompletion() async throws {
+    @Test func solvingRunsCompletion() async {
         let (_, completions) = registerBaseMocks(
             startPuzzle: TestFixtures.almostSolvedPuzzle(),
         )
@@ -174,7 +171,7 @@ struct GameViewModelTests {
         let index = firstEmpty(session)
         viewModel.tapCell(index)
         viewModel.tapDigit(session.puzzle.solution[index])
-        try await Task.sleep(for: .milliseconds(300))
+        await viewModel.completionTask?.value
 
         let outcomes = await completions.outcomes
         #expect(outcomes == [.won])

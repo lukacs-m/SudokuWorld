@@ -55,14 +55,19 @@ public final class GameViewModel {
     @ObservationIgnored @Injected(\.settingsRepository) private var settingsRepository
 
     private let launch: GameLaunch
-    private var autosaveTask: Task<Void, Never>?
+    /// Drives the autosave debounce; tests inject an immediate clock.
+    private let clock: any Clock<Duration>
+    /// Exposed (not private) so tests can await them instead of sleeping.
+    private(set) var autosaveTask: Task<Void, Never>?
+    private(set) var completionTask: Task<Void, Never>?
     private var feedbackSequence = 0
     private var knownFogAutoReveals = 0
     /// Peer lookup for selection highlighting, derived from the topology.
     private var peersByCell: [[Int]] = []
 
-    public init(launch: GameLaunch) {
+    public init(launch: GameLaunch, clock: any Clock<Duration> = ContinuousClock()) {
         self.launch = launch
+        self.clock = clock
     }
 
     // MARK: - Derived state
@@ -215,10 +220,10 @@ public final class GameViewModel {
 
         switch result {
         case .solved:
-            Task { await finish(outcome: .won, now: now) }
+            completionTask = Task { await finish(outcome: .won, now: now) }
 
         case .hardcoreLoss:
-            Task { await finish(outcome: .lost, now: now) }
+            completionTask = Task { await finish(outcome: .lost, now: now) }
 
         default:
             break
@@ -322,8 +327,8 @@ public final class GameViewModel {
 
     private func scheduleAutosave() {
         autosaveTask?.cancel()
-        autosaveTask = Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(500))
+        autosaveTask = Task { [weak self, clock] in
+            try? await clock.sleep(for: .milliseconds(500))
             guard !Task.isCancelled, let self else { return }
             guard let session, !session.isOver else { return }
             await saveGame(session.savedGame(at: Date()))
