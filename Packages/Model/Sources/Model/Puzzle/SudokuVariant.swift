@@ -68,3 +68,27 @@ public enum SudokuVariant: String, CaseIterable, Equatable, Sendable, Codable {
         self == .evenOdd
     }
 }
+
+public extension SudokuVariant {
+    /// The tiers a player may be assigned, in ascending order. The fold
+    /// variants omit the tiers their honest grading cannot reach (the survey
+    /// behind PR 11), so no puzzle is served under a label it does not earn.
+    var offeredDifficulties: [Difficulty] {
+        switch self {
+        case .tredoku: [.beginner, .easy, .hard]
+        case .cube: [.beginner, .easy, .medium, .hard]
+        default: Difficulty.allCases
+        }
+    }
+
+    /// `difficulty` itself when offered, otherwise the closest offered tier by
+    /// rank; a tie resolves to the easier side so a puzzle is never harder
+    /// than its label.
+    func nearestOfferedDifficulty(to difficulty: Difficulty) -> Difficulty {
+        offeredDifficulties.min { lhs, rhs in
+            let lhsDistance = abs(lhs.rank - difficulty.rank)
+            let rhsDistance = abs(rhs.rank - difficulty.rank)
+            return lhsDistance != rhsDistance ? lhsDistance < rhsDistance : lhs < rhs
+        } ?? difficulty
+    }
+}

@@ -38,7 +38,12 @@ French localization.
   and master boards genuinely *require* their techniques (pinned by tests).
   Every generated puzzle is fully solvable by logic (that's also what
   guarantees a unique solution) and every hint names and explains its
-  technique.
+  technique. A variant only offers the tiers its honest grading reaches
+  (`SudokuVariant.offeredDifficulties`); the fold variants hide the rest, so
+  Tredoku offers Beginner, Easy and Hard, and Cube those three plus Medium. A
+  hidden tier never appears in the New Game sheet, and a daily or weekly
+  lineup that lands on one drops to the variant's nearest offered tier (ties
+  resolve toward the easier one, so a board is never harder than its label).
 - **Deterministic generation** — one seed produces a byte-identical puzzle on
   every device. The Daily Challenge derives its seed from the UTC date, so the
   whole world plays the same board.
@@ -159,7 +164,8 @@ Every identifier derives from `GameCenterIDs.prefix`
 Change the prefix there once and the whole matrix follows; a unit test pins
 the counts (84/88/16) so a rename can't silently desync. The in-app **Debug
 menu** (Debug builds → Settings → Debug) lists every ID for copy-paste,
-offers an achievement reset, and quick-plays any variant at medium.
+offers an achievement reset, and quick-plays any variant at medium (or the
+nearest tier it offers).
 
 **Leaderboards — 84 classic (non-recurring):** for each *curated* variant
 slug (`classic, mini6, killer, diagonal, windoku, evenodd, samurai` —
@@ -242,7 +248,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 275 tests; the Domain
+Tests across four packages (`make test`, macOS host, 287 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):

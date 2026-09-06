@@ -146,6 +146,47 @@ struct EventSeedsTests {
         #expect(EventSeeds.nextAppearance(of: .classic, after: "2026-07-04") == nil)
     }
 
+    @Test func dailySlotsNeverAssignAHiddenTier() {
+        // One full complex cycle covers every fold variant at least once.
+        let calendar = EventSeeds.utcCalendar
+        let epoch = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        var foldDays = 0
+        for offset in 0 ..< (2 * EventSeeds.complexRotation.count) {
+            let day = calendar.date(byAdding: .day, value: offset, to: epoch)!
+            for slot in EventSeeds.dailySlots(dateKey: EventSeeds.dailyDateKey(for: day)) {
+                #expect(slot.variant.offeredDifficulties.contains(slot.difficulty))
+                if slot.variant == .tredoku || slot.variant == .cube {
+                    foldDays += 1
+                }
+            }
+        }
+        #expect(foldDays == 4)
+    }
+
+    @Test func fullyOfferedVariantsKeepTheirDailyDifficulty() {
+        // The rotation table is the ground truth for every variant that
+        // offers all six tiers; only fold variants may be remapped.
+        for dateKey in ["2026-01-01", "2026-07-04", "2026-12-31", "2027-03-15"] {
+            for slot in EventSeeds.dailySlots(dateKey: dateKey)
+                where slot.variant.offeredDifficulties == Difficulty.allCases
+            {
+                let table: [Difficulty] = slot.variant == .classic
+                    ? [.beginner, .easy, .easy, .medium, .medium, .hard]
+                    : [.easy, .easy, .medium, .medium, .hard]
+                let hash = EventSeeds.fnv1a("dailydiff:\(dateKey):\(slot.variant.slug)")
+                #expect(slot.difficulty == table[Int(hash % UInt64(table.count))])
+            }
+        }
+    }
+
+    @Test func tredokuDailyMediumSnapsToEasy() {
+        // Dates chosen because their raw table pick really is Medium: tredoku
+        // does not offer it and lands on Easy (the tie with Hard resolves
+        // easier), while cube offers it and keeps it.
+        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-01-10", variant: .tredoku) == .easy)
+        #expect(EventSeeds.dailyDifficulty(dateKey: "2026-01-10", variant: .cube) == .medium)
+    }
+
     @Test func nextDailyResetIsUTCMidnight() {
         let reset = EventSeeds.nextDailyReset(after: noonUTC)
         #expect(EventSeeds.dailyDateKey(for: reset) == "2026-07-05")
@@ -165,6 +206,13 @@ struct EventSeedsTests {
         #expect(first.variant == second.variant)
         #expect(first.difficulty == second.difficulty)
         #expect(first.variant != .samurai)
+    }
+
+    @Test func weeklyPlanNeverAssignsAHiddenTier() {
+        for week in 1 ... 53 {
+            let plan = EventSeeds.weeklyPlan(weekKey: String(format: "2026-W%02d", week))
+            #expect(plan.variant.offeredDifficulties.contains(plan.difficulty))
+        }
     }
 
     @Test func weekEndFollowsWeekStart() {
