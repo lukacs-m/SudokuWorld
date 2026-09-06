@@ -2,10 +2,10 @@
 /// learning section: the digits and pencil marks on show, the cells the
 /// pattern is built from, and the placement or eliminations it yields.
 /// Positions are classic 9×9 grids (variant figures add their clue; the
-/// bent-line figure is a Tredoku net). Cells
-/// without declared candidates are unconstrained — the figure leaves them
-/// blank. A Domain test replays every figure through the solver ladder to
-/// prove the illustrated step is exactly what the engine would find.
+/// bent-line figure is a Tredoku net). Cells without declared candidates are
+/// unconstrained — the figure leaves them blank. A Domain test replays every
+/// figure through the solver ladder to prove the illustrated step is exactly
+/// what the engine would find.
 public struct TechniqueFigure: Equatable, Sendable {
     public let technique: Technique
     public let variant: SudokuVariant

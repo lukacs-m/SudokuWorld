@@ -20,9 +20,10 @@ enum LessonGroup: CaseIterable {
         }
     }
 
-    /// Ties (cage and arrow arithmetic share a rank) break on declaration
-    /// order — `sorted(by:)` is not guaranteed stable, so the index is part
-    /// of the comparison rather than an assumption about the sort.
+    /// Ties (pointing pair and bent-line lock; cage and arrow arithmetic)
+    /// break on declaration order — `sorted(by:)` is not guaranteed stable,
+    /// so the index is part of the comparison rather than an assumption
+    /// about the sort.
     var techniques: [Technique] {
         Technique.allCases
             .filter { $0.lessonGroup == self }
