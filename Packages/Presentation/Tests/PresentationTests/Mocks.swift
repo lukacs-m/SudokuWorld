@@ -318,3 +318,30 @@ actor MockSettingsRepository: SettingsRepository {
         notifications = preferences
     }
 }
+
+/// A clock whose sleeps return at once, so debounced work runs without
+/// real-time waiting.
+nonisolated struct ImmediateClock: Clock {
+    struct Instant: InstantProtocol {
+        var offset: Duration = .zero
+
+        func advanced(by duration: Duration) -> Instant {
+            Instant(offset: offset + duration)
+        }
+
+        func duration(to other: Instant) -> Duration {
+            other.offset - offset
+        }
+
+        static func < (lhs: Instant, rhs: Instant) -> Bool {
+            lhs.offset < rhs.offset
+        }
+    }
+
+    var now: Instant { Instant() }
+    var minimumResolution: Duration { .zero }
+
+    func sleep(until _: Instant, tolerance _: Duration?) async throws {
+        try Task.checkCancellation()
+    }
+}
