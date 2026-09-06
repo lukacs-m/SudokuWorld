@@ -2454,6 +2454,74 @@
         }
       }
     },
+    "learn.bentLine.definition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bent line is a row or column that continues over a fold onto the neighbouring face, and no digit may repeat along it. Each face must hold every digit, so when a digit's only candidates on a face all lie on one bent line, the digit is locked into the face's part of that line and can be removed from the line's continuation on the neighbouring face. It is the pointing pair carried across a fold, and it only works in this direction: the bent line as a whole need not contain every digit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une ligne pliée est une rangée ou une colonne qui se prolonge au-delà de la pliure sur la face voisine, et aucun chiffre ne peut s'y répéter. Chaque face doit contenir tous les chiffres : quand les seuls candidats d'un chiffre sur une face sont tous sur une même ligne pliée, ce chiffre est verrouillé dans la partie de la ligne qui appartient à la face et peut être retiré du prolongement de la ligne sur la face voisine. C'est la paire pointante transportée au-delà d'une pliure, et elle ne vaut que dans ce sens : la ligne pliée entière n'a pas à contenir tous les chiffres."
+          }
+        }
+      }
+    },
+    "learn.bentLine.figure" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Tredoku net of three faces: face A top-left, face B to its right, face C below. Rows 2 and 3 of face A hold 2 to 7, so digit 1 can only go in the three cells of its first row, which are highlighted. That row bends onto face B, whose first-row cells show a struck-through 1."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un patron de Tredoku à trois faces : la face A en haut à gauche, la face B à sa droite, la face C en dessous. Les rangées 2 et 3 de la face A contiennent 2 à 7, donc le chiffre 1 ne peut aller que dans les trois cases de sa première rangée, qui sont surlignées. Cette rangée se replie sur la face B, dont les cases de la première rangée affichent un 1 barré."
+          }
+        }
+      }
+    },
+    "learn.bentLine.tip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow the line with your finger over the fold: the digit lives on the near face's part of it, so it cannot sit on the far part."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivez la ligne du doigt au-delà de la pliure : le chiffre se trouve sur la partie de la face proche, il ne peut donc pas être sur la partie éloignée."
+          }
+        }
+      }
+    },
+    "learn.bentLine.where" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Cube and Tredoku have folds. Look at faces that are nearly full: for each missing digit, check whether its candidates on that face line up along a row or column that bends onto another face, then clean the continuation."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seuls Cube et Tredoku ont des pliures. Regardez les faces presque pleines : pour chaque chiffre manquant, vérifiez si ses candidats sur cette face s'alignent le long d'une rangée ou d'une colonne qui se replie sur une autre face, puis nettoyez le prolongement."
+          }
+        }
+      }
+    },
     "learn.boxLineReduction.definition" : {
       "extractionState" : "manual",
       "localizations" : {

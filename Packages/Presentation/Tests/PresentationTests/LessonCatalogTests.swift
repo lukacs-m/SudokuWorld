@@ -42,6 +42,10 @@ struct LessonCatalogTests {
             #expect(ranks == ranks.sorted(), "\(group) is not in rank order")
         }
         #expect(LessonGroup.basics.techniques == [.nakedSingle, .hiddenSingle])
+        #expect(LessonGroup.intermediate.techniques == [
+            .nakedPair, .hiddenPair, .pointingPair, .bentLine, .boxLineReduction,
+            .nakedTriple, .hiddenTriple,
+        ])
         #expect(LessonGroup.advanced.techniques == [.xWing, .swordfish, .xyWing, .xyChain])
         #expect(LessonGroup.variantSpecific.techniques
             == [.relationAnalysis, .cageArithmetic, .arrowArithmetic, .outsideClueAnalysis])

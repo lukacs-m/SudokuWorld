@@ -1,7 +1,8 @@
 /// A hand-built board position illustrating one solving technique for the
 /// learning section: the digits and pencil marks on show, the cells the
 /// pattern is built from, and the placement or eliminations it yields.
-/// Positions are classic 9×9 grids (variant figures add their clue). Cells
+/// Positions are classic 9×9 grids (variant figures add their clue; the
+/// bent-line figure is a Tredoku net). Cells
 /// without declared candidates are unconstrained — the figure leaves them
 /// blank. A Domain test replays every figure through the solver ladder to
 /// prove the illustrated step is exactly what the engine would find.
@@ -166,6 +167,20 @@ public extension TechniqueFigure {
             focusCells: [at(3, 0), at(3, 1)],
             regionCells: row(3) + box(3),
             eliminations: eliminate([6], at: [at(4, 2), at(5, 1)]),
+        ),
+        // Tredoku net (three 3×3 faces: A top-left, B to its right, C below;
+        // indices run row-major over the active cells, so face A is 0-2, 6-8,
+        // 12-14 and face B is 3-5, 9-11, 15-17). Rows 2-3 of face A hold 2…7,
+        // so digit 1 on face A is confined to its first row, a bent line that
+        // continues onto face B's first row.
+        TechniqueFigure(
+            technique: .bentLine,
+            variant: .tredoku,
+            givens: [6: 2, 7: 3, 8: 4, 12: 5, 13: 6, 14: 7],
+            candidates: [0: [1, 8, 9], 1: [1, 8, 9], 2: [1, 8, 9]],
+            focusCells: [0, 1, 2],
+            regionCells: [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14],
+            eliminations: eliminate([1], at: [3, 4, 5]),
         ),
         // {1,2}, {2,3}, {1,3} lock 1, 2, 3 into three cells of row 1.
         TechniqueFigure(

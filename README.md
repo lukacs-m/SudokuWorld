@@ -52,7 +52,7 @@ French localization.
   whole row, column and box, with the fog lifting on its own whenever the
   visible board has no logical move), confetti on wins, a system-decided
   rating prompt after the confetti, haptics via `.sensoryFeedback`.
-- **Learn** — a free, illustrated lesson for each of the engine's 16 solving
+- **Learn** — a free, illustrated lesson for each of the engine's 17 solving
   techniques (Naked Single to XY-Chain), reachable from Home, Settings, and the
   "Learn more" link on every technique hint; each figure is validated against
   the solver.

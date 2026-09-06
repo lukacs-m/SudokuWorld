@@ -37,7 +37,8 @@ extension Technique {
         switch self {
         case .nakedSingle, .hiddenSingle:
             .basics
-        case .nakedPair, .hiddenPair, .pointingPair, .boxLineReduction, .nakedTriple, .hiddenTriple:
+        case .nakedPair, .hiddenPair, .pointingPair, .bentLine, .boxLineReduction, .nakedTriple,
+             .hiddenTriple:
             .intermediate
         case .xWing, .swordfish, .xyWing, .xyChain:
             .advanced
