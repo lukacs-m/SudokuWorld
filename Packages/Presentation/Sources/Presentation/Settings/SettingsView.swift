@@ -334,6 +334,7 @@ private struct SupportIDRow: View {
     let theme: Theme
 
     @State private var copied = false
+    @State private var copiedResetTask: Task<Void, Never>?
 
     var body: some View {
         Button {
@@ -369,8 +370,13 @@ private struct SupportIDRow: View {
             UIPasteboard.general.string = supportID
         #endif
         withAnimation { copied = true }
-        Task {
+        AccessibilityNotification
+            .Announcement(String(localized: "settings.support.copied", bundle: .module))
+            .post()
+        copiedResetTask?.cancel()
+        copiedResetTask = Task {
             try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
             withAnimation { copied = false }
         }
     }
