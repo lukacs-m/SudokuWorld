@@ -347,25 +347,29 @@ private struct SupportIDRow: View {
         Button {
             copy()
         } label: {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Text("settings.support.id", bundle: .module)
-                        .foregroundStyle(theme.textPrimary)
-                    Spacer()
-                    if copied {
-                        Text("settings.support.copied", bundle: .module)
-                            .font(.caption)
-                            .foregroundStyle(theme.success)
-                    } else {
-                        Image(systemName: "doc.on.doc")
-                            .foregroundStyle(theme.textSecondary)
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack {
+                        Text("settings.support.id", bundle: .module)
+                            .foregroundStyle(theme.textPrimary)
+                        Spacer()
+                        if copied {
+                            Text("settings.support.copied", bundle: .module)
+                                .font(.caption)
+                                .foregroundStyle(theme.success)
+                        } else {
+                            Image(systemName: "doc.on.doc")
+                                .foregroundStyle(theme.textSecondary)
+                        }
                     }
+                    Text(supportID)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(theme.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
-                Text(supportID)
-                    .font(.caption.monospaced())
-                    .foregroundStyle(theme.textSecondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+            } icon: {
+                Image(systemName: "person.text.rectangle")
             }
         }
         .accessibilityLabel(Text("settings.support.id", bundle: .module))
