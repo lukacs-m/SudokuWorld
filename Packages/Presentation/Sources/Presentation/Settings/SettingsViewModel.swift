@@ -40,18 +40,16 @@ public final class SettingsViewModel {
     public init() {}
 
     public func load() async {
+        // Settings re-loads on every appearance; last session's restore
+        // feedback would otherwise greet the player out of context. A restore
+        // started from a previous appearance keeps running, so leave it alone.
+        if restorePhase != .restoring {
+            restorePhase = .idle
+        }
         settings = await settingsRepository.gameSettings()
         notifications = await settingsRepository.notificationPreferences()
         purchasesUserID = await getPurchasesUserID()
         isLoaded = true
-    }
-
-    /// The purchases SDK is configured by a launch task that can still be in
-    /// flight when Settings opens, so a nil ID is often just that race; the
-    /// view re-reads on every appearance until one comes back.
-    public func refreshSupportID() async {
-        guard purchasesUserID == nil else { return }
-        purchasesUserID = await getPurchasesUserID()
     }
 
     public func observeAuthState() async {

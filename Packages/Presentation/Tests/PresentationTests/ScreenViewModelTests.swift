@@ -229,24 +229,6 @@ struct SettingsViewModelTests {
         #expect(viewModel.purchasesUserID == nil)
     }
 
-    @Test func refreshRecoversTheUserIDWhenThePurchasesSDKConfiguresLate() async {
-        registerMocks()
-        let useCase = MockMutableGetPurchasesUserID()
-        Container.shared.getPurchasesUserIDUseCase.register { useCase }
-        let viewModel = SettingsViewModel()
-
-        await viewModel.load()
-        #expect(viewModel.purchasesUserID == nil)
-
-        useCase.id = "$RCAnonymousID:abc123"
-        await viewModel.refreshSupportID()
-        #expect(viewModel.purchasesUserID == "$RCAnonymousID:abc123")
-
-        useCase.id = nil
-        await viewModel.refreshSupportID()
-        #expect(viewModel.purchasesUserID == "$RCAnonymousID:abc123")
-    }
-
     @Test func freeThemeSelectsDirectly() async {
         registerMocks()
         let viewModel = SettingsViewModel()
@@ -317,6 +299,20 @@ struct SettingsViewModelTests {
 
         await viewModel.restore()
         #expect(viewModel.restorePhase == .nothingToRestore)
+    }
+
+    @Test func loadClearsStaleRestoreFeedback() async {
+        registerMocks()
+        Container.shared.restorePurchasesUseCase.register {
+            MockRestorePurchases(result: .success(.free))
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.restore()
+        #expect(viewModel.restorePhase == .nothingToRestore)
+
+        await viewModel.load()
+        #expect(viewModel.restorePhase == .idle)
     }
 
     @Test func restoreFailureIsSurfaced() async {

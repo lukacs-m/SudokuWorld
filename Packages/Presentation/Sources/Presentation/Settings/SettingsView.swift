@@ -43,7 +43,6 @@ struct SettingsView: View {
         .navigationTitle(Text("settings.title", bundle: .module))
         .task { await viewModel.load() }
         .task { await viewModel.observeAuthState() }
-        .onAppear { Task { await viewModel.refreshSupportID() } }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
         }
@@ -254,24 +253,14 @@ struct SettingsView: View {
         } header: {
             Text("settings.section.premium", bundle: .module)
         } footer: {
+            let feedback = viewModel.restorePhase.footerFeedback(theme: theme)
             // An always-present VStack would give the section a blank footer
             // (and its insets) when neither line has anything to say.
-            if viewModel.restorePhase.hasFooterFeedback || viewModel.purchasesUserID != nil {
+            if feedback != nil || viewModel.purchasesUserID != nil {
                 VStack(alignment: .leading, spacing: 4) {
-                    switch viewModel.restorePhase {
-                    case .restored:
-                        Text("paywall.restored", bundle: .module)
-                            .foregroundStyle(theme.success)
-
-                    case .nothingToRestore:
-                        Text("paywall.nothingToRestore", bundle: .module)
-
-                    case .failed:
-                        Text("paywall.restoreFailed", bundle: .module)
-                            .foregroundStyle(theme.conflict)
-
-                    case .idle, .restoring:
-                        EmptyView()
+                    if let feedback {
+                        Text(feedback.key, bundle: .module)
+                            .foregroundStyle(feedback.color)
                     }
                     if viewModel.purchasesUserID != nil {
                         Text("settings.support.footer", bundle: .module)
@@ -334,10 +323,14 @@ struct SettingsView: View {
 }
 
 private extension SettingsViewModel.RestorePhase {
-    var hasFooterFeedback: Bool {
+    /// The premium footer's only source of truth for restore feedback: nil
+    /// means the phase has nothing to say, so the footer collapses.
+    func footerFeedback(theme: Theme) -> (key: LocalizedStringKey, color: Color)? {
         switch self {
-        case .restored, .nothingToRestore, .failed: true
-        case .idle, .restoring: false
+        case .restored: ("paywall.restored", theme.success)
+        case .nothingToRestore: ("paywall.nothingToRestore", .secondary)
+        case .failed: ("paywall.restoreFailed", theme.conflict)
+        case .idle, .restoring: nil
         }
     }
 }
