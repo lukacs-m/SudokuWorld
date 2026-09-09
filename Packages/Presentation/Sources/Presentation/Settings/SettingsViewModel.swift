@@ -46,6 +46,14 @@ public final class SettingsViewModel {
         isLoaded = true
     }
 
+    /// The purchases SDK is configured by a launch task that can still be in
+    /// flight when Settings opens, so a nil ID is often just that race; the
+    /// view re-reads on every appearance until one comes back.
+    public func refreshSupportID() async {
+        guard purchasesUserID == nil else { return }
+        purchasesUserID = await getPurchasesUserID()
+    }
+
     public func observeAuthState() async {
         for await newState in observeAuth() {
             authState = newState

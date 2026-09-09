@@ -219,6 +219,16 @@ nonisolated struct MockGetPurchasesUserID: GetPurchasesUserIDUseCase {
     }
 }
 
+/// Reference semantics so a test can flip the ID after the view model has
+/// already resolved the use case — the late-SDK-configuration case.
+final class MockMutableGetPurchasesUserID: GetPurchasesUserIDUseCase, @unchecked Sendable {
+    var id: String?
+
+    func callAsFunction() async -> String? {
+        id
+    }
+}
+
 // MARK: - Stats & events mocks
 
 nonisolated struct MockComputeStats: ComputeStatsUseCase {

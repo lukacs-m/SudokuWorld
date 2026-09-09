@@ -43,6 +43,7 @@ struct SettingsView: View {
         .navigationTitle(Text("settings.title", bundle: .module))
         .task { await viewModel.load() }
         .task { await viewModel.observeAuthState() }
+        .onAppear { Task { await viewModel.refreshSupportID() } }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
         }
@@ -253,24 +254,28 @@ struct SettingsView: View {
         } header: {
             Text("settings.section.premium", bundle: .module)
         } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                switch viewModel.restorePhase {
-                case .restored:
-                    Text("paywall.restored", bundle: .module)
-                        .foregroundStyle(theme.success)
+            // An always-present VStack would give the section a blank footer
+            // (and its insets) when neither line has anything to say.
+            if viewModel.restorePhase.hasFooterFeedback || viewModel.purchasesUserID != nil {
+                VStack(alignment: .leading, spacing: 4) {
+                    switch viewModel.restorePhase {
+                    case .restored:
+                        Text("paywall.restored", bundle: .module)
+                            .foregroundStyle(theme.success)
 
-                case .nothingToRestore:
-                    Text("paywall.nothingToRestore", bundle: .module)
+                    case .nothingToRestore:
+                        Text("paywall.nothingToRestore", bundle: .module)
 
-                case .failed:
-                    Text("paywall.restoreFailed", bundle: .module)
-                        .foregroundStyle(theme.conflict)
+                    case .failed:
+                        Text("paywall.restoreFailed", bundle: .module)
+                            .foregroundStyle(theme.conflict)
 
-                case .idle, .restoring:
-                    EmptyView()
-                }
-                if viewModel.purchasesUserID != nil {
-                    Text("settings.support.footer", bundle: .module)
+                    case .idle, .restoring:
+                        EmptyView()
+                    }
+                    if viewModel.purchasesUserID != nil {
+                        Text("settings.support.footer", bundle: .module)
+                    }
                 }
             }
         }
@@ -324,6 +329,15 @@ struct SettingsView: View {
             set: { newValue in viewModel.update { $0[keyPath: keyPath] = newValue } },
         )) {
             Text(titleKey, bundle: .module)
+        }
+    }
+}
+
+private extension SettingsViewModel.RestorePhase {
+    var hasFooterFeedback: Bool {
+        switch self {
+        case .restored, .nothingToRestore, .failed: true
+        case .idle, .restoring: false
         }
     }
 }
