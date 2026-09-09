@@ -1,6 +1,9 @@
 import Foundation
 import Model
 import SwiftUI
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 /// Settings: input preferences, assistance toggles, notifications, themes,
 /// Game Center status, and purchases (paywall + restore).
@@ -227,38 +230,48 @@ struct SettingsView: View {
                         Image(systemName: "crown")
                     }
                 }
-                Button {
-                    Task { await viewModel.restore() }
-                } label: {
-                    HStack {
-                        Label {
-                            Text("paywall.restore", bundle: .module)
-                        } icon: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        if viewModel.restorePhase == .restoring {
-                            Spacer()
-                            ProgressView()
-                        }
+            }
+            Button {
+                Task { await viewModel.restore() }
+            } label: {
+                HStack {
+                    Label {
+                        Text("paywall.restore", bundle: .module)
+                    } icon: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    if viewModel.restorePhase == .restoring {
+                        Spacer()
+                        ProgressView()
                     }
                 }
-                .disabled(viewModel.restorePhase == .restoring)
+            }
+            .disabled(viewModel.restorePhase == .restoring)
+            if let supportID = viewModel.purchasesUserID {
+                SupportIDRow(supportID: supportID, theme: theme)
             }
         } header: {
             Text("settings.section.premium", bundle: .module)
         } footer: {
-            switch viewModel.restorePhase {
-            case .nothingToRestore:
-                Text("paywall.nothingToRestore", bundle: .module)
+            VStack(alignment: .leading, spacing: 4) {
+                switch viewModel.restorePhase {
+                case .restored:
+                    Text("paywall.restored", bundle: .module)
+                        .foregroundStyle(theme.success)
 
-            case .failed:
-                Text("paywall.restoreFailed", bundle: .module)
-                    .foregroundStyle(theme.conflict)
+                case .nothingToRestore:
+                    Text("paywall.nothingToRestore", bundle: .module)
 
-            case .idle, .restoring, .restored:
-                // A successful restore flips the section to the active
-                // crown through PremiumGate — no extra text needed.
-                EmptyView()
+                case .failed:
+                    Text("paywall.restoreFailed", bundle: .module)
+                        .foregroundStyle(theme.conflict)
+
+                case .idle, .restoring:
+                    EmptyView()
+                }
+                if viewModel.purchasesUserID != nil {
+                    Text("settings.support.footer", bundle: .module)
+                }
             }
         }
     }
@@ -311,6 +324,54 @@ struct SettingsView: View {
             set: { newValue in viewModel.update { $0[keyPath: keyPath] = newValue } },
         )) {
             Text(titleKey, bundle: .module)
+        }
+    }
+}
+
+/// The RevenueCat app user ID a player quotes to support; tapping copies it.
+private struct SupportIDRow: View {
+    let supportID: String
+    let theme: Theme
+
+    @State private var copied = false
+
+    var body: some View {
+        Button {
+            copy()
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text("settings.support.id", bundle: .module)
+                        .foregroundStyle(theme.textPrimary)
+                    Spacer()
+                    if copied {
+                        Text("settings.support.copied", bundle: .module)
+                            .font(.caption)
+                            .foregroundStyle(theme.success)
+                    } else {
+                        Image(systemName: "doc.on.doc")
+                            .foregroundStyle(theme.textSecondary)
+                    }
+                }
+                Text(supportID)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(theme.textSecondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+        }
+        .accessibilityLabel(Text("settings.support.id", bundle: .module))
+        .accessibilityValue(supportID)
+    }
+
+    private func copy() {
+        #if canImport(UIKit)
+            UIPasteboard.general.string = supportID
+        #endif
+        withAnimation { copied = true }
+        Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            withAnimation { copied = false }
         }
     }
 }

@@ -101,3 +101,20 @@ public struct RestorePurchases: RestorePurchasesUseCase {
         try await purchases.restore()
     }
 }
+
+/// The purchases user ID a player quotes to support (nil without a real key).
+public protocol GetPurchasesUserIDUseCase: Sendable {
+    func callAsFunction() async -> String?
+}
+
+public struct GetPurchasesUserID: GetPurchasesUserIDUseCase {
+    private let purchases: any PurchasesService
+
+    public init(purchases: any PurchasesService) {
+        self.purchases = purchases
+    }
+
+    public func callAsFunction() async -> String? {
+        await purchases.appUserID()
+    }
+}

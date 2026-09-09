@@ -27,9 +27,12 @@ public final class SettingsViewModel {
     public private(set) var notificationsDenied = false
     public private(set) var isLoaded = false
     public private(set) var restorePhase: RestorePhase = .idle
+    /// Nil when the purchases SDK is unconfigured; Settings hides the row.
+    public private(set) var purchasesUserID: String?
 
     @ObservationIgnored @Injected(\.settingsRepository) private var settingsRepository
     @ObservationIgnored @Injected(\.restorePurchasesUseCase) private var restorePurchases
+    @ObservationIgnored @Injected(\.getPurchasesUserIDUseCase) private var getPurchasesUserID
     @ObservationIgnored @Injected(\.updateRemindersUseCase) private var updateReminders
     @ObservationIgnored @Injected(\.observeGameCenterAuthUseCase) private var observeAuth
     @ObservationIgnored @Injected(\.authenticateGameCenterUseCase) private var authenticateGC
@@ -39,6 +42,7 @@ public final class SettingsViewModel {
     public func load() async {
         settings = await settingsRepository.gameSettings()
         notifications = await settingsRepository.notificationPreferences()
+        purchasesUserID = await getPurchasesUserID()
         isLoaded = true
     }
 

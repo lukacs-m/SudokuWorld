@@ -108,6 +108,11 @@ public struct RevenueCatPurchasesService: PurchasesService {
         }
     }
 
+    public func appUserID() -> String? {
+        guard Purchases.isConfigured else { return nil }
+        return Purchases.shared.appUserID
+    }
+
     // MARK: - Mapping
 
     static func map(_ info: CustomerInfo) -> Entitlements {

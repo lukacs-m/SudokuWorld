@@ -211,6 +211,14 @@ nonisolated struct MockRestorePurchases: RestorePurchasesUseCase {
     }
 }
 
+nonisolated struct MockGetPurchasesUserID: GetPurchasesUserIDUseCase {
+    var id: String?
+
+    func callAsFunction() async -> String? {
+        id
+    }
+}
+
 // MARK: - Stats & events mocks
 
 nonisolated struct MockComputeStats: ComputeStatsUseCase {

@@ -207,6 +207,26 @@ struct SettingsViewModelTests {
         Container.shared.updateRemindersUseCase.register { MockUpdateReminders() }
         Container.shared.observeGameCenterAuthUseCase.register { MockObserveGameCenterAuth() }
         Container.shared.authenticateGameCenterUseCase.register { MockAuthenticateGameCenter() }
+        Container.shared.getPurchasesUserIDUseCase.register { MockGetPurchasesUserID() }
+    }
+
+    @Test func loadExposesThePurchasesUserID() async {
+        registerMocks()
+        Container.shared.getPurchasesUserIDUseCase.register {
+            MockGetPurchasesUserID(id: "$RCAnonymousID:abc123")
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.load()
+        #expect(viewModel.purchasesUserID == "$RCAnonymousID:abc123")
+    }
+
+    @Test func loadLeavesThePurchasesUserIDNilWhenUnavailable() async {
+        registerMocks()
+        let viewModel = SettingsViewModel()
+
+        await viewModel.load()
+        #expect(viewModel.purchasesUserID == nil)
     }
 
     @Test func freeThemeSelectsDirectly() async {
