@@ -1,9 +1,12 @@
 import Foundation
 import Model
 import SwiftUI
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 /// Settings: input preferences, assistance toggles, notifications, themes,
-/// Game Center status, and purchases (paywall + restore).
+/// Game Center status, and purchases (paywall, restore, support ID).
 struct SettingsView: View {
     // TODO: replace with the real App Store ID before release.
     private static let appStoreReviewURL =
@@ -227,38 +230,42 @@ struct SettingsView: View {
                         Image(systemName: "crown")
                     }
                 }
-                Button {
-                    Task { await viewModel.restore() }
-                } label: {
-                    HStack {
-                        Label {
-                            Text("paywall.restore", bundle: .module)
-                        } icon: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        if viewModel.restorePhase == .restoring {
-                            Spacer()
-                            ProgressView()
-                        }
+            }
+            Button {
+                Task { await viewModel.restore() }
+            } label: {
+                HStack {
+                    Label {
+                        Text("paywall.restore", bundle: .module)
+                    } icon: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    if viewModel.restorePhase == .restoring {
+                        Spacer()
+                        ProgressView()
                     }
                 }
-                .disabled(viewModel.restorePhase == .restoring)
+            }
+            .disabled(viewModel.restorePhase == .restoring)
+            if let supportID = viewModel.purchasesUserID {
+                SupportIDRow(supportID: supportID, theme: theme)
             }
         } header: {
             Text("settings.section.premium", bundle: .module)
         } footer: {
-            switch viewModel.restorePhase {
-            case .nothingToRestore:
-                Text("paywall.nothingToRestore", bundle: .module)
-
-            case .failed:
-                Text("paywall.restoreFailed", bundle: .module)
-                    .foregroundStyle(theme.conflict)
-
-            case .idle, .restoring, .restored:
-                // A successful restore flips the section to the active
-                // crown through PremiumGate — no extra text needed.
-                EmptyView()
+            let feedback = viewModel.restorePhase.footerFeedback(theme: theme)
+            // An always-present VStack would give the section a blank footer
+            // (and its insets) when neither line has anything to say.
+            if feedback != nil || viewModel.purchasesUserID != nil {
+                VStack(alignment: .leading, spacing: 4) {
+                    if let feedback {
+                        Text(feedback.key, bundle: .module)
+                            .foregroundStyle(feedback.color)
+                    }
+                    if viewModel.purchasesUserID != nil {
+                        Text("settings.support.footer", bundle: .module)
+                    }
+                }
             }
         }
     }
@@ -311,6 +318,77 @@ struct SettingsView: View {
             set: { newValue in viewModel.update { $0[keyPath: keyPath] = newValue } },
         )) {
             Text(titleKey, bundle: .module)
+        }
+    }
+}
+
+private extension SettingsViewModel.RestorePhase {
+    /// The premium footer's only source of truth for restore feedback: nil
+    /// means the phase has nothing to say, so the footer collapses.
+    func footerFeedback(theme: Theme) -> (key: LocalizedStringKey, color: Color)? {
+        switch self {
+        case .restored: ("paywall.restored", theme.success)
+        case .nothingToRestore: ("paywall.nothingToRestore", .secondary)
+        case .failed: ("paywall.restoreFailed", theme.conflict)
+        case .idle, .restoring: nil
+        }
+    }
+}
+
+/// The RevenueCat app user ID a player quotes to support; tapping copies it.
+private struct SupportIDRow: View {
+    let supportID: String
+    let theme: Theme
+
+    @State private var copied = false
+    @State private var copiedResetTask: Task<Void, Never>?
+
+    var body: some View {
+        Button {
+            copy()
+        } label: {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack {
+                        Text("settings.support.id", bundle: .module)
+                            .foregroundStyle(theme.textPrimary)
+                        Spacer()
+                        if copied {
+                            Text("settings.support.copied", bundle: .module)
+                                .font(.caption)
+                                .foregroundStyle(theme.success)
+                        } else {
+                            Image(systemName: "doc.on.doc")
+                                .foregroundStyle(theme.textSecondary)
+                        }
+                    }
+                    Text(supportID)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(theme.textSecondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            } icon: {
+                Image(systemName: "person.text.rectangle")
+            }
+        }
+        .accessibilityLabel(Text("settings.support.id", bundle: .module))
+        .accessibilityValue(supportID)
+    }
+
+    private func copy() {
+        #if canImport(UIKit)
+            UIPasteboard.general.string = supportID
+        #endif
+        withAnimation { copied = true }
+        AccessibilityNotification
+            .Announcement(String(localized: "settings.support.copied", bundle: .module))
+            .post()
+        copiedResetTask?.cancel()
+        copiedResetTask = Task {
+            try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
+            withAnimation { copied = false }
         }
     }
 }

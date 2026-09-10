@@ -207,6 +207,26 @@ struct SettingsViewModelTests {
         Container.shared.updateRemindersUseCase.register { MockUpdateReminders() }
         Container.shared.observeGameCenterAuthUseCase.register { MockObserveGameCenterAuth() }
         Container.shared.authenticateGameCenterUseCase.register { MockAuthenticateGameCenter() }
+        Container.shared.getPurchasesUserIDUseCase.register { MockGetPurchasesUserID() }
+    }
+
+    @Test func loadExposesThePurchasesUserID() async {
+        registerMocks()
+        Container.shared.getPurchasesUserIDUseCase.register {
+            MockGetPurchasesUserID(id: "$RCAnonymousID:abc123")
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.load()
+        #expect(viewModel.purchasesUserID == "$RCAnonymousID:abc123")
+    }
+
+    @Test func loadLeavesThePurchasesUserIDNilWhenUnavailable() async {
+        registerMocks()
+        let viewModel = SettingsViewModel()
+
+        await viewModel.load()
+        #expect(viewModel.purchasesUserID == nil)
     }
 
     @Test func freeThemeSelectsDirectly() async {
@@ -279,6 +299,20 @@ struct SettingsViewModelTests {
 
         await viewModel.restore()
         #expect(viewModel.restorePhase == .nothingToRestore)
+    }
+
+    @Test func loadClearsStaleRestoreFeedback() async {
+        registerMocks()
+        Container.shared.restorePurchasesUseCase.register {
+            MockRestorePurchases(result: .success(.free))
+        }
+        let viewModel = SettingsViewModel()
+
+        await viewModel.restore()
+        #expect(viewModel.restorePhase == .nothingToRestore)
+
+        await viewModel.load()
+        #expect(viewModel.restorePhase == .idle)
     }
 
     @Test func restoreFailureIsSurfaced() async {

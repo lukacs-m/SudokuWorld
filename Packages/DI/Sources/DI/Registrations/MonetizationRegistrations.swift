@@ -32,4 +32,8 @@ public extension Container {
     var restorePurchasesUseCase: Factory<any RestorePurchasesUseCase> {
         self { RestorePurchases(purchases: self.purchasesService()) }
     }
+
+    var getPurchasesUserIDUseCase: Factory<any GetPurchasesUserIDUseCase> {
+        self { GetPurchasesUserID(purchases: self.purchasesService()) }
+    }
 }

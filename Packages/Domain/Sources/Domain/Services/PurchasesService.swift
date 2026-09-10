@@ -13,6 +13,9 @@ public protocol PurchasesService: Sendable {
     func offerings() async throws -> PaywallOfferings
     func purchase(productID: String) async throws -> Entitlements
     func restore() async throws -> Entitlements
+    /// The store's identifier for this player, shown so support can look up a
+    /// purchase; nil while the SDK is unconfigured.
+    func appUserID() async -> String?
 }
 
 /// Product and entitlement identifiers shared between the adapter, the
