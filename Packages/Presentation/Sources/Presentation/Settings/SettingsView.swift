@@ -6,7 +6,7 @@ import SwiftUI
 #endif
 
 /// Settings: input preferences, assistance toggles, notifications, themes,
-/// Game Center status, and purchases (paywall + restore).
+/// Game Center status, and purchases (paywall, restore, support ID).
 struct SettingsView: View {
     // TODO: replace with the real App Store ID before release.
     private static let appStoreReviewURL =

@@ -84,7 +84,10 @@ French localization.
   monthly/annual/lifetime) unlocks unlimited variant play, the daily archive
   (free players can only resume a game they already started there), and
   premium themes. Soft wall with the variant's next daily date instead of
-  lock screens; paywall with restore and no dark patterns.
+  lock screens; paywall with restore and no dark patterns. Settings keeps
+  Restore Purchases available to every player, subscriber or not, next to a
+  copyable Support ID (the RevenueCat app user ID) to quote when reporting a
+  purchase problem.
 - **Polish** — 6 color themes (3 premium) with light/dark palettes (Midnight
   is always dark), a system/light/dark appearance override, full VoiceOver
   labels on every board cell, Dynamic Type, English + French string
@@ -226,7 +229,8 @@ incremental percent automatically:
 
 With a `REPLACE_ME` key, `configure()` is a no-op and purchase/restore throw
 `DomainError.purchasesUnavailable`, which the paywall renders as a friendly
-unavailable state — gameplay is never affected.
+unavailable state; Settings hides the Support ID row rather than showing an
+empty value — gameplay is never affected.
 
 ### Notifications
 
@@ -248,7 +252,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 287 tests; the Domain
+Tests across four packages (`make test`, macOS host, 290 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):
