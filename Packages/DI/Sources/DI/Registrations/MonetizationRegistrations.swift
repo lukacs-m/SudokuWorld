@@ -1,3 +1,4 @@
+import Common
 import Data
 public import Domain
 public import FactoryKit
@@ -5,8 +6,17 @@ public import FactoryKit
 /// Monetization wiring: purchases and entitlements.
 public extension Container {
     var purchasesService: Factory<any PurchasesService> {
-        self { RevenueCatPurchasesService() }
-            .singleton
+        self {
+            #if DEBUG
+                if LaunchHooks.forcePremium {
+                    return DebugPremiumOverridePurchasesService(
+                        wrapping: RevenueCatPurchasesService(),
+                    )
+                }
+            #endif
+            return RevenueCatPurchasesService()
+        }
+        .singleton
     }
 
     var configurePurchasesUseCase: Factory<any ConfigurePurchasesUseCase> {
