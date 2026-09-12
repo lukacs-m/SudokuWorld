@@ -34,6 +34,10 @@ xcrun simctl launch $SIM com.mlukacs.sudokuWorld -uiHookVariant littlekiller -ui
 #   straight to its difficulty step: ... -uiHookNewGameSheet YES -uiHookDifficultyStep tredoku
 # Fog of War: ... -uiHookVariant fogofwar -uiHookDifficulty expert -uiHookFogMoves 5
 #   plays N logic-only moves 3 s after the board appears (reveals + "fog lifts" cue).
+# Settings as a subscriber: ... -uiHookTab settings -uiHookPremium YES
+#   `-uiHookPremium YES` wraps the purchases service in DI so every entitlement
+#   read reports premium (active crown, Restore Purchases row); tapping Restore
+#   then renders the "Purchases restored" footer without a sandbox purchase.
 sleep 6   # let generation finish before screenshotting
 xcrun simctl io $SIM screenshot /path/to/shot.png
 ```

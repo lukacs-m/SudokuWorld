@@ -101,6 +101,13 @@ public enum LaunchHooks {
         public static var openHintLesson: Bool {
             UserDefaults.standard.bool(forKey: "uiHookHintLesson")
         }
+
+        /// Report the premium entitlement as active without a store purchase,
+        /// so the paywall-free branches (Settings crown, Restore footer) can be
+        /// screenshotted: `-uiHookPremium YES`.
+        public static var forcePremium: Bool {
+            UserDefaults.standard.bool(forKey: "uiHookPremium")
+        }
     #else
         public static let openNewGameSheet = false
         public static let autostart: (variantSlug: String, difficultySlug: String)? = nil
@@ -116,5 +123,6 @@ public enum LaunchHooks {
         public static let lessonTechnique: String? = nil
         public static let openHint = false
         public static let openHintLesson = false
+        public static let forcePremium = false
     #endif
 }
