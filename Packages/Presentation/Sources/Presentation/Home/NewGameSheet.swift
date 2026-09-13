@@ -304,8 +304,8 @@ struct NewGameSheet: View {
                 result[candidate] = String(
                     format: String(localized: "catalog.dailyOn", bundle: .module),
                     withinAWeek
-                        ? date.formatted(.dateTime.weekday(.abbreviated))
-                        : date.formatted(.dateTime.month(.abbreviated).day()),
+                        ? date.formatted(DailyDayGrid.labelFormat.weekday(.abbreviated))
+                        : date.formatted(DailyDayGrid.labelFormat.month(.abbreviated).day()),
                 )
             }
         }

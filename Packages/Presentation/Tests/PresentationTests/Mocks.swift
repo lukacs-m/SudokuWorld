@@ -224,7 +224,7 @@ nonisolated struct MockGetPurchasesUserID: GetPurchasesUserIDUseCase {
 nonisolated struct MockComputeStats: ComputeStatsUseCase {
     var overview: StatsOverview = .empty
 
-    func callAsFunction(today: Date) async -> StatsOverview {
+    func callAsFunction(today _: Date, firstWeekday _: Int) async -> StatsOverview {
         overview
     }
 }

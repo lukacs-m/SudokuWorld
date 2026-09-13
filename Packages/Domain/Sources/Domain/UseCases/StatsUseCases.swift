@@ -3,7 +3,7 @@ public import Model
 
 /// Assembles the Statistics screen's data from records and daily completions.
 public protocol ComputeStatsUseCase: Sendable {
-    func callAsFunction(today: Date) async -> StatsOverview
+    func callAsFunction(today: Date, firstWeekday: Int) async -> StatsOverview
 }
 
 public struct ComputeStats: ComputeStatsUseCase {
@@ -19,13 +19,14 @@ public struct ComputeStats: ComputeStatsUseCase {
         self.dailyChallenges = dailyChallenges
     }
 
-    public func callAsFunction(today: Date) async -> StatsOverview {
+    public func callAsFunction(today: Date, firstWeekday: Int) async -> StatsOverview {
         let records = await (try? gameRecords.allRecords()) ?? []
         let dailyKeys = await (try? dailyChallenges.completedDays()) ?? []
         return aggregator.overview(
             records: records,
             dailyCompletionKeys: dailyKeys,
             today: today,
+            firstWeekday: firstWeekday,
         )
     }
 }

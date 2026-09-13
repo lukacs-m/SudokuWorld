@@ -132,6 +132,8 @@ private struct CalendarMonthGrid: View {
     let calendar: Calendar
     let theme: Theme
 
+    @ScaledMetric(relativeTo: .subheadline) private var cellSide = DailyDayGrid.cellSide
+
     var body: some View {
         LazyVGrid(
             columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7),
@@ -143,17 +145,18 @@ private struct CalendarMonthGrid: View {
                     .foregroundStyle(theme.textSecondary)
             }
             ForEach(0 ..< leadingBlanks, id: \.self) { _ in
-                Color.clear.frame(height: 32)
+                Color.clear.frame(height: cellSide)
             }
             ForEach(days, id: \.self) { day in
-                CalendarDayCell(
+                DailyDayCell(
                     day: day,
                     isCompleted: completedDayKeys.contains(EventSeeds.dailyDateKey(for: day)),
                     isToday: calendar.isDate(day, inSameDayAs: today),
-                    isFuture: day > today,
                     calendar: calendar,
                     theme: theme,
                 )
+                .frame(maxWidth: .infinity)
+                .opacity(day > today ? 0.35 : 1)
             }
         }
     }
@@ -172,35 +175,12 @@ private struct CalendarMonthGrid: View {
     }
 }
 
-private struct CalendarDayCell: View {
-    let day: Date
-    let isCompleted: Bool
-    let isToday: Bool
-    let isFuture: Bool
-    let calendar: Calendar
-    let theme: Theme
-
-    var body: some View {
-        Text("\(calendar.component(.day, from: day))")
-            .font(.subheadline.weight(isToday ? .bold : .medium))
-            .monospacedDigit()
-            .foregroundStyle(isCompleted ? Color.white : isToday ? theme.accent : theme.textPrimary)
-            .frame(width: 32, height: 32)
-            .background(isCompleted ? theme.accent : .clear, in: Circle())
-            .overlay {
-                if isToday, !isCompleted {
-                    Circle().strokeBorder(theme.accent, lineWidth: 1.5)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .opacity(isFuture ? 0.35 : 1)
-            .accessibilityLabel(accessibilityLabel)
-    }
-
-    private var accessibilityLabel: Text {
-        let date = day.formatted(DailyDayGrid.labelFormat.month(.wide).day())
-        guard isCompleted else { return Text(verbatim: date) }
-        let completed = String(localized: "events.calendar.completed", bundle: .module)
-        return Text(verbatim: "\(date), \(completed)")
-    }
+#Preview("Two-digit days at AX5") {
+    DailyCompletionCalendarView(
+        completedDayKeys: ["2026-07-04", "2026-07-18", "2026-07-25"],
+        today: EventSeeds.date(fromDateKey: "2026-07-26") ?? Date(),
+    )
+    .padding()
+    .environment(\.dynamicTypeSize, .accessibility5)
+    .environment(ThemeStore())
 }

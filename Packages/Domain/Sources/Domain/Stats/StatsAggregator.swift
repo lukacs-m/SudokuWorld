@@ -15,6 +15,7 @@ public struct StatsAggregator: Sendable {
         records: [GameRecord],
         dailyCompletionKeys: Set<String>,
         today: Date,
+        firstWeekday: Int,
     ) -> StatsOverview {
         let won = records.count { $0.outcome == .won }
         let lost = records.count { $0.outcome == .lost }
@@ -37,7 +38,11 @@ public struct StatsAggregator: Sendable {
             totalLost: lost,
             totalAbandoned: abandoned,
             gamesToday: records.count { calendar.isDate($0.finishedAt, inSameDayAs: today) },
-            gamesThisWeek: gamesThisWeek(records: records, today: today),
+            gamesThisWeek: gamesThisWeek(
+                records: records,
+                today: today,
+                firstWeekday: firstWeekday,
+            ),
             averageMistakes: average(records.map(\.mistakes)),
             averageHints: average(records.map(\.hintsUsed)),
             perfectSolves: records.count(where: isPerfectSolve),
@@ -98,12 +103,12 @@ public struct StatsAggregator: Sendable {
         return calendar.date(byAdding: .day, value: 1 - days, to: startOfToday) ?? startOfToday
     }
 
-    private func gamesThisWeek(records: [GameRecord], today: Date) -> Int {
+    /// Days stay UTC buckets; only where the week starts comes from the
+    /// caller, so this counter and the events week strip agree.
+    private func gamesThisWeek(records: [GameRecord], today: Date, firstWeekday: Int) -> Int {
         let startOfToday = calendar.startOfDay(for: today)
-        // Gregorian weekdays run Sunday = 1 ... Saturday = 7; the week here
-        // starts on Monday.
-        let daysSinceMonday = (calendar.component(.weekday, from: startOfToday) + 5) % 7
-        guard let start = calendar.date(byAdding: .day, value: -daysSinceMonday, to: startOfToday),
+        let delta = (calendar.component(.weekday, from: startOfToday) - firstWeekday + 7) % 7
+        guard let start = calendar.date(byAdding: .day, value: -delta, to: startOfToday),
               let end = calendar.date(byAdding: .day, value: 7, to: start)
         else { return 0 }
         return records.count { $0.finishedAt >= start && $0.finishedAt < end }

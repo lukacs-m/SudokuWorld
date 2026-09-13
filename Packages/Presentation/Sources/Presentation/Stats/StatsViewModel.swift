@@ -19,7 +19,7 @@ public final class StatsViewModel {
         if case .idle = state {
             state = .loading
         }
-        let overview = await computeStats(today: now)
+        let overview = await computeStats(today: now, firstWeekday: DailyDayGrid.firstWeekday)
         state = overview.totalPlayed == 0 ? .empty : .loaded(overview)
     }
 }

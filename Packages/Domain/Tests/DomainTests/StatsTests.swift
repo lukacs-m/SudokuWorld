@@ -148,6 +148,7 @@ struct StatsAggregatorTests {
             records: records,
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.totalPlayed == 4)
         #expect(overview.totalWon == 2)
@@ -179,6 +180,7 @@ struct StatsAggregatorTests {
             records: [record(outcome: .won, variant: .killer, difficulty: .hard)],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         let expectedCells = SudokuVariant.allCases.reduce(0) { $0 + $1.offeredDifficulties.count }
         #expect(overview.perVariant.count == expectedCells)
@@ -201,6 +203,7 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         let hidden = overview.perVariant.filter { $0.played > 0 }
         #expect(hidden.map(\.variant) == [.tredoku, .cube])
@@ -220,6 +223,7 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.gamesPerDay.count == 30)
         #expect(overview.gamesPerDay.last?.count == 2)
@@ -231,6 +235,7 @@ struct StatsAggregatorTests {
             records: [record(outcome: .won)],
             dailyCompletionKeys: ["2026-07-03", "2026-07-04"],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.streaks.currentDailyStreak == 2)
         #expect(overview.streaks.currentWinStreak == 1)
@@ -246,6 +251,7 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.classicWinRateByDifficulty.map(\.difficulty) == [.easy])
         #expect(overview.classicWinRateByDifficulty.first?.played == 2)
@@ -265,6 +271,7 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: today,
+            firstWeekday: 2,
         )
         #expect(overview.classicTimesByDifficulty.first?.fastest == 50)
         #expect(overview.recentClassicTimesByDifficulty.first?.fastest == 100)
@@ -279,6 +286,7 @@ struct StatsAggregatorTests {
             records: [record(outcome: .lost, mode: .hardcore)],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.totalLost == 1)
     }
@@ -288,8 +296,17 @@ struct StatsAggregatorTests {
 struct StatsCounterTests {
     private let aggregator = StatsAggregator()
 
-    private func overview(_ records: [GameRecord], today: Date) -> StatsOverview {
-        aggregator.overview(records: records, dailyCompletionKeys: [], today: today)
+    private func overview(
+        _ records: [GameRecord],
+        today: Date,
+        firstWeekday: Int = 2,
+    ) -> StatsOverview {
+        aggregator.overview(
+            records: records,
+            dailyCompletionKeys: [],
+            today: today,
+            firstWeekday: firstWeekday,
+        )
     }
 
     @Test func todayCountsUTCDayAndIncludesAbandonedGames() {
@@ -315,13 +332,21 @@ struct StatsCounterTests {
         #expect(result.gamesThisWeek == 2)
     }
 
-    @Test func sundayBelongsToTheWeekThatStartedOnMonday() {
-        let sunday = day("2026-07-12")
-        let result = overview([
+    /// Sunday 2026-07-12 closes a Monday-start week that began on 07-06, but
+    /// opens a Sunday-start one, so only the caller's first weekday decides
+    /// whether the 07-06 game still counts.
+    @Test(arguments: [
+        (firstWeekday: 2, expected: 2),
+        (firstWeekday: 1, expected: 1),
+    ])
+    func theWeekStartsOnTheCallersFirstWeekday(firstWeekday: Int, expected: Int) {
+        let records = [
             record(outcome: .won, finishedAt: day("2026-07-06")),
             record(outcome: .won, finishedAt: day("2026-07-12")),
-        ], today: sunday)
-        #expect(result.gamesThisWeek == 2)
+        ]
+        let sunday = day("2026-07-12")
+        let result = overview(records, today: sunday, firstWeekday: firstWeekday)
+        #expect(result.gamesThisWeek == expected)
     }
 
     @Test func perfectSolvesNeedAWinWithNoMistakesAndNoHints() {
@@ -358,7 +383,12 @@ struct SolveTimeTrendTests {
     private let today = day("2026-07-04", hour: 8)
 
     private func overview(_ records: [GameRecord]) -> StatsOverview {
-        aggregator.overview(records: records, dailyCompletionKeys: [], today: today)
+        aggregator.overview(
+            records: records,
+            dailyCompletionKeys: [],
+            today: today,
+            firstWeekday: 2,
+        )
     }
 
     @Test func noWinsMeansNoTrend() {

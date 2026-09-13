@@ -11,9 +11,17 @@ enum DailyDayGrid {
     static var calendar: Calendar {
         var utc = EventSeeds.utcCalendar
         utc.locale = .current
-        utc.firstWeekday = Calendar.current.firstWeekday
+        utc.firstWeekday = firstWeekday
         return utc
     }
+
+    /// Where the week starts, for the grids and for the "this week" counter.
+    static var firstWeekday: Int {
+        Calendar.current.firstWeekday
+    }
+
+    /// Base side of a day cell, scaled with Dynamic Type by the views.
+    static let cellSide: CGFloat = 32
 
     /// Days in this grid are UTC day starts, so their labels must format in UTC
     /// too - the device time zone would shift them by one day either way.

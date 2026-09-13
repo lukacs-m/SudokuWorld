@@ -27,18 +27,20 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     }
 
     var body: some View {
-        if premiumGate.isPremium {
-            CardView { content }
-        } else {
-            Button {
-                showPaywall = true
-            } label: {
-                locked(theme: themeStore.theme(for: colorScheme))
+        Group {
+            if premiumGate.isPremium {
+                CardView { content }
+            } else {
+                Button {
+                    showPaywall = true
+                } label: {
+                    locked(theme: themeStore.theme(for: colorScheme))
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
-            .sheet(isPresented: $showPaywall) {
-                PaywallView()
-            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
         }
     }
 

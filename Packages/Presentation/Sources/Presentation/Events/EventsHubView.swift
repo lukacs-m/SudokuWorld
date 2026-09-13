@@ -144,9 +144,9 @@ struct EventsHubView: View {
         .foregroundStyle(theme.textPrimary)
     }
 
-    /// The mock's week strip: this week's days, today accented, completed
-    /// days tinted. Days are UTC so the strip names the same days as the
-    /// month calendar below it and as the streak.
+    /// The mock's week strip: this week's days, drawn with the same cell as
+    /// the month calendar below it. Days are UTC so both grids name the same
+    /// days as the streak.
     private func weekStrip(theme: Theme) -> some View {
         let calendar = DailyDayGrid.calendar
         let now = Date()
@@ -162,19 +162,13 @@ struct EventsHubView: View {
                     Text(day.formatted(DailyDayGrid.labelFormat.weekday(.narrow)))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(theme.textSecondary)
-                    Text("\(calendar.component(.day, from: day))")
-                        .font(.subheadline.weight(isToday ? .bold : .medium))
-                        .monospacedDigit()
-                        .foregroundStyle(
-                            isToday ? Color.white
-                                : isCompleted ? theme.accent : theme.textPrimary,
-                        )
-                        .frame(width: 32, height: 32)
-                        .background(
-                            isToday ? theme.accent
-                                : isCompleted ? theme.accent.opacity(0.15) : .clear,
-                            in: Circle(),
-                        )
+                    DailyDayCell(
+                        day: day,
+                        isCompleted: isCompleted,
+                        isToday: isToday,
+                        calendar: calendar,
+                        theme: theme,
+                    )
                 }
                 .frame(maxWidth: .infinity)
                 .opacity(isFuture ? 0.35 : 1)

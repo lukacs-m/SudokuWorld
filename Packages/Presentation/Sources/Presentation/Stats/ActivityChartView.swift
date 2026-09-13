@@ -52,7 +52,7 @@ struct ActivityChartView: View {
         .chartXAxis {
             AxisMarks(values: xTicks) {
                 AxisValueLabel(
-                    format: Date.FormatStyle(timeZone: utc.timeZone).day().month(.abbreviated),
+                    format: DailyDayGrid.labelFormat.day().month(.abbreviated),
                 )
                 .font(.caption2)
                 .foregroundStyle(theme.textSecondary)
