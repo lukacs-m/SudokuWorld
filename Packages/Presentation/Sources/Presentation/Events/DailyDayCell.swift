@@ -4,8 +4,9 @@ import SwiftUI
 /// One day of a daily-challenge grid, shared by the events week strip and the
 /// month calendar so both encode the same state the same way: a completed day
 /// is a filled accent circle, today wears an accent ring, and a completed today
-/// gets both. The cell grows with Dynamic Type; the digits scale down as a
-/// backstop so a two-digit day never truncates.
+/// gets both. The cell fills the slot its grid gives it and stays square, so it
+/// can never overhang a neighbour; at accessibility text sizes the digits scale
+/// down inside that slot instead.
 struct DailyDayCell: View {
     let day: Date
     let isCompleted: Bool
@@ -13,22 +14,19 @@ struct DailyDayCell: View {
     let calendar: Calendar
     let theme: Theme
 
-    @ScaledMetric(relativeTo: .subheadline) private var side = DailyDayGrid.cellSide
-
     var body: some View {
         Text(verbatim: "\(calendar.component(.day, from: day))")
             .font(.subheadline.weight(isToday ? .bold : .medium))
             .monospacedDigit()
             .lineLimit(1)
-            .minimumScaleFactor(0.6)
+            .minimumScaleFactor(0.5)
             .foregroundStyle(numberColor)
-            .frame(width: side, height: side)
-            .background(isCompleted ? theme.accent : .clear, in: Circle())
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .background(isCompleted ? theme.accent : .clear, in: Circle().inset(by: 3))
             .overlay {
                 if isToday {
-                    Circle()
-                        .strokeBorder(theme.accent, lineWidth: 1.5)
-                        .padding(-2)
+                    Circle().strokeBorder(theme.accent, lineWidth: 1.5)
                 }
             }
             .accessibilityLabel(accessibilityLabel)

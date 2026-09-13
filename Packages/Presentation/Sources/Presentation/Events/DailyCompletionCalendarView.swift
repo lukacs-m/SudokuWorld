@@ -132,8 +132,6 @@ private struct CalendarMonthGrid: View {
     let calendar: Calendar
     let theme: Theme
 
-    @ScaledMetric(relativeTo: .subheadline) private var cellSide = DailyDayGrid.cellSide
-
     var body: some View {
         LazyVGrid(
             columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7),
@@ -145,7 +143,7 @@ private struct CalendarMonthGrid: View {
                     .foregroundStyle(theme.textSecondary)
             }
             ForEach(0 ..< leadingBlanks, id: \.self) { _ in
-                Color.clear.frame(height: cellSide)
+                Color.clear
             }
             ForEach(days, id: \.self) { day in
                 DailyDayCell(
@@ -155,7 +153,6 @@ private struct CalendarMonthGrid: View {
                     calendar: calendar,
                     theme: theme,
                 )
-                .frame(maxWidth: .infinity)
                 .opacity(day > today ? 0.35 : 1)
             }
         }

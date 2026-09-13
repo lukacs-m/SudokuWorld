@@ -393,13 +393,13 @@ struct SolveTimeTrendTests {
 
     @Test func noWinsMeansNoTrend() {
         let result = overview([record(outcome: .abandoned), record(outcome: .lost, mode: .hardcore)])
-        #expect(result.solveTimeTrendByDifficulty.isEmpty)
+        #expect(result.classicSolveTimeTrendByDifficulty.isEmpty)
         #expect(result.solveTimeTrendByVariant.isEmpty)
     }
 
     @Test func aSingleWinIsAOnePointSeries() {
         let result = overview([record(outcome: .won, duration: 420, finishedAt: today)])
-        let trend = result.solveTimeTrendByDifficulty[.medium]
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
         #expect(trend?.last30Days.count == 1)
         #expect(trend?.last90Days.count == 1)
         #expect(trend?.last30Days.first?.averageTime == 420)
@@ -415,11 +415,14 @@ struct SolveTimeTrendTests {
             record(outcome: .won, variant: .killer, duration: 700, finishedAt: day("2026-06-20")),
             record(outcome: .abandoned, duration: 5, finishedAt: day("2026-07-02")),
         ])
-        let medium = result.solveTimeTrendByDifficulty[.medium]
-        #expect(medium?.last30Days.map(\.averageTime) == [700, 500, 200])
+        let medium = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(medium?.last30Days.map(\.averageTime) == [500, 200])
         #expect(medium?.last30Days.map(\.day) == [
-            day("2026-06-20", hour: 0), day("2026-07-01", hour: 0), day("2026-07-04", hour: 0),
+            day("2026-07-01", hour: 0), day("2026-07-04", hour: 0),
         ])
+        // The killer win is a medium too, but a difficulty line only reads as
+        // progress if every point on it comes from the same variant.
+        #expect(medium?.last90Days.contains { $0.averageTime == 700 } == false)
         #expect(result.solveTimeTrendByVariant[.classic]?.last30Days.map(\.averageTime) == [500, 200])
         #expect(result.solveTimeTrendByVariant[.killer]?.last30Days.map(\.averageTime) == [700])
     }
@@ -434,7 +437,7 @@ struct SolveTimeTrendTests {
             record(outcome: .won, duration: 4, finishedAt: day("2026-04-06", hour: 0)),
             record(outcome: .won, duration: 5, finishedAt: day("2026-04-05", hour: 23, minute: 59)),
         ])
-        let trend = result.solveTimeTrendByDifficulty[.medium]
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
         #expect(trend?.last30Days.map(\.averageTime) == [2, 1])
         #expect(trend?.last90Days.map(\.averageTime) == [4, 3, 2, 1])
     }

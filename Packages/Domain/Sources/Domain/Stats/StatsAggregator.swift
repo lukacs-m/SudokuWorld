@@ -54,7 +54,11 @@ public struct StatsAggregator: Sendable {
             recentClassicTimesByDifficulty: timesByDifficulty(
                 records: classic.filter { $0.finishedAt >= recentStart },
             ),
-            solveTimeTrendByDifficulty: trends(records: records, today: today, by: \.difficulty),
+            classicSolveTimeTrendByDifficulty: trends(
+                records: classic,
+                today: today,
+                by: \.difficulty,
+            ),
             solveTimeTrendByVariant: trends(records: records, today: today, by: \.variant),
             variantShares: variantShares(records: records),
         )

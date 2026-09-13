@@ -103,8 +103,9 @@ public struct StatsOverview: Equatable, Sendable {
     public let totalWon: Int
     public let totalLost: Int
     public let totalAbandoned: Int
-    /// Games finished today and in the current Monday to Sunday week (UTC),
-    /// abandoned ones included like `totalPlayed`.
+    /// Games finished today and in the current UTC week, which starts on the
+    /// first weekday the caller supplied. Abandoned ones count, like
+    /// `totalPlayed`.
     public let gamesToday: Int
     public let gamesThisWeek: Int
     /// Mistakes and hints per finished game, over every game played.
@@ -121,8 +122,10 @@ public struct StatsOverview: Equatable, Sendable {
     /// Classic times over all history, and over the last `recentHistoryDays`.
     public let classicTimesByDifficulty: [DifficultyTimes]
     public let recentClassicTimesByDifficulty: [DifficultyTimes]
-    /// Only keys with at least one win in the last 90 days are present.
-    public let solveTimeTrendByDifficulty: [Difficulty: SolveTimeTrend]
+    /// Only keys with at least one win in the last 90 days are present. The
+    /// per-difficulty series is classic-only, like its sibling difficulty
+    /// breakdowns, so times stay comparable across a tier.
+    public let classicSolveTimeTrendByDifficulty: [Difficulty: SolveTimeTrend]
     public let solveTimeTrendByVariant: [SudokuVariant: SolveTimeTrend]
     public let variantShares: [VariantShare]
 
@@ -146,7 +149,7 @@ public struct StatsOverview: Equatable, Sendable {
         classicWinRateByDifficulty: [],
         classicTimesByDifficulty: [],
         recentClassicTimesByDifficulty: [],
-        solveTimeTrendByDifficulty: [:],
+        classicSolveTimeTrendByDifficulty: [:],
         solveTimeTrendByVariant: [:],
         variantShares: [],
     )
@@ -167,7 +170,7 @@ public struct StatsOverview: Equatable, Sendable {
         classicWinRateByDifficulty: [DifficultyWinRate],
         classicTimesByDifficulty: [DifficultyTimes],
         recentClassicTimesByDifficulty: [DifficultyTimes],
-        solveTimeTrendByDifficulty: [Difficulty: SolveTimeTrend],
+        classicSolveTimeTrendByDifficulty: [Difficulty: SolveTimeTrend],
         solveTimeTrendByVariant: [SudokuVariant: SolveTimeTrend],
         variantShares: [VariantShare],
     ) {
@@ -186,7 +189,7 @@ public struct StatsOverview: Equatable, Sendable {
         self.classicWinRateByDifficulty = classicWinRateByDifficulty
         self.classicTimesByDifficulty = classicTimesByDifficulty
         self.recentClassicTimesByDifficulty = recentClassicTimesByDifficulty
-        self.solveTimeTrendByDifficulty = solveTimeTrendByDifficulty
+        self.classicSolveTimeTrendByDifficulty = classicSolveTimeTrendByDifficulty
         self.solveTimeTrendByVariant = solveTimeTrendByVariant
         self.variantShares = variantShares
     }

@@ -20,9 +20,6 @@ enum DailyDayGrid {
         Calendar.current.firstWeekday
     }
 
-    /// Base side of a day cell, scaled with Dynamic Type by the views.
-    static let cellSide: CGFloat = 32
-
     /// Days in this grid are UTC day starts, so their labels must format in UTC
     /// too - the device time zone would shift them by one day either way.
     static var labelFormat: Date.FormatStyle {
