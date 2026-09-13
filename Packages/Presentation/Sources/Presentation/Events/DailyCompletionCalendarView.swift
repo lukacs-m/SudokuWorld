@@ -44,11 +44,8 @@ struct DailyCompletionCalendarView: View {
         }
     }
 
-    /// UTC days, laid out with the device's first weekday.
     private var calendar: Calendar {
-        var utc = EventSeeds.utcCalendar
-        utc.firstWeekday = Calendar.current.firstWeekday
-        return utc
+        DailyDayGrid.calendar
     }
 
     private var currentMonthStart: Date {
@@ -95,7 +92,7 @@ private struct CalendarMonthHeader: View {
                 onStep(-1)
             }
             Spacer()
-            Text(monthStart, format: Date.FormatStyle(timeZone: .gmt).month(.wide).year())
+            Text(monthStart, format: DailyDayGrid.labelFormat.month(.wide).year())
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(theme.textPrimary)
             Spacer()
@@ -161,11 +158,8 @@ private struct CalendarMonthGrid: View {
         }
     }
 
-    /// Symbols rotated so the row starts on the calendar's first weekday.
     private var weekdaySymbols: [(offset: Int, element: String)] {
-        let symbols = calendar.veryShortStandaloneWeekdaySymbols
-        let start = calendar.firstWeekday - 1
-        return Array((symbols[start...] + symbols[..<start]).enumerated())
+        Array(DailyDayGrid.weekdaySymbols(for: calendar).enumerated())
     }
 
     private var leadingBlanks: Int {
@@ -204,7 +198,7 @@ private struct CalendarDayCell: View {
     }
 
     private var accessibilityLabel: Text {
-        let date = day.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).day())
+        let date = day.formatted(DailyDayGrid.labelFormat.month(.wide).day())
         guard isCompleted else { return Text(verbatim: date) }
         let completed = String(localized: "events.calendar.completed", bundle: .module)
         return Text(verbatim: "\(date), \(completed)")

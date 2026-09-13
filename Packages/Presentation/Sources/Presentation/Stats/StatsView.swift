@@ -7,7 +7,6 @@ struct StatsView: View {
     @State private var viewModel = StatsViewModel()
 
     @Environment(ThemeStore.self) private var themeStore
-    @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -34,7 +33,7 @@ struct StatsView: View {
                 case let .loaded(overview):
                     StatsTotalsGrid(overview: overview)
                     StreakBadgeView(streaks: overview.streaks)
-                    StatsChartsView(overview: overview, isPremium: premiumGate.isPremium)
+                    StatsChartsView(overview: overview)
                     VariantBreakdownView(overview: overview)
 
                 case .failed:

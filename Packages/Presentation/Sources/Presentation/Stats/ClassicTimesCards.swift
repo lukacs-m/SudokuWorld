@@ -6,38 +6,29 @@ import SwiftUI
 /// players see all time directly.
 struct ClassicTimesCards: View {
     let overview: StatsOverview
-    let isPremium: Bool
+
+    @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        if isPremium {
-            if !overview.classicTimesByDifficulty.isEmpty {
-                allTime
-            }
-        } else {
-            if !overview.recentClassicTimesByDifficulty.isEmpty {
-                TimesBreakdownView(
-                    title: String(
-                        format: String(localized: "stats.chart.times.recent", bundle: .module),
-                        StatsOverview.recentHistoryDays,
-                    ),
-                    entries: overview.recentClassicTimesByDifficulty,
+        if !premiumGate.isPremium, !overview.recentClassicTimesByDifficulty.isEmpty {
+            TimesBreakdownView(
+                title: String(
+                    format: String(localized: "stats.chart.times.recent", bundle: .module),
+                    StatsOverview.recentHistoryDays,
+                ),
+                entries: overview.recentClassicTimesByDifficulty,
+            )
+        }
+        if !overview.classicTimesByDifficulty.isEmpty {
+            PremiumStatBlurOverlay(
+                "stats.premium.allTimeTimes.title",
+                tease: "stats.premium.allTimeTimes.tease",
+            ) {
+                TimesBreakdownContent(
+                    title: moduleString("stats.chart.times"),
+                    entries: overview.classicTimesByDifficulty,
                 )
             }
-            if !overview.classicTimesByDifficulty.isEmpty {
-                PremiumStatBlurOverlay(
-                    "stats.premium.allTimeTimes.title",
-                    tease: "stats.premium.allTimeTimes.tease",
-                ) {
-                    allTime
-                }
-            }
         }
-    }
-
-    private var allTime: some View {
-        TimesBreakdownView(
-            title: moduleString("stats.chart.times"),
-            entries: overview.classicTimesByDifficulty,
-        )
     }
 }

@@ -9,20 +9,31 @@ struct TimesBreakdownView: View {
     let title: String
     let entries: [StatsOverview.DifficultyTimes]
 
+    var body: some View {
+        CardView {
+            TimesBreakdownContent(title: title, entries: entries)
+        }
+    }
+}
+
+/// The card's interior on its own, so a wrapper such as
+/// `PremiumStatBlurOverlay` can supply the `CardView` itself.
+struct TimesBreakdownContent: View {
+    let title: String
+    let entries: [StatsOverview.DifficultyTimes]
+
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        CardView {
-            VStack(alignment: .leading, spacing: 12) {
-                SectionLabel(verbatim: title)
-                VStack(spacing: 0) {
-                    ForEach(entries) { entry in
-                        TimesRow(entry: entry, theme: theme)
-                        if entry.id != entries.last?.id {
-                            Divider()
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel(verbatim: title)
+            VStack(spacing: 0) {
+                ForEach(entries) { entry in
+                    TimesRow(entry: entry, theme: theme)
+                    if entry.id != entries.last?.id {
+                        Divider()
                     }
                 }
             }

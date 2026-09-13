@@ -78,7 +78,7 @@ struct EventsHubView: View {
                 HStack(spacing: 6) {
                     Text("events.daily.today", bundle: .module)
                     Text("·")
-                    Text(Date.now.formatted(.dateTime.month(.wide).day()))
+                    Text(Date.now.formatted(DailyDayGrid.labelFormat.month(.wide).day()))
                 }
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(theme.textSecondary)
@@ -145,13 +145,13 @@ struct EventsHubView: View {
     }
 
     /// The mock's week strip: this week's days, today accented, completed
-    /// days tinted. Completion keys are UTC (the daily clock authority).
+    /// days tinted. Days are UTC so the strip names the same days as the
+    /// month calendar below it and as the streak.
     private func weekStrip(theme: Theme) -> some View {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let delta = (calendar.component(.weekday, from: today) - calendar.firstWeekday + 7) % 7
-        let start = calendar.date(byAdding: .day, value: -delta, to: today) ?? today
-        let days = (0 ..< 7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+        let calendar = DailyDayGrid.calendar
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let days = DailyDayGrid.weekDays(containing: now)
         return HStack(spacing: 6) {
             ForEach(days, id: \.self) { day in
                 let isToday = calendar.isDate(day, inSameDayAs: today)
@@ -159,7 +159,7 @@ struct EventsHubView: View {
                     .contains(EventSeeds.dailyDateKey(for: day))
                 let isFuture = day > today
                 VStack(spacing: 4) {
-                    Text(day.formatted(.dateTime.weekday(.narrow)))
+                    Text(day.formatted(DailyDayGrid.labelFormat.weekday(.narrow)))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(theme.textSecondary)
                     Text("\(calendar.component(.day, from: day))")

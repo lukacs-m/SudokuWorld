@@ -1,10 +1,11 @@
 import Model
 import SwiftUI
 
-/// Wraps a premium-only stat card for free players: the real content stays
-/// underneath, blurred and washed out, with a lock, the stat's name and a
-/// one-line tease on top. The whole card opens the paywall. Premium players
-/// get the content untouched.
+/// Wraps premium-only stat card content for free players: the real content
+/// stays underneath, blurred and washed out, with a lock, the stat's name and a
+/// one-line tease on top. The whole card opens the paywall. Premium players get
+/// the content untouched. The card itself is supplied here, so the locked state
+/// keeps the standard card background, shadow and elevation.
 struct PremiumStatBlurOverlay<Content: View>: View {
     private let titleKey: LocalizedStringKey
     private let teaseKey: LocalizedStringKey
@@ -27,7 +28,7 @@ struct PremiumStatBlurOverlay<Content: View>: View {
 
     var body: some View {
         if premiumGate.isPremium {
-            content
+            CardView { content }
         } else {
             Button {
                 showPaywall = true
@@ -41,18 +42,21 @@ struct PremiumStatBlurOverlay<Content: View>: View {
         }
     }
 
-    /// The clip matches `CardView`'s corner radius so the blur stays inside
-    /// the card's silhouette.
+    /// The label is a `ZStack` sibling rather than an overlay so that it grows
+    /// the card at accessibility text sizes instead of spilling over the
+    /// neighbouring ones. The clip keeps the blur's bleed off the card's edge.
     private func locked(theme: Theme) -> some View {
-        content
-            .blur(radius: 5)
-            .overlay(theme.screenBackground.opacity(0.25))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .accessibilityHidden(true)
-            .overlay {
+        CardView {
+            ZStack {
+                content
+                    .blur(radius: 5)
+                    .overlay(theme.screenBackground.opacity(0.25))
+                    .accessibilityHidden(true)
                 LockedStatLabel(titleKey: titleKey, teaseKey: teaseKey, theme: theme)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 20))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
@@ -84,9 +88,26 @@ private struct LockedStatLabel: View {
         "stats.premium.allTimeTimes.title",
         tease: "stats.premium.allTimeTimes.tease",
     ) {
-        TimesBreakdownView(title: "Classic best times", entries: PreviewData.times)
+        TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
     }
     .padding()
+    .environment(ThemeStore())
+    .environment(PremiumGate(isPremium: false))
+}
+
+/// The tightest case for the locked label: one row of content, largest text.
+#Preview("Free · one row · AX5") {
+    PremiumStatBlurOverlay(
+        "stats.premium.allTimeTimes.title",
+        tease: "stats.premium.allTimeTimes.tease",
+    ) {
+        TimesBreakdownContent(
+            title: "Classic best times",
+            entries: Array(PreviewData.times.prefix(1)),
+        )
+    }
+    .padding()
+    .environment(\.dynamicTypeSize, .accessibility5)
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
@@ -96,7 +117,7 @@ private struct LockedStatLabel: View {
         "stats.premium.allTimeTimes.title",
         tease: "stats.premium.allTimeTimes.tease",
     ) {
-        TimesBreakdownView(title: "Classic best times", entries: PreviewData.times)
+        TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
     }
     .padding()
     .environment(ThemeStore())

@@ -7,7 +7,6 @@ import SwiftUI
 /// difficulty, classic best vs average times, and variant distribution.
 struct StatsChartsView: View {
     let overview: StatsOverview
-    let isPremium: Bool
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -23,7 +22,7 @@ struct StatsChartsView: View {
                 WinRateBreakdownView(entries: overview.classicWinRateByDifficulty)
             }
 
-            ClassicTimesCards(overview: overview, isPremium: isPremium)
+            ClassicTimesCards(overview: overview)
 
             if !overview.variantShares.isEmpty {
                 chartCard("stats.chart.variants", theme: theme) {
