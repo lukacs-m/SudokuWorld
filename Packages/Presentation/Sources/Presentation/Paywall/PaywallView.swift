@@ -75,6 +75,11 @@ struct PaywallView: View {
                     theme: theme,
                 )
                 benefit("paywall.benefit.themes", systemImage: "paintpalette.fill", theme: theme)
+                benefit(
+                    "paywall.benefit.stats",
+                    systemImage: "chart.xyaxis.line",
+                    theme: theme,
+                )
             }
         }
     }

@@ -12,6 +12,8 @@ public struct VariantStats: Equatable, Sendable, Codable {
     public let bestWinStreak: Int
     public let fastestTime: TimeInterval?
     public let averageTime: TimeInterval?
+    /// Wins with no mistakes and no hints (a reveal counts as a hint).
+    public let perfectSolves: Int
 
     public var winRate: Double {
         played > 0 ? Double(won) / Double(played) : 0
@@ -28,6 +30,7 @@ public struct VariantStats: Equatable, Sendable, Codable {
         bestWinStreak: Int,
         fastestTime: TimeInterval?,
         averageTime: TimeInterval?,
+        perfectSolves: Int,
     ) {
         self.variant = variant
         self.difficulty = difficulty
@@ -39,5 +42,6 @@ public struct VariantStats: Equatable, Sendable, Codable {
         self.bestWinStreak = bestWinStreak
         self.fastestTime = fastestTime
         self.averageTime = averageTime
+        self.perfectSolves = perfectSolves
     }
 }

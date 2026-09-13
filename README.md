@@ -62,9 +62,13 @@ French localization.
   "Learn more" link on every technique hint; each figure is validated against
   the solver.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
-  win streaks, fastest/average times; daily-challenge streaks; Swift Charts
-  (30-day activity, win rate by difficulty, best-vs-average times, variant
-  distribution).
+  win streaks, fastest/average times, perfect solves; daily-challenge streaks
+  and a monthly completion calendar; games today / this week; classic win rate
+  and best times by difficulty (free players see the last 7 days, all-time
+  history sits behind a tappable blurred preview that opens the paywall);
+  30/90-day solve-time trend series ready for premium charts; Swift Charts
+  (30-day activity, variant distribution). Every day bucket is a UTC day like
+  the daily challenge.
 - **Game Center** — 84 matrix leaderboards (the 7 curated variants in
   `GameCenterIDs.leaderboardVariants` × 6 difficulties × time/wins; every
   other variant counts toward the aggregates only) + 4 aggregates, 16
@@ -252,7 +256,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 294 tests; the Domain
+Tests across four packages (`make test`, macOS host, 308 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):

@@ -25,6 +25,7 @@ struct EventsHubView: View {
 
                 case let .loaded(content):
                     dailyCard(content.daily, theme: theme)
+                    DailyCompletionCalendarView(completedDayKeys: viewModel.completedDayKeys)
                     weeklyCard(content.weekly, theme: theme)
 
                 case .empty, .failed:

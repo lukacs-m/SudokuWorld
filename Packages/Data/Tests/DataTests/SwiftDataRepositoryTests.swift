@@ -152,6 +152,21 @@ struct SwiftDataStoreTests {
             #expect(days == ["2026-07-04"])
         }
 
+        @Test func completedDaysUniteEverySlot() async throws {
+            // The streak is unified: classic one day, a variant slot the
+            // next, both days count.
+            let repository = try makeRepository()
+            try await repository.markCompleted(
+                dateKey: "2026-07-03", variant: .classic, duration: 300, at: noon("2026-07-03"),
+            )
+            try await repository.markCompleted(
+                dateKey: "2026-07-04", variant: .killer, duration: 500, at: noon("2026-07-04"),
+            )
+
+            let days = try await repository.completedDays()
+            #expect(days == ["2026-07-03", "2026-07-04"])
+        }
+
         @Test func repeatCompletionKeepsBestTime() async throws {
             let repository = try makeRepository()
             let at = noon("2026-07-04")
