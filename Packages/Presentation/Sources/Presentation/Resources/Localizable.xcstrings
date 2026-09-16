@@ -4125,22 +4125,6 @@
         }
       }
     },
-    "paywall.benefit.stats" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full statistics: trends, mastery matrix and all-time history"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statistiques complètes : tendances, matrice de maîtrise et historique complet"
-          }
-        }
-      }
-    },
     "paywall.bestValue" : {
       "localizations" : {
         "en" : {
