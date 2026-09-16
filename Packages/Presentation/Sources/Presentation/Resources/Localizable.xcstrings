@@ -998,6 +998,22 @@
         }
       }
     },
+    "events.calendar.today" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aujourd'hui"
+          }
+        }
+      }
+    },
     "events.daily.completedTile" : {
       "localizations" : {
         "en" : {

@@ -42,10 +42,14 @@ struct DailyDayCell: View {
     }
 
     private var accessibilityLabel: Text {
-        let date = day.formatted(DailyDayGrid.labelFormat.month(.wide).day())
-        guard isCompleted else { return Text(verbatim: date) }
-        let completed = String(localized: "events.calendar.completed", bundle: .module)
-        return Text(verbatim: "\(date), \(completed)")
+        var parts = [day.formatted(DailyDayGrid.labelFormat.month(.wide).day())]
+        if isToday {
+            parts.append(String(localized: "events.calendar.today", bundle: .module))
+        }
+        if isCompleted {
+            parts.append(String(localized: "events.calendar.completed", bundle: .module))
+        }
+        return Text(verbatim: parts.joined(separator: ", "))
     }
 }
 

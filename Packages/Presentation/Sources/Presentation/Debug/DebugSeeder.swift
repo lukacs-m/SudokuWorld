@@ -47,9 +47,14 @@
                 guard let day = EventSeeds.utcCalendar.date(
                     byAdding: .day, value: -offset, to: now,
                 ) else { continue }
+                let dateKey = EventSeeds.dailyDateKey(for: day)
+                let usesVariantSlot = offset > 0 && offset.isMultiple(of: 3)
+                let variant = usesVariantSlot
+                    ? EventSeeds.dailySlots(dateKey: dateKey).last?.variant ?? .classic
+                    : .classic
                 try? await dailies.markCompleted(
-                    dateKey: EventSeeds.dailyDateKey(for: day),
-                    variant: offset.isMultiple(of: 3) ? .killer : .classic,
+                    dateKey: dateKey,
+                    variant: variant,
                     duration: 240,
                     at: day,
                 )
