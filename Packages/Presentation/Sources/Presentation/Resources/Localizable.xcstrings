@@ -7089,22 +7089,6 @@
         }
       }
     },
-    "stats.chart.times.recent" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Classic best times · last %lld days"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meilleurs temps en classique · %lld derniers jours"
-          }
-        }
-      }
-    },
     "stats.chart.variants" : {
       "localizations" : {
         "en" : {

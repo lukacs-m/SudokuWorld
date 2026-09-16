@@ -259,25 +259,6 @@ struct StatsAggregatorTests {
         #expect(overview.classicTimesByDifficulty.map(\.fastest) == [200])
     }
 
-    @Test func recentTimesCoverTheLastSevenUTCDays() {
-        let today = day("2026-07-10", hour: 8)
-        let overview = aggregator.overview(
-            records: [
-                record(outcome: .won, duration: 500, finishedAt: day("2026-07-10", hour: 1)),
-                // Six days back at midnight: the first instant of the window.
-                record(outcome: .won, duration: 100, finishedAt: day("2026-07-04", hour: 0)),
-                // Seven days back: outside, however late in the day.
-                record(outcome: .won, duration: 50, finishedAt: day("2026-07-03", hour: 23)),
-            ],
-            dailyCompletionKeys: [],
-            today: today,
-            firstWeekday: 2,
-        )
-        #expect(overview.classicTimesByDifficulty.first?.fastest == 50)
-        #expect(overview.recentClassicTimesByDifficulty.first?.fastest == 100)
-        #expect(overview.recentClassicTimesByDifficulty.first?.average == 300)
-    }
-
     @Test func lossOnlyFromHardcore() {
         // Business rule: `lost` records only ever come from hardcore games —
         // aggregation just counts what it is given, so the rule lives in the

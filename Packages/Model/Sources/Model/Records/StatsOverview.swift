@@ -4,9 +4,6 @@ public import Foundation
 /// series so the view stays dumb. Every day bucket is a UTC day — the clock
 /// the daily challenge and the streak already run on.
 public struct StatsOverview: Equatable, Sendable {
-    /// The free tier's window for time-based stats; premium sees all time.
-    public static let recentHistoryDays = 7
-
     /// Finished games per UTC day (for the activity chart).
     public struct DailyCount: Identifiable, Equatable, Sendable {
         public let day: Date
@@ -119,9 +116,8 @@ public struct StatsOverview: Equatable, Sendable {
     public let perVariant: [VariantStats]
     public let gamesPerDay: [DailyCount]
     public let classicWinRateByDifficulty: [DifficultyWinRate]
-    /// Classic times over all history, and over the last `recentHistoryDays`.
+    /// Classic best and average time per difficulty, over all history.
     public let classicTimesByDifficulty: [DifficultyTimes]
-    public let recentClassicTimesByDifficulty: [DifficultyTimes]
     /// Only keys with at least one win in the last 90 days are present. The
     /// per-difficulty series is classic-only, like its sibling difficulty
     /// breakdowns, so times stay comparable across a tier.
@@ -148,7 +144,6 @@ public struct StatsOverview: Equatable, Sendable {
         gamesPerDay: [],
         classicWinRateByDifficulty: [],
         classicTimesByDifficulty: [],
-        recentClassicTimesByDifficulty: [],
         classicSolveTimeTrendByDifficulty: [:],
         solveTimeTrendByVariant: [:],
         variantShares: [],
@@ -169,7 +164,6 @@ public struct StatsOverview: Equatable, Sendable {
         gamesPerDay: [DailyCount],
         classicWinRateByDifficulty: [DifficultyWinRate],
         classicTimesByDifficulty: [DifficultyTimes],
-        recentClassicTimesByDifficulty: [DifficultyTimes],
         classicSolveTimeTrendByDifficulty: [Difficulty: SolveTimeTrend],
         solveTimeTrendByVariant: [SudokuVariant: SolveTimeTrend],
         variantShares: [VariantShare],
@@ -188,7 +182,6 @@ public struct StatsOverview: Equatable, Sendable {
         self.gamesPerDay = gamesPerDay
         self.classicWinRateByDifficulty = classicWinRateByDifficulty
         self.classicTimesByDifficulty = classicTimesByDifficulty
-        self.recentClassicTimesByDifficulty = recentClassicTimesByDifficulty
         self.classicSolveTimeTrendByDifficulty = classicSolveTimeTrendByDifficulty
         self.solveTimeTrendByVariant = solveTimeTrendByVariant
         self.variantShares = variantShares

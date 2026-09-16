@@ -68,7 +68,6 @@ struct StatsViewModelTests {
             gamesPerDay: [],
             classicWinRateByDifficulty: [],
             classicTimesByDifficulty: [],
-            recentClassicTimesByDifficulty: [],
             classicSolveTimeTrendByDifficulty: [:],
             solveTimeTrendByVariant: [:],
             variantShares: [],

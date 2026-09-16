@@ -31,7 +31,6 @@ public struct StatsAggregator: Sendable {
         )
 
         let classic = records.filter { $0.variant == .classic }
-        let recentStart = startOfWindow(days: StatsOverview.recentHistoryDays, today: today)
         return StatsOverview(
             totalPlayed: records.count,
             totalWon: won,
@@ -51,9 +50,6 @@ public struct StatsAggregator: Sendable {
             gamesPerDay: gamesPerDay(records: records, today: today),
             classicWinRateByDifficulty: winRateByDifficulty(records: classic),
             classicTimesByDifficulty: timesByDifficulty(records: classic),
-            recentClassicTimesByDifficulty: timesByDifficulty(
-                records: classic.filter { $0.finishedAt >= recentStart },
-            ),
             classicSolveTimeTrendByDifficulty: trends(
                 records: classic,
                 today: today,

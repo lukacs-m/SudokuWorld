@@ -1,14 +1,14 @@
 import Model
 import SwiftUI
 
-/// The stats header: three tiles per row, since six captions in one row
-/// truncate on small phones.
+/// The stats header: three tiles per row at normal text sizes, dropping to
+/// two or one as Dynamic Type grows the captions.
 struct StatsTotalsGrid: View {
     let overview: StatsOverview
 
     var body: some View {
         LazyVGrid(
-            columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
+            columns: [GridItem(.adaptive(minimum: 100), spacing: 10)],
             spacing: 10,
         ) {
             StatTile("stats.today", value: "\(overview.gamesToday)")

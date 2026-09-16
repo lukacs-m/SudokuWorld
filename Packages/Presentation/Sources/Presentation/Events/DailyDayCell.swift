@@ -26,7 +26,7 @@ struct DailyDayCell: View {
             .background(isCompleted ? theme.accent : .clear, in: Circle().inset(by: 3))
             .overlay {
                 if isToday {
-                    Circle().strokeBorder(theme.accent, lineWidth: 1.5)
+                    Circle().inset(by: 3).strokeBorder(theme.accent, lineWidth: 1.5)
                 }
             }
             .accessibilityLabel(accessibilityLabel)
