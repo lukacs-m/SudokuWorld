@@ -156,6 +156,8 @@ private struct CalendarMonthGrid: View {
                 .opacity(day > today ? 0.35 : 1)
             }
         }
+        // The cells grow with the digits, so cap them short of their slot.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private var weekdaySymbols: [(offset: Int, element: String)] {
@@ -172,7 +174,7 @@ private struct CalendarMonthGrid: View {
     }
 }
 
-#Preview("Two-digit days at AX5") {
+#Preview("Two-digit days at AX5, capped to xxxLarge") {
     DailyCompletionCalendarView(
         completedDayKeys: ["2026-07-04", "2026-07-18", "2026-07-25"],
         today: EventSeeds.date(fromDateKey: "2026-07-26") ?? Date(),

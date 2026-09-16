@@ -174,6 +174,8 @@ struct EventsHubView: View {
                 .opacity(isFuture ? 0.35 : 1)
             }
         }
+        // The cells grow with the digits, so cap them short of their slot.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityHidden(true)
     }
 
