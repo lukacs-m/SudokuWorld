@@ -64,11 +64,11 @@ French localization.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
   win streaks, fastest/average times, perfect solves; daily-challenge streaks
   and a monthly completion calendar; games today / this week; classic win rate
-  and best times by difficulty (free players see the last 7 days, all-time
-  history sits behind a tappable blurred preview that opens the paywall);
-  30/90-day solve-time trend series ready for premium charts; Swift Charts
-  (30-day activity, variant distribution). Every day bucket is a UTC day like
-  the daily challenge.
+  and best times by difficulty, free and over all history; 30/90-day
+  solve-time trend series and a `PremiumStatBlurOverlay` component ready for
+  the premium trend cards, which are where the blurred, paywall-opening preview
+  lands; Swift Charts (30-day activity, variant distribution). Every day bucket
+  is a UTC day like the daily challenge.
 - **Game Center** — 84 matrix leaderboards (the 7 curated variants in
   `GameCenterIDs.leaderboardVariants` × 6 difficulties × time/wins; every
   other variant counts toward the aggregates only) + 4 aggregates, 16

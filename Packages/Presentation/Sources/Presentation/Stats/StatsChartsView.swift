@@ -8,11 +8,7 @@ import SwiftUI
 struct StatsChartsView: View {
     let overview: StatsOverview
 
-    @Environment(ThemeStore.self) private var themeStore
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
-        let theme = themeStore.theme(for: colorScheme)
         VStack(spacing: 16) {
             if hasRecentActivity {
                 ActivityChartView(days: overview.gamesPerDay)
@@ -25,7 +21,7 @@ struct StatsChartsView: View {
             ClassicTimesCards(overview: overview)
 
             if !overview.variantShares.isEmpty {
-                chartCard("stats.chart.variants", theme: theme) {
+                chartCard("stats.chart.variants") {
                     Chart(overview.variantShares) { share in
                         SectorMark(
                             angle: .value("Games", share.played),
@@ -52,7 +48,6 @@ struct StatsChartsView: View {
 
     private func chartCard(
         _ titleKey: LocalizedStringKey,
-        theme _: Theme,
         @ViewBuilder chart: () -> some View,
     ) -> some View {
         CardView {
