@@ -1,22 +1,23 @@
 import SwiftUI
 
-/// Chart colours from two of the theme's own roles, so multi-series charts
-/// never fall back to the system blue/green/orange that clashes with the sage
-/// palettes. The eight sectors are four brightness steps of the accent
-/// interleaved with four of the gold - accent, gold, accent one step on, gold
-/// one step on, and so on - with hue and saturation carried over untouched,
-/// so a muted palette keeps muted sectors and no sector lands on a hue the
-/// theme does not already use. The steps walk away from the card background,
-/// darker on a light palette and lighter on a dark one, starting far enough
-/// from it that the dimmest sector still reads; the gold ladder is offset
-/// half a step from the accent one, which is what keeps the two families
-/// apart in the amber palettes, whose accent and gold sit seven degrees of
-/// hue from each other.
+/// Chart colours that start on the theme's own roles: the first sector is
+/// `theme.accent` and the second `theme.gold` exactly as the palette defines
+/// them, so the biggest slice of a donut carries the theme's own colour. Each
+/// family then walks three more shades away from its base, 0.20 of brightness
+/// at a time with hue and saturation untouched, so no sector lands on a hue
+/// the theme does not already use. On a dark card the walk fades toward the
+/// card and stops a margin short of it; on a light card it deepens instead,
+/// because the palettes put their gold at 0.95 brightness or above and a
+/// tint that pale cannot be told from white with saturation held fixed. The
+/// gold walk stops one step earlier than the accent walk so the two ladders
+/// never converge on the same brightness - that is what keeps the amber
+/// palettes apart, whose accent and gold are seven degrees of hue from each
+/// other.
 enum StatsPalette {
-    private static let step = 0.19
-    private static let goldOffset = 0.08
-    private static let lightCardAnchor = 0.94
-    private static let darkCardAnchor = 0.34
+    private static let maxStep = 0.20
+    private static let cardMargin = 0.22
+    private static let darkestSector = 0.15
+    private static let goldStagger = 0.14
 
     static func series(count: Int, theme: Theme) -> [Color] {
         let ramp = ramp(theme: theme)
@@ -24,19 +25,28 @@ enum StatsPalette {
     }
 
     private static func ramp(theme: Theme) -> [Color] {
-        let accent = HSB(theme.accent)
-        let gold = HSB(theme.gold)
-        let onDarkCard = HSB(theme.cardBackground).brightness < 0.5
-        return (0 ..< 4).flatMap { index in
-            let accentStep = brightness(index, offset: 0, onDarkCard: onDarkCard)
-            let goldStep = brightness(index, offset: goldOffset, onDarkCard: onDarkCard)
-            return [accent.color(brightness: accentStep), gold.color(brightness: goldStep)]
-        }
+        let limit = limit(card: HSB(theme.cardBackground))
+        let accent = walk(from: theme.accent, stoppingAt: limit)
+        let gold = walk(from: theme.gold, stoppingAt: limit + goldStagger)
+        return (0 ..< 4).flatMap { [accent[$0], gold[$0]] }
     }
 
-    private static func brightness(_ index: Int, offset: Double, onDarkCard: Bool) -> Double {
-        let walked = Double(index) * step + offset
-        return onDarkCard ? darkCardAnchor + walked : lightCardAnchor - walked
+    /// The brightness a walk must not pass: a margin above a dark card, so
+    /// the last shade still stands off it, and short of black on a light one.
+    private static func limit(card: HSB) -> Double {
+        card.brightness < 0.5 ? card.brightness + cardMargin : darkestSector
+    }
+
+    /// Four shades from the base, a full step apart unless that would carry
+    /// the last one past the limit, in which case the step shortens to land
+    /// exactly on it.
+    private static func walk(from base: Color, stoppingAt limit: Double) -> [Color] {
+        let hsb = HSB(base)
+        let step = min(maxStep, max(0, hsb.brightness - limit) / 3)
+        return (0 ..< 4).map { index in
+            guard index > 0 else { return base }
+            return hsb.color(brightness: hsb.brightness - Double(index) * step)
+        }
     }
 }
 

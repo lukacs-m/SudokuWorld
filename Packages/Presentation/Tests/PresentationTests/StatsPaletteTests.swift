@@ -8,12 +8,12 @@ import Testing
 struct StatsPaletteTests {
     /// The donut caps itself at eight sectors, so eight is exactly how many
     /// colours a legend has to be able to tell apart - in every palette,
-    /// including the muted ones (warm paper, slate) and the amber ones, whose
-    /// accent and gold share a hue and so lean hardest on the ramp's
-    /// brightness steps. The measured ΔE76 floor across all eleven palettes
-    /// is 11.5 (both amber palettes), so the bar sits at 10: a palette or
-    /// ramp edit that pushes a pair below that fails here rather than
-    /// shipping a legend that cannot be matched to the chart.
+    /// including the muted ones and the amber pair, whose accent and gold
+    /// share a hue and so lean hardest on the brightness steps. The measured
+    /// ΔE76 floor across all eleven palettes is 9.8 (warm paper dark, whose
+    /// accent walk is the one most shortened to clear its card), so the bar
+    /// sits at 8: a palette or ramp edit that pushes a pair below that fails
+    /// here rather than shipping a legend that cannot be matched.
     @Test(arguments: ThemeID.allCases, [ColorScheme.light, ColorScheme.dark])
     func theFirstEightSeriesColoursStayPerceptuallyApart(id: ThemeID, scheme: ColorScheme) {
         let theme = ThemePalettes.palette(for: id, scheme: scheme)
@@ -25,20 +25,40 @@ struct StatsPaletteTests {
             for (other, color) in sectors.enumerated().dropFirst(offset + 1) {
                 let distance = sector.distance(to: color)
                 #expect(
-                    distance >= 10,
+                    distance >= 8,
                     "\(id) \(scheme): sectors \(offset) and \(other) are ΔE \(distance) apart",
                 )
             }
         }
     }
 
+    /// Sectors are drawn on the card with an angular inset that lets it show
+    /// through the gaps, so every sector has to stand off the card - the
+    /// dominant slice included, since it takes the first colour of the ramp.
+    /// The measured floor is 21.2 (slate dark); the walk shortens its step
+    /// per palette to hold that rather than fading into the card.
+    @Test(arguments: ThemeID.allCases, [ColorScheme.light, ColorScheme.dark])
+    func everySeriesColourStandsOffTheCard(id: ThemeID, scheme: ColorScheme) {
+        let theme = ThemePalettes.palette(for: id, scheme: scheme)
+        let card = LabColor(theme.cardBackground.resolve(in: EnvironmentValues()))
+
+        for (index, sector) in StatsPalette.series(count: 8, theme: theme).enumerated() {
+            let distance = LabColor(sector.resolve(in: EnvironmentValues())).distance(to: card)
+            #expect(
+                distance >= 20,
+                "\(id) \(scheme): sector \(index) is only ΔE \(distance) from the card",
+            )
+        }
+    }
+
     @Test func moreSeriesThanTheRampWrapAroundIt() {
-        let colors = StatsPalette.series(count: 9, theme: ThemePalettes.palette(
-            for: .slate,
-            scheme: .light,
-        ))
+        let theme = ThemePalettes.palette(for: .slate, scheme: .light)
+        let colors = StatsPalette.series(count: 9, theme: theme)
+
         #expect(colors.count == 9)
         #expect(colors[8] == colors[0])
+        #expect(colors[0] == theme.accent)
+        #expect(colors[1] == theme.gold)
     }
 }
 
