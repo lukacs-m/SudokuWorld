@@ -62,9 +62,9 @@ extension TrendSeriesOption {
     }
 }
 
-/// The card's series choice. Seeded from the window on screen the first time
-/// the card appears and then left alone, so switching the window keeps the
-/// line the player is reading instead of swapping it for a fuller one.
+/// The card's series choice. Seeded the first time the card appears and then
+/// left alone, so switching the window keeps the line the player is reading
+/// instead of swapping it for a fuller one.
 struct TrendSelection: Equatable {
     var id: TrendSeriesOption.Series?
 
@@ -94,6 +94,31 @@ enum TrendWindow: Int, CaseIterable, Identifiable {
     }
 }
 
+/// The two windows a trend card reads: the one it plots, and the one its
+/// default series is picked from. Premium draws the window its picker is set
+/// to and defaults from that same one. A free card has two windows on screen
+/// at once - seven days live, ninety blurred underneath - and the blurred one
+/// is what the paywall is selling, so the default follows it rather than
+/// letting one recent win decide which history gets teased.
+struct TrendWindows {
+    let drawn: TrendSeriesOption.Window
+    let seed: TrendSeriesOption.Window
+
+    init(isPremium: Bool, window: TrendWindow) {
+        guard isPremium else {
+            drawn = \.last7Days
+            seed = \.last90Days
+            return
+        }
+        let onScreen: TrendSeriesOption.Window = switch window {
+        case .days30: \.last30Days
+        case .days90: \.last90Days
+        }
+        drawn = onScreen
+        seed = onScreen
+    }
+}
+
 /// Item 6 of the stats plan: average solve time over 30 or 90 days. Premium
 /// players get the full window in one card. Free players get the last 7 days
 /// live, with the picked window blurred right underneath as the paywall tease.
@@ -106,8 +131,8 @@ struct SolveTimeTrendSection: View {
     @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        let selected = selection.option(in: options, window: displayedWindow)
-        let drawn = selected?.trend[keyPath: displayedWindow] ?? []
+        let selected = selection.option(in: options, window: windows.seed)
+        let drawn = selected?.trend[keyPath: windows.drawn] ?? []
         Group {
             if premiumGate.isPremium {
                 CardView {
@@ -152,24 +177,18 @@ struct SolveTimeTrendSection: View {
                 }
             }
         }
-        .onAppear { selection.seed(from: options, in: displayedWindow) }
+        .onAppear { selection.seed(from: options, in: windows.seed) }
     }
 
-    /// The window the live card draws, so the default series is picked from
-    /// the points that are actually on screen.
-    private var displayedWindow: TrendSeriesOption.Window {
-        guard premiumGate.isPremium else { return \.last7Days }
-        return switch window {
-        case .days30: \.last30Days
-        case .days90: \.last90Days
-        }
+    private var windows: TrendWindows {
+        TrendWindows(isPremium: premiumGate.isPremium, window: window)
     }
 
     /// The picker needs a concrete selection to show its label, so it reads
     /// the same resolved option the chart draws.
     private var seriesSelection: Binding<TrendSeriesOption.Series?> {
         Binding(
-            get: { selection.option(in: options, window: displayedWindow)?.id },
+            get: { selection.option(in: options, window: windows.seed)?.id },
             set: { selection.id = $0 },
         )
     }

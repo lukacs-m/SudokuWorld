@@ -27,6 +27,14 @@ struct TrendSeriesOptionTests {
         )
     }
 
+    /// Twenty medium wins between eight and twenty-seven days back, and three
+    /// easy ones this week: the shape of a player whose recent week sits on a
+    /// different tier than their history.
+    private var freeHistory: [TrendSeriesOption] {
+        options((8 ... 27).map { win(.medium, daysAgo: $0) }
+            + (0 ... 2).map { win(.easy, daysAgo: $0) })
+    }
+
     private func options(_ records: [GameRecord]) -> [TrendSeriesOption] {
         TrendSeriesOption.all(from: StatsAggregator().overview(
             records: records,
@@ -36,16 +44,44 @@ struct TrendSeriesOptionTests {
         ))
     }
 
-    /// The free card draws the last 7 days, so a series whose 20 wins are all
-    /// older than a week must not be the one it opens on.
-    @Test func theDefaultSeriesIsTheFullestOneInTheWindowOnScreen() {
-        let older = (8 ... 27).map { win(.medium, daysAgo: $0) }
-        let thisWeek = (0 ... 2).map { win(.easy, daysAgo: $0) }
-        let all = options(older + thisWeek)
+    /// A free card draws seven days but sells the blurred ninety-day one, so
+    /// its default is the richest series over ninety days - one win this week
+    /// on another tier must not decide which history gets teased.
+    @Test func theFreeDefaultSeriesIsTheFullestOverNinetyDays() {
+        var selection = TrendSelection()
 
-        #expect(TrendSeriesOption.fullest(of: all, in: \.last7Days)?.id == .classic(.easy))
-        #expect(TrendSeriesOption.fullest(of: all, in: \.last30Days)?.id == .classic(.medium))
-        #expect(TrendSeriesOption.fullest(of: all, in: \.last90Days)?.id == .classic(.medium))
+        selection.seed(from: freeHistory, in: TrendWindows(isPremium: false, window: .days30).seed)
+
+        #expect(selection.id == .classic(.medium))
+        #expect(TrendSeriesOption.fullest(of: freeHistory, in: \.last7Days)?.id == .classic(.easy))
+    }
+
+    /// The live card keeps the series the tease is selling, so where that
+    /// series has no win this week it shows its own empty state instead of
+    /// plotting a different line than the card below it.
+    @Test func theFreeSevenDayCardIsEmptyWhenTheDefaultHasNoWinsThisWeek() {
+        let windows = TrendWindows(isPremium: false, window: .days30)
+        var selection = TrendSelection()
+        selection.seed(from: freeHistory, in: windows.seed)
+
+        let selected = selection.option(in: freeHistory, window: windows.seed)
+
+        #expect(selected?.trend[keyPath: windows.drawn].isEmpty == true)
+        #expect(selected?.trend.last90Days.count == 20)
+    }
+
+    /// Premium has one window on screen, so that one drives the default.
+    @Test func thePremiumDefaultFollowsTheWindowOnScreen() {
+        let all = options((0 ... 2).map { win(.easy, daysAgo: $0) }
+            + (31 ... 40).map { win(.medium, daysAgo: $0) })
+        var thirtyDays = TrendSelection()
+        var ninetyDays = TrendSelection()
+
+        thirtyDays.seed(from: all, in: TrendWindows(isPremium: true, window: .days30).seed)
+        ninetyDays.seed(from: all, in: TrendWindows(isPremium: true, window: .days90).seed)
+
+        #expect(thirtyDays.id == .classic(.easy))
+        #expect(ninetyDays.id == .classic(.medium))
     }
 
     /// Nothing won this week: the picker still has to name a series, so the
