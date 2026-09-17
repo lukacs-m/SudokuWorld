@@ -58,8 +58,29 @@ struct TrendSeriesOptionTests {
         #expect(fallback?.id == .classic(.medium))
     }
 
+    /// The window picker must not double as a series picker: once the card
+    /// has seeded its series, switching 30/90 days keeps that series even
+    /// though another one is fuller over the wider window.
+    @Test func aWindowToggleKeepsTheSeededSeries() {
+        let thisMonth = (0 ... 2).map { win(.easy, daysAgo: $0) }
+        let older = (31 ... 40).map { win(.medium, daysAgo: $0) }
+        let all = options(thisMonth + older)
+        var selection = TrendSelection()
+
+        selection.seed(from: all, in: \.last30Days)
+        #expect(selection.id == .classic(.easy))
+
+        selection.seed(from: all, in: \.last90Days)
+        #expect(selection.id == .classic(.easy))
+        #expect(TrendSeriesOption.fullest(of: all, in: \.last90Days)?.id == .classic(.medium))
+    }
+
     @Test func noSeriesMeansNoDefault() {
+        var selection = TrendSelection()
+        selection.seed(from: [], in: \.last7Days)
+
         #expect(TrendSeriesOption.fullest(of: [], in: \.last7Days) == nil)
+        #expect(selection.id == nil)
     }
 
     /// Classic is covered by its own per-difficulty series, so it must not

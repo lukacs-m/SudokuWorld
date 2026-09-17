@@ -62,6 +62,18 @@ extension TrendSeriesOption {
     }
 }
 
+/// The card's series choice. Seeded from the window on screen the first time
+/// the card appears and then left alone, so switching the window keeps the
+/// line the player is reading instead of swapping it for a fuller one.
+struct TrendSelection: Equatable {
+    var id: TrendSeriesOption.Series?
+
+    mutating func seed(from options: [TrendSeriesOption], in window: TrendSeriesOption.Window) {
+        guard id == nil else { return }
+        id = TrendSeriesOption.fullest(of: options, in: window)?.id
+    }
+}
+
 enum TrendWindow: Int, CaseIterable, Identifiable {
     case days30 = 30
     case days90 = 90
@@ -78,51 +90,58 @@ struct SolveTimeTrendSection: View {
     let options: [TrendSeriesOption]
 
     @State private var window: TrendWindow = .days30
-    @State private var selectedID: TrendSeriesOption.Series?
+    @State private var selection = TrendSelection()
 
     @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        let selected = options.first { $0.id == selectedID } ?? defaultOption
+        let selected = options.first { $0.id == selection.id } ?? defaultOption
         let drawn = selected?.trend[keyPath: displayedWindow] ?? []
-        if premiumGate.isPremium {
-            CardView {
-                TrendCardContent(
-                    "stats.trend.title",
-                    points: drawn,
-                    days: window.rawValue,
-                    endDay: selected?.trend.endDay,
-                ) {
-                    TrendControls(options: options, window: $window, selectedID: seriesSelection)
+        Group {
+            if premiumGate.isPremium {
+                CardView {
+                    TrendCardContent(
+                        "stats.trend.title",
+                        points: drawn,
+                        days: window.rawValue,
+                        endDay: selected?.trend.endDay,
+                    ) {
+                        TrendControls(
+                            options: options,
+                            window: $window,
+                            selectedID: seriesSelection,
+                        )
+                    }
                 }
-            }
-        } else {
-            CardView {
-                TrendCardContent(
-                    "stats.trend.free.title",
-                    points: drawn,
-                    days: 7,
-                    endDay: selected?.trend.endDay,
-                ) {
-                    TrendSeriesPicker(options: options, selectedID: seriesSelection)
+            } else {
+                CardView {
+                    TrendCardContent(
+                        "stats.trend.free.title",
+                        points: drawn,
+                        days: 7,
+                        endDay: selected?.trend.endDay,
+                    ) {
+                        TrendSeriesPicker(options: options, selectedID: seriesSelection)
+                    }
                 }
-            }
-            // The tease is pinned to the widest window: a picker here would
-            // change a chart the free player cannot read anyway.
-            PremiumStatBlurOverlay(
-                "stats.premium.trend.title \(TrendWindow.days90.rawValue)",
-                tease: "stats.premium.trend.tease",
-            ) {
-                TrendCardContent(
-                    "stats.trend.title",
-                    points: selected?.trend.last90Days ?? [],
-                    days: TrendWindow.days90.rawValue,
-                    endDay: selected?.trend.endDay,
+                // The tease is pinned to the widest window: a picker here would
+                // change a chart the free player cannot read anyway.
+                PremiumStatBlurOverlay(
+                    "stats.premium.trend.title \(TrendWindow.days90.rawValue)",
+                    tease: "stats.premium.trend.tease",
                 ) {
-                    EmptyView()
+                    TrendCardContent(
+                        "stats.trend.title",
+                        points: selected?.trend.last90Days ?? [],
+                        days: TrendWindow.days90.rawValue,
+                        endDay: selected?.trend.endDay,
+                    ) {
+                        EmptyView()
+                    }
                 }
             }
         }
+        .onAppear { selection.seed(from: options, in: displayedWindow) }
     }
 
     /// The window the live card draws, so the default series is picked from
@@ -143,8 +162,8 @@ struct SolveTimeTrendSection: View {
     /// state reads as the default series.
     private var seriesSelection: Binding<TrendSeriesOption.Series?> {
         Binding(
-            get: { selectedID ?? defaultOption?.id },
-            set: { selectedID = $0 },
+            get: { selection.id ?? defaultOption?.id },
+            set: { selection.id = $0 },
         )
     }
 }

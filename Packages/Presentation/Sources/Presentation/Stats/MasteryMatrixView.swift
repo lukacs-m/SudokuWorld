@@ -208,8 +208,8 @@ private struct MasteryCellView: View {
             return "\(name): \(moduleString("stats.mastery.cell.none"))"
         }
         let solvedCount = String(
-            format: String(localized: "stats.mastery.cell.solved", bundle: .module),
-            cell.won,
+            localized: "stats.mastery.cell.solved \(cell.won)",
+            bundle: .module,
         )
         var parts = [solvedCount]
         if let fastest = cell.fastestTime {

@@ -259,7 +259,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 324 tests; the Domain
+Tests across four packages (`make test`, macOS host, 325 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):
