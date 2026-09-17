@@ -182,11 +182,13 @@ public struct StatsAggregator: Sendable {
         let start90 = startOfWindow(days: 90, today: today)
         let start30 = startOfWindow(days: 30, today: today)
         let start7 = startOfWindow(days: 7, today: today)
+        let endDay = calendar.startOfDay(for: today)
         let wins = records.filter { $0.outcome == .won && $0.finishedAt >= start90 }
         var trends: [Key: StatsOverview.SolveTimeTrend] = [:]
         for (value, subset) in Dictionary(grouping: wins, by: { $0[keyPath: key] }) {
             let points = trendPoints(wins: subset)
             trends[value] = StatsOverview.SolveTimeTrend(
+                endDay: endDay,
                 last7Days: points.filter { $0.day >= start7 },
                 last30Days: points.filter { $0.day >= start30 },
                 last90Days: points,

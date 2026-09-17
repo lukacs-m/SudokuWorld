@@ -41,7 +41,7 @@ struct MasteryMatrixView: View {
                     Text("stats.mastery.legend.perfect", bundle: .module)
                 } icon: {
                     Image(systemName: "star.fill")
-                        .foregroundStyle(StatsPalette.hintGold)
+                        .foregroundStyle(theme.gold)
                 }
                 .font(.caption)
                 .foregroundStyle(theme.textSecondary)
@@ -180,7 +180,7 @@ private struct MasteryCellView: View {
                 if cell?.hasPerfectSolve == true {
                     Image(systemName: "star.fill")
                         .font(.system(size: 8))
-                        .foregroundStyle(StatsPalette.hintGold)
+                        .foregroundStyle(theme.gold)
                 }
             }
             Text(verbatim: best)

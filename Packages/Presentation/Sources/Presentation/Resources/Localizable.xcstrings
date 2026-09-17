@@ -7185,6 +7185,22 @@
         }
       }
     },
+    "stats.chart.variants.other" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other variants"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres variantes"
+          }
+        }
+      }
+    },
     "stats.chart.winRate" : {
       "localizations" : {
         "en" : {

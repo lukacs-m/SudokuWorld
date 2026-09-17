@@ -74,11 +74,21 @@ public struct StatsOverview: Equatable, Sendable {
     /// are left out rather than zero-filled, so sparse history plots as gaps.
     /// The 7-day series is the free preview of the same line.
     public struct SolveTimeTrend: Equatable, Sendable {
+        /// The UTC day every window was measured back from, so a chart draws
+        /// the axis the points were bucketed against even if midnight passes
+        /// while the screen stays open.
+        public let endDay: Date
         public let last7Days: [TrendPoint]
         public let last30Days: [TrendPoint]
         public let last90Days: [TrendPoint]
 
-        public init(last7Days: [TrendPoint], last30Days: [TrendPoint], last90Days: [TrendPoint]) {
+        public init(
+            endDay: Date,
+            last7Days: [TrendPoint],
+            last30Days: [TrendPoint],
+            last90Days: [TrendPoint],
+        ) {
+            self.endDay = endDay
             self.last7Days = last7Days
             self.last30Days = last30Days
             self.last90Days = last90Days

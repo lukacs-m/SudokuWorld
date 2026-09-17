@@ -461,6 +461,18 @@ struct SolveTimeTrendTests {
         #expect(days == days.sorted())
     }
 
+    /// The chart draws its axis from `endDay`, so it has to be the UTC day
+    /// the aggregation ran for and not whatever the clock says at render time.
+    @Test func everyTrendEndsOnTheAggregationDay() {
+        let result = overview([
+            record(outcome: .won, duration: 100, finishedAt: today),
+            record(outcome: .won, variant: .killer, duration: 200, finishedAt: day("2026-06-25")),
+        ])
+        let startOfToday = day("2026-07-04", hour: 0)
+        #expect(result.classicSolveTimeTrendByDifficulty[.medium]?.endDay == startOfToday)
+        #expect(result.solveTimeTrendByVariant[.killer]?.endDay == startOfToday)
+    }
+
     @Test func aDailyChallengeRecordFeedsItsVariantTrendAndMasteryCell() {
         let daily = GameRecord(
             id: UUID(),

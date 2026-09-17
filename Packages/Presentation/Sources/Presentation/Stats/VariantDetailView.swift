@@ -1,3 +1,4 @@
+import Domain
 import Foundation
 import Model
 import SwiftUI
@@ -34,7 +35,12 @@ struct VariantDetailView: View {
         TrendSeriesOption(
             id: .variant(variant),
             trend: overview.solveTimeTrendByVariant[variant]
-                ?? StatsOverview.SolveTimeTrend(last7Days: [], last30Days: [], last90Days: []),
+                ?? StatsOverview.SolveTimeTrend(
+                    endDay: EventSeeds.utcCalendar.startOfDay(for: Date()),
+                    last7Days: [],
+                    last30Days: [],
+                    last90Days: [],
+                ),
         )
     }
 }

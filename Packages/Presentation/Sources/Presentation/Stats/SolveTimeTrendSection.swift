@@ -23,17 +23,21 @@ struct TrendSeriesOption: Identifiable, Equatable {
         }
     }
 
-    /// Classic per difficulty first, then every variant with a win in the
-    /// last 90 days, in the app's own order.
+    /// Classic per difficulty first, then every other variant with a win in
+    /// the last 90 days, in the app's own order. Classic is left out of the
+    /// variant list: its difficulties already cover it, and a series mixing
+    /// an easy solve with a master one is not comparable.
     static func all(from overview: StatsOverview) -> [Self] {
         let classic = Difficulty.allCases.compactMap { difficulty in
             overview.classicSolveTimeTrendByDifficulty[difficulty]
                 .map { Self(id: .classic(difficulty), trend: $0) }
         }
-        let variants = SudokuVariant.allCases.compactMap { variant in
-            overview.solveTimeTrendByVariant[variant]
-                .map { Self(id: .variant(variant), trend: $0) }
-        }
+        let variants = SudokuVariant.allCases
+            .filter { $0 != .classic }
+            .compactMap { variant in
+                overview.solveTimeTrendByVariant[variant]
+                    .map { Self(id: .variant(variant), trend: $0) }
+            }
         return classic + variants
     }
 }
@@ -59,12 +63,16 @@ struct SolveTimeTrendSection: View {
     @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        let selected = options.first { $0.id == selectedID } ?? options.first
-        let full = points(of: selected, in: window)
+        let selected = options.first { $0.id == selectedID } ?? defaultOption
         if premiumGate.isPremium {
             CardView {
-                TrendCardContent("stats.trend.title", points: full, days: window.rawValue) {
-                    controls
+                TrendCardContent(
+                    "stats.trend.title",
+                    points: points(of: selected, in: window),
+                    days: window.rawValue,
+                    endDay: selected?.trend.endDay,
+                ) {
+                    TrendControls(options: options, window: $window, selectedID: seriesSelection)
                 }
             }
         } else {
@@ -73,31 +81,41 @@ struct SolveTimeTrendSection: View {
                     "stats.trend.free.title",
                     points: selected?.trend.last7Days ?? [],
                     days: 7,
+                    endDay: selected?.trend.endDay,
                 ) {
-                    controls
+                    TrendSeriesPicker(options: options, selectedID: seriesSelection)
                 }
             }
+            // The tease is pinned to the widest window: a picker here would
+            // change a chart the free player cannot read anyway.
             PremiumStatBlurOverlay(
-                "stats.premium.trend.title \(window.rawValue)",
+                "stats.premium.trend.title \(TrendWindow.days90.rawValue)",
                 tease: "stats.premium.trend.tease",
             ) {
-                TrendCardContent("stats.trend.title", points: full, days: window.rawValue) {
+                TrendCardContent(
+                    "stats.trend.title",
+                    points: selected?.trend.last90Days ?? [],
+                    days: TrendWindow.days90.rawValue,
+                    endDay: selected?.trend.endDay,
+                ) {
                     EmptyView()
                 }
             }
         }
     }
 
+    /// An unset picker reads as the series with the most days on it, rather
+    /// than whichever tier happens to sort first.
+    private var defaultOption: TrendSeriesOption? {
+        options.max { $0.trend.last90Days.count < $1.trend.last90Days.count }
+    }
+
     /// The picker needs a concrete selection to show its label, so an unset
-    /// state reads as the first option.
-    private var controls: some View {
-        TrendControls(
-            options: options,
-            window: $window,
-            selectedID: Binding(
-                get: { selectedID ?? options.first?.id },
-                set: { selectedID = $0 },
-            ),
+    /// state reads as the default series.
+    private var seriesSelection: Binding<TrendSeriesOption.Series?> {
+        Binding(
+            get: { selectedID ?? defaultOption?.id },
+            set: { selectedID = $0 },
         )
     }
 
@@ -113,8 +131,7 @@ struct SolveTimeTrendSection: View {
     }
 }
 
-/// The window picker, plus a series picker when there is more than one line
-/// to choose from (the deep dive pins its variant).
+/// The premium window picker, above the series picker.
 private struct TrendControls: View {
     let options: [TrendSeriesOption]
     @Binding var window: TrendWindow
@@ -131,17 +148,28 @@ private struct TrendControls: View {
             }
             .pickerStyle(.segmented)
 
-            if options.count > 1 {
-                Picker(selection: $selectedID) {
-                    ForEach(options) { option in
-                        Text(verbatim: option.label).tag(Optional(option.id))
-                    }
-                } label: {
-                    Text("stats.trend.series", bundle: .module)
+            TrendSeriesPicker(options: options, selectedID: $selectedID)
+        }
+    }
+}
+
+/// Shown only when there is more than one line to choose from (the deep dive
+/// pins its variant).
+private struct TrendSeriesPicker: View {
+    let options: [TrendSeriesOption]
+    @Binding var selectedID: TrendSeriesOption.Series?
+
+    var body: some View {
+        if options.count > 1 {
+            Picker(selection: $selectedID) {
+                ForEach(options) { option in
+                    Text(verbatim: option.label).tag(Optional(option.id))
                 }
-                .pickerStyle(.menu)
-                .labelsHidden()
+            } label: {
+                Text("stats.trend.series", bundle: .module)
             }
+            .pickerStyle(.menu)
+            .labelsHidden()
         }
     }
 }
@@ -152,17 +180,20 @@ struct TrendCardContent<Controls: View>: View {
     private let titleKey: LocalizedStringKey
     private let points: [StatsOverview.TrendPoint]
     private let days: Int
+    private let endDay: Date?
     private let controls: Controls
 
     init(
         _ titleKey: LocalizedStringKey,
         points: [StatsOverview.TrendPoint],
         days: Int,
+        endDay: Date?,
         @ViewBuilder controls: () -> Controls,
     ) {
         self.titleKey = titleKey
         self.points = points
         self.days = days
+        self.endDay = endDay
         self.controls = controls()
     }
 
@@ -170,7 +201,7 @@ struct TrendCardContent<Controls: View>: View {
         VStack(alignment: .leading, spacing: 12) {
             SectionLabel(titleKey)
             controls
-            SolveTimeTrendChart(points: points, days: days)
+            SolveTimeTrendChart(points: points, days: days, endDay: endDay)
         }
     }
 }
@@ -181,6 +212,10 @@ struct TrendCardContent<Controls: View>: View {
 struct SolveTimeTrendChart: View {
     let points: [StatsOverview.TrendPoint]
     let days: Int
+    /// The UTC day the points were bucketed against. A live `Date()` would
+    /// drift past it once midnight passes with the screen open, clipping the
+    /// oldest point out of the domain.
+    let endDay: Date?
 
     private let utc = EventSeeds.utcCalendar
 
@@ -245,8 +280,8 @@ struct SolveTimeTrendChart: View {
     }
 
     private var startOfWindow: Date {
-        let today = utc.startOfDay(for: Date())
-        return utc.date(byAdding: .day, value: 1 - days, to: today) ?? today
+        let end = endDay ?? utc.startOfDay(for: Date())
+        return utc.date(byAdding: .day, value: 1 - days, to: end) ?? end
     }
 
     /// The window's UTC days, padded half a day per side like the activity chart.
@@ -314,6 +349,7 @@ private enum PreviewData {
         let weekAgo = today.addingTimeInterval(-6 * 86400)
         let monthAgo = today.addingTimeInterval(-29 * 86400)
         let trend = StatsOverview.SolveTimeTrend(
+            endDay: today,
             last7Days: points.filter { $0.day >= weekAgo },
             last30Days: points.filter { $0.day >= monthAgo },
             last90Days: points,
