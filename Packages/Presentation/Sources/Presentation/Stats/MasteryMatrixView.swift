@@ -191,7 +191,7 @@ private struct MasteryCellView: View {
                 .foregroundStyle(theme.textSecondary)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: accessibilityLabel))
+        .accessibilityLabel(Text(verbatim: masteryCellLabel(difficulty: difficulty, cell: cell)))
     }
 
     private var solved: String {
@@ -203,25 +203,30 @@ private struct MasteryCellView: View {
         guard let fastest = cell?.fastestTime else { return "-" }
         return DurationFormatter.string(for: fastest)
     }
+}
 
-    private var accessibilityLabel: String {
-        let name = moduleString("difficulty.\(difficulty.slug)")
-        guard let cell, cell.played > 0 else {
-            return "\(name): \(moduleString("stats.mastery.cell.none"))"
-        }
-        let solvedCount = String(
-            localized: "stats.mastery.cell.solved \(cell.won)",
-            bundle: .module,
-        )
-        var parts = [solvedCount]
-        if let fastest = cell.fastestTime {
-            parts.append(bestTimeString(fastest))
-        }
-        if cell.hasPerfectSolve {
-            parts.append(moduleString("stats.mastery.legend.perfect"))
-        }
-        return "\(name): \(parts.joined(separator: ", "))"
+/// The cell's VoiceOver reading. Both render "-", but a missing cell is a tier
+/// the variant never offers rather than one the player has yet to play.
+func masteryCellLabel(difficulty: Difficulty, cell: VariantStats?) -> String {
+    let name = moduleString("difficulty.\(difficulty.slug)")
+    guard let cell else {
+        return "\(name): \(moduleString("stats.mastery.cell.notOffered"))"
     }
+    guard cell.played > 0 else {
+        return "\(name): \(moduleString("stats.mastery.cell.none"))"
+    }
+    let solvedCount = String(
+        localized: "stats.mastery.cell.solved \(cell.won)",
+        bundle: .module,
+    )
+    var parts = [solvedCount]
+    if let fastest = cell.fastestTime {
+        parts.append(bestTimeString(fastest))
+    }
+    if cell.hasPerfectSolve {
+        parts.append(moduleString("stats.mastery.legend.perfect"))
+    }
+    return "\(name): \(parts.joined(separator: ", "))"
 }
 
 #Preview("Free") {

@@ -68,6 +68,23 @@ struct MasteryMatrixLayoutTests {
         #expect(cube.cell(for: .easy)?.won == 1)
     }
 
+    @Test func aTierTheVariantDoesNotOfferReadsApartFromAnUnplayedTier() throws {
+        let result = layout([record(variant: .tredoku), record(variant: .cube)])
+        let tredoku = try #require(result.rows.first { $0.variant == .tredoku })
+        let cube = try #require(result.rows.first { $0.variant == .cube })
+        #expect(tredoku.cell(for: .master) == nil)
+        #expect(cube.cell(for: .beginner)?.played == 0)
+
+        let notOffered = masteryCellLabel(difficulty: .master, cell: tredoku.cell(for: .master))
+        let noGames = masteryCellLabel(difficulty: .beginner, cell: cube.cell(for: .beginner))
+        #expect(notOffered.hasSuffix(moduleString("stats.mastery.cell.notOffered")))
+        #expect(noGames.hasSuffix(moduleString("stats.mastery.cell.none")))
+        #expect(
+            masteryCellLabel(difficulty: .medium, cell: tredoku.cell(for: .medium))
+                != masteryCellLabel(difficulty: .medium, cell: cube.cell(for: .medium)),
+        )
+    }
+
     @Test func perfectSolveBadgeNeedsAFlawlessWin() {
         let flawed = layout([
             record(variant: .classic, mistakes: 1),

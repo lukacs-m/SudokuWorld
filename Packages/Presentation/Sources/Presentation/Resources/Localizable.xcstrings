@@ -7313,6 +7313,22 @@
         }
       }
     },
+    "stats.mastery.cell.notOffered" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not offered"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non proposé"
+          }
+        }
+      }
+    },
     "stats.mastery.cell.solved %lld" : {
       "localizations" : {
         "en" : {
