@@ -8,10 +8,11 @@ import Testing
 struct StatsPaletteTests {
     /// The donut caps itself at eight sectors, so eight is exactly how many
     /// colours a legend has to be able to tell apart - in every palette,
-    /// including the forest one whose accent and success are the same green.
-    /// The bar is deliberately low: the ramp keeps each base's own saturation,
-    /// so a palette as muted as warm paper cannot spread its sectors far, and
-    /// what the guard catches is a pair that renders as one colour.
+    /// including the muted ones (warm paper, slate) and the forest one whose
+    /// accent and success are the same green. A ΔE76 of 12 is about where two
+    /// chart sectors stop reading as the same colour; the ramp's own floor is
+    /// 13.2 (amber dark), so a palette or ramp edit that drops a pair below
+    /// that bar fails here rather than shipping an unreadable legend.
     @Test(arguments: ThemeID.allCases, [ColorScheme.light, ColorScheme.dark])
     func theFirstEightSeriesColoursStayPerceptuallyApart(id: ThemeID, scheme: ColorScheme) {
         let theme = ThemePalettes.palette(for: id, scheme: scheme)
@@ -23,7 +24,7 @@ struct StatsPaletteTests {
             for (other, color) in sectors.enumerated().dropFirst(offset + 1) {
                 let distance = sector.distance(to: color)
                 #expect(
-                    distance >= 4,
+                    distance >= 12,
                     "\(id) \(scheme): sectors \(offset) and \(other) are ΔE \(distance) apart",
                 )
             }

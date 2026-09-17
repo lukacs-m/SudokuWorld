@@ -72,7 +72,19 @@ struct TrendSeriesOptionTests {
 
         selection.seed(from: all, in: \.last90Days)
         #expect(selection.id == .classic(.easy))
+        #expect(selection.option(in: all, window: \.last90Days)?.id == .classic(.easy))
         #expect(TrendSeriesOption.fullest(of: all, in: \.last90Days)?.id == .classic(.medium))
+    }
+
+    /// A reload drops a series once its last win ages out of the window, and
+    /// the stale selection must not leave the picker naming nothing.
+    @Test func aSelectionThatNoLongerExistsResolvesToTheDrawnSeries() {
+        let all = options((0 ... 2).map { win(.easy, daysAgo: $0) })
+        var selection = TrendSelection()
+        selection.id = .classic(.master)
+
+        #expect(!all.contains { $0.id == .classic(.master) })
+        #expect(selection.option(in: all, window: \.last7Days)?.id == .classic(.easy))
     }
 
     @Test func noSeriesMeansNoDefault() {

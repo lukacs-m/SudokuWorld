@@ -72,6 +72,17 @@ struct TrendSelection: Equatable {
         guard id == nil else { return }
         id = TrendSeriesOption.fullest(of: options, in: window)?.id
     }
+
+    /// The option the card draws. A reload drops a series once its last win
+    /// ages out of the 90-day window, so a selection that no longer exists
+    /// re-anchors on the line actually plotted instead of leaving the picker
+    /// with a label that matches nothing.
+    func option(
+        in options: [TrendSeriesOption],
+        window: TrendSeriesOption.Window,
+    ) -> TrendSeriesOption? {
+        options.first { $0.id == id } ?? TrendSeriesOption.fullest(of: options, in: window)
+    }
 }
 
 enum TrendWindow: Int, CaseIterable, Identifiable {
@@ -95,7 +106,7 @@ struct SolveTimeTrendSection: View {
     @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        let selected = options.first { $0.id == selection.id } ?? defaultOption
+        let selected = selection.option(in: options, window: displayedWindow)
         let drawn = selected?.trend[keyPath: displayedWindow] ?? []
         Group {
             if premiumGate.isPremium {
@@ -154,15 +165,11 @@ struct SolveTimeTrendSection: View {
         }
     }
 
-    private var defaultOption: TrendSeriesOption? {
-        TrendSeriesOption.fullest(of: options, in: displayedWindow)
-    }
-
-    /// The picker needs a concrete selection to show its label, so an unset
-    /// state reads as the default series.
+    /// The picker needs a concrete selection to show its label, so it reads
+    /// the same resolved option the chart draws.
     private var seriesSelection: Binding<TrendSeriesOption.Series?> {
         Binding(
-            get: { selection.id ?? defaultOption?.id },
+            get: { selection.option(in: options, window: displayedWindow)?.id },
             set: { selection.id = $0 },
         )
     }
