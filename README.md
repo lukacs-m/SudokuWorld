@@ -62,9 +62,13 @@ French localization.
   "Learn more" link on every technique hint; each figure is validated against
   the solver.
 - **Stats** — per variant × difficulty: played/won/lost/abandoned, win rate,
-  win streaks, fastest/average times; daily-challenge streaks; Swift Charts
-  (30-day activity, win rate by difficulty, best-vs-average times, variant
-  distribution).
+  win streaks, fastest/average times, perfect solves; daily-challenge streaks,
+  plus a monthly completion calendar on the events hub; games today / this
+  week; classic win rate and best times by difficulty, free and over all
+  history; 30/90-day solve-time trend series and a `PremiumStatBlurOverlay`
+  component ready for the premium trend cards, which are where the blurred,
+  paywall-opening preview lands; Swift Charts (30-day activity, variant
+  distribution). Every day bucket is a UTC day like the daily challenge.
 - **Game Center** — 84 matrix leaderboards (the 7 curated variants in
   `GameCenterIDs.leaderboardVariants` × 6 difficulties × time/wins; every
   other variant counts toward the aggregates only) + 4 aggregates, 16
@@ -241,7 +245,7 @@ All copy lives in the string catalog.
 ## Localization
 
 `Packages/Presentation/Sources/Presentation/Resources/Localizable.xcstrings`
-carries **English and French** (~540 keys: UI, variant and technique names,
+carries **English and French** (~560 keys: UI, variant and technique names,
 hint explanations, lesson copy, notifications, paywall; only symbols and a few
 chart axis labels have no French entry). Shipping French-first is a
 `CFBundleDevelopmentRegion` flip in `project.yml`. Test at runtime with:
@@ -252,7 +256,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 294 tests; the Domain
+Tests across four packages (`make test`, macOS host, 309 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):
@@ -277,9 +281,11 @@ Hard/Expert/Master boards to completion):
 - **Presentation** — ViewModels with container-registered mocks
   (`@Suite(.container)`): game flow incl. hardcore loss, unlimited hints,
   digit-first input, `PremiumGate` (cache seed + stream flips), paywall
-  flows, premium theme gating, events hub; board zoom clamping, outside-clue
-  overlay layout, variant glyphs, cube geometry (bent lines straight over
-  each fold, tap ray-cast, settle, zoom clamp), cube face texture rendering
+  flows, premium theme gating, events hub; the daily day grids (week strip,
+  month calendar and archive all naming the same UTC day, weekday symbols in
+  the device's language), board zoom clamping, outside-clue overlay layout,
+  variant glyphs, cube geometry (bent lines straight over each fold, tap
+  ray-cast, settle, zoom clamp), cube face texture rendering
   off the main actor (highlight blending over the cell background, given and
   note ink); `LessonCatalogTests` (technique coverage, rank order, English and
   French key presence).

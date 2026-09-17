@@ -34,7 +34,7 @@ public final class HomeViewModel {
             state = .loading
         }
         let session = await resumeGame(context: .regular)
-        let stats = await computeStats(today: now)
+        let stats = await computeStats(today: now, firstWeekday: DailyDayGrid.firstWeekday)
         state = .loaded(Content(
             continueGame: session?.savedGame(at: now),
             streaks: stats.streaks,

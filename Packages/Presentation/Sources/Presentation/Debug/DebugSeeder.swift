@@ -40,14 +40,21 @@
                 try? await records.insert(record)
             }
 
-            // A 5-day daily streak ending today, for the week strip.
-            for offset in 0 ..< 5 {
+            // A 5-day daily streak ending today for the week strip, plus
+            // scattered earlier days (some on a variant slot) for the calendar.
+            let completedOffsets = [0, 1, 2, 3, 4, 7, 9, 12, 13, 20, 26, 33, 41, 42]
+            for offset in completedOffsets {
                 guard let day = EventSeeds.utcCalendar.date(
                     byAdding: .day, value: -offset, to: now,
                 ) else { continue }
+                let dateKey = EventSeeds.dailyDateKey(for: day)
+                let usesVariantSlot = offset > 0 && offset.isMultiple(of: 3)
+                let variant = usesVariantSlot
+                    ? EventSeeds.dailySlots(dateKey: dateKey).last?.variant ?? .classic
+                    : .classic
                 try? await dailies.markCompleted(
-                    dateKey: EventSeeds.dailyDateKey(for: day),
-                    variant: .classic,
+                    dateKey: dateKey,
+                    variant: variant,
                     duration: 240,
                     at: day,
                 )

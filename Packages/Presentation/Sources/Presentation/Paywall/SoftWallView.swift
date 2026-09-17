@@ -112,7 +112,7 @@ struct SoftWallView: View {
             of: variant,
             after: EventSeeds.dailyDateKey(for: now),
         ), let date = EventSeeds.date(fromDateKey: key) else { return nil }
-        return date.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
+        return date.formatted(DailyDayGrid.labelFormat.weekday(.wide).month(.abbreviated).day())
     }
 
     private var tomorrowVariants: [SudokuVariant] {

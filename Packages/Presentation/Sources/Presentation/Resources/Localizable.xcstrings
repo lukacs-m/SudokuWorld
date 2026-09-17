@@ -934,6 +934,86 @@
         }
       }
     },
+    "events.calendar.completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "completed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "réussi"
+          }
+        }
+      }
+    },
+    "events.calendar.next" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next month"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mois suivant"
+          }
+        }
+      }
+    },
+    "events.calendar.previous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous month"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mois précédent"
+          }
+        }
+      }
+    },
+    "events.calendar.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily challenge calendar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calendrier des défis"
+          }
+        }
+      }
+    },
+    "events.calendar.today" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aujourd'hui"
+          }
+        }
+      }
+    },
     "events.daily.completedTile" : {
       "localizations" : {
         "en" : {
@@ -6998,13 +7078,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Best times"
+            "value" : "Classic best times"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meilleurs temps"
+            "value" : "Meilleurs temps en classique"
           }
         }
       }
@@ -7030,13 +7110,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Win rate by difficulty"
+            "value" : "Classic win rate by difficulty"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réussite par difficulté"
+            "value" : "Réussite en classique par difficulté"
           }
         }
       }
@@ -7117,6 +7197,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jouées"
+          }
+        }
+      }
+    },
+    "stats.premium.allTimeTimes.tease" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every personal best since your first game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque record depuis votre première grille"
+          }
+        }
+      }
+    },
+    "stats.premium.allTimeTimes.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your all-time best times"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos meilleurs temps de tous les temps"
           }
         }
       }
@@ -7231,6 +7343,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moy. %@"
+          }
+        }
+      }
+    },
+    "stats.thisWeek" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette semaine"
+          }
+        }
+      }
+    },
+    "stats.today" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd'hui"
           }
         }
       }

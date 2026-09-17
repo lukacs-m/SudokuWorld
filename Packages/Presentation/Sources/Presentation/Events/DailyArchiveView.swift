@@ -149,6 +149,6 @@ struct ArchiveDayCard: View {
 
     private var dateLabel: String {
         guard let date = EventSeeds.date(fromDateKey: dateKey) else { return dateKey }
-        return date.formatted(.dateTime.weekday(.wide).month(.wide).day())
+        return date.formatted(DailyDayGrid.labelFormat.weekday(.wide).month(.wide).day())
     }
 }

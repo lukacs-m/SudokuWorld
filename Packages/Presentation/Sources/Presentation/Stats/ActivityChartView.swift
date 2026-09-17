@@ -1,13 +1,17 @@
 import Charts
+import Domain
 import Foundation
 import Model
 import SwiftUI
 
 /// The 30-day activity chart. Axis labels land only on interior ticks (the
 /// domain is padded half a day per side), which keeps them clear of the
-/// chart frame's clipping edges.
+/// chart frame's clipping edges. Days are UTC like every other stats bucket,
+/// so bars and labels are laid out on that calendar, not the device's.
 struct ActivityChartView: View {
     let days: [StatsOverview.DailyCount]
+
+    private let utc = EventSeeds.utcCalendar
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -31,7 +35,7 @@ struct ActivityChartView: View {
     private func chart(theme: Theme) -> some View {
         Chart(days) { day in
             BarMark(
-                x: .value("Day", day.day, unit: .day),
+                x: .value("Day", day.day, unit: .day, calendar: utc),
                 y: .value("Games", day.count),
                 width: .ratio(0.62),
             )
@@ -47,9 +51,11 @@ struct ActivityChartView: View {
         .chartXScale(domain: domain)
         .chartXAxis {
             AxisMarks(values: xTicks) {
-                AxisValueLabel(format: .dateTime.day().month(.abbreviated))
-                    .font(.caption2)
-                    .foregroundStyle(theme.textSecondary)
+                AxisValueLabel(
+                    format: DailyDayGrid.labelFormat.day().month(.abbreviated),
+                )
+                .font(.caption2)
+                .foregroundStyle(theme.textSecondary)
             }
         }
         .chartYAxis {

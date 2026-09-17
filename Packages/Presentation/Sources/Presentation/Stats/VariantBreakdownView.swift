@@ -21,8 +21,11 @@ struct VariantBreakdownView: View {
         }
     }
 
+    /// The grid keeps empty cells for the mastery matrix; this list only
+    /// shows what was actually played.
     private var sections: [(variant: SudokuVariant, cells: [VariantStats])] {
-        let byVariant = Dictionary(grouping: overview.perVariant, by: \.variant)
+        let played = overview.perVariant.filter { $0.played > 0 }
+        let byVariant = Dictionary(grouping: played, by: \.variant)
         return SudokuVariant.allCases.compactMap { variant in
             byVariant[variant].map { (variant, $0) }
         }

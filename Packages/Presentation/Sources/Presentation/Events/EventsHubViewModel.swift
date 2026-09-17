@@ -61,7 +61,8 @@ public final class EventsHubViewModel {
         state = .loaded(Content(daily: daily, weekly: weekly))
 
         completedDayKeys = await (try? dailyChallenges.completedDays()) ?? []
-        streaks = await computeStats(today: now).streaks
+        streaks = await computeStats(today: now, firstWeekday: DailyDayGrid.firstWeekday)
+            .streaks
 
         await loadStandings()
     }

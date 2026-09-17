@@ -3,13 +3,14 @@ import Testing
 @testable import Domain
 import Model
 
-private func day(_ dateKey: String, hour: Int = 12) -> Date {
+private func day(_ dateKey: String, hour: Int = 12, minute: Int = 0) -> Date {
     let parts = dateKey.split(separator: "-").compactMap { Int($0) }
     var components = DateComponents()
     components.year = parts[0]
     components.month = parts[1]
     components.day = parts[2]
     components.hour = hour
+    components.minute = minute
     return EventSeeds.utcCalendar.date(from: components) ?? Date(timeIntervalSince1970: 0)
 }
 
@@ -19,6 +20,9 @@ private func record(
     difficulty: Difficulty = .medium,
     mode: GameMode = .normal,
     duration: TimeInterval = 300,
+    mistakes: Int = 0,
+    hintsUsed: Int = 0,
+    usedReveal: Bool = false,
     finishedAt: Date = day("2026-07-04"),
 ) -> GameRecord {
     GameRecord(
@@ -29,9 +33,9 @@ private func record(
         outcome: outcome,
         context: .regular,
         duration: duration,
-        mistakes: 0,
-        hintsUsed: 0,
-        usedReveal: false,
+        mistakes: mistakes,
+        hintsUsed: hintsUsed,
+        usedReveal: usedReveal,
         points: 0,
         startedAt: finishedAt.addingTimeInterval(-duration),
         finishedAt: finishedAt,
@@ -82,6 +86,35 @@ struct StreakCalculatorTests {
         #expect(result.current == 3)
     }
 
+    @Test func slotsOnEitherSideOfUTCMidnightAreConsecutiveDays() {
+        // Classic solved at 23:30 UTC, a variant slot at 00:30 UTC: the keys
+        // the repository derives from those instants land on two days.
+        let classicAt = day("2026-07-03", hour: 23, minute: 30)
+        let variantAt = day("2026-07-04", hour: 0, minute: 30)
+        let keys: Set<String> = [
+            EventSeeds.dailyDateKey(for: classicAt),
+            EventSeeds.dailyDateKey(for: variantAt),
+        ]
+        #expect(keys == ["2026-07-03", "2026-07-04"])
+        let result = calculator.dailyStreak(completedDateKeys: keys, today: variantAt)
+        #expect(result.current == 2)
+    }
+
+    @Test func dayKeysFollowUTCNotTheDeviceTimeZone() {
+        // 20:30 on July 3 in Los Angeles is already July 4 in UTC, so a
+        // completion then extends a streak that ended on July 3.
+        var losAngeles = Calendar(identifier: .gregorian)
+        losAngeles.timeZone = TimeZone(identifier: "America/Los_Angeles") ?? .gmt
+        let evening = losAngeles.date(
+            from: DateComponents(year: 2026, month: 7, day: 3, hour: 20, minute: 30),
+        ) ?? Date(timeIntervalSince1970: 0)
+        #expect(EventSeeds.dailyDateKey(for: evening) == "2026-07-04")
+
+        let keys: Set<String> = ["2026-07-03", EventSeeds.dailyDateKey(for: evening)]
+        let result = calculator.dailyStreak(completedDateKeys: keys, today: evening)
+        #expect(result.current == 2)
+    }
+
     @Test func winStreaksBreakOnLossAndAbandon() {
         let base = day("2026-07-01")
         let records = [
@@ -102,9 +135,7 @@ struct StreakCalculatorTests {
 
 @Suite
 struct StatsAggregatorTests {
-    private var aggregator: StatsAggregator {
-        StatsAggregator(calendar: EventSeeds.utcCalendar)
-    }
+    private let aggregator = StatsAggregator()
 
     @Test func totalsAndWinRate() {
         let records = [
@@ -117,6 +148,7 @@ struct StatsAggregatorTests {
             records: records,
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.totalPlayed == 4)
         #expect(overview.totalWon == 2)
@@ -143,15 +175,22 @@ struct StatsAggregatorTests {
         #expect(stats.abandoned == 1)
     }
 
-    @Test func emptyCellsAreOmittedFromPerVariant() {
+    @Test func perVariantIsTheFullGridOfOfferedTiers() {
         let overview = aggregator.overview(
             records: [record(outcome: .won, variant: .killer, difficulty: .hard)],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
-        #expect(overview.perVariant.count == 1)
-        #expect(overview.perVariant.first?.variant == .killer)
-        #expect(overview.perVariant.first?.difficulty == .hard)
+        let expectedCells = SudokuVariant.allCases.reduce(0) { $0 + $1.offeredDifficulties.count }
+        #expect(overview.perVariant.count == expectedCells)
+        let killerHard = overview.perVariant.first { $0.variant == .killer && $0.difficulty == .hard }
+        #expect(killerHard?.won == 1)
+        let untouched = overview.perVariant.first { $0.variant == .arrow && $0.difficulty == .easy }
+        #expect(untouched?.played == 0)
+        #expect(untouched?.fastestTime == nil)
+        // A tier the fold variant hides has no cell without history.
+        #expect(!overview.perVariant.contains { $0.variant == .tredoku && $0.difficulty == .master })
     }
 
     @Test func historyOnAHiddenTierStaysVisible() {
@@ -164,10 +203,11 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
-        #expect(overview.perVariant.count == 2)
-        #expect(overview.winRateByDifficulty.map(\.difficulty) == [.expert, .master])
-        #expect(overview.timesByDifficulty.map(\.fastest) == [400, 600])
+        let hidden = overview.perVariant.filter { $0.played > 0 }
+        #expect(hidden.map(\.variant) == [.tredoku, .cube])
+        #expect(hidden.map(\.difficulty) == [.expert, .master])
         let shared = overview.variantShares.map(\.variant).sorted { $0.slug < $1.slug }
         #expect(shared == [.cube, .tredoku])
     }
@@ -183,6 +223,7 @@ struct StatsAggregatorTests {
             ],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.gamesPerDay.count == 30)
         #expect(overview.gamesPerDay.last?.count == 2)
@@ -194,9 +235,28 @@ struct StatsAggregatorTests {
             records: [record(outcome: .won)],
             dailyCompletionKeys: ["2026-07-03", "2026-07-04"],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.streaks.currentDailyStreak == 2)
         #expect(overview.streaks.currentWinStreak == 1)
+    }
+
+    @Test func difficultySeriesAreClassicOnly() {
+        let overview = aggregator.overview(
+            records: [
+                record(outcome: .won, difficulty: .easy, duration: 200),
+                record(outcome: .lost, difficulty: .easy, mode: .hardcore),
+                record(outcome: .won, variant: .killer, difficulty: .easy, duration: 50),
+                record(outcome: .won, variant: .killer, difficulty: .hard, duration: 900),
+            ],
+            dailyCompletionKeys: [],
+            today: day("2026-07-04"),
+            firstWeekday: 2,
+        )
+        #expect(overview.classicWinRateByDifficulty.map(\.difficulty) == [.easy])
+        #expect(overview.classicWinRateByDifficulty.first?.played == 2)
+        #expect(overview.classicWinRateByDifficulty.first?.won == 1)
+        #expect(overview.classicTimesByDifficulty.map(\.fastest) == [200])
     }
 
     @Test func lossOnlyFromHardcore() {
@@ -207,7 +267,159 @@ struct StatsAggregatorTests {
             records: [record(outcome: .lost, mode: .hardcore)],
             dailyCompletionKeys: [],
             today: day("2026-07-04"),
+            firstWeekday: 2,
         )
         #expect(overview.totalLost == 1)
+    }
+}
+
+@Suite
+struct StatsCounterTests {
+    private let aggregator = StatsAggregator()
+
+    private func overview(
+        _ records: [GameRecord],
+        today: Date,
+        firstWeekday: Int = 2,
+    ) -> StatsOverview {
+        aggregator.overview(
+            records: records,
+            dailyCompletionKeys: [],
+            today: today,
+            firstWeekday: firstWeekday,
+        )
+    }
+
+    @Test func todayCountsUTCDayAndIncludesAbandonedGames() {
+        // Wednesday 2026-07-08, 02:00 UTC.
+        let today = day("2026-07-08", hour: 2)
+        let result = overview([
+            record(outcome: .won, finishedAt: day("2026-07-08", hour: 0)),
+            record(outcome: .abandoned, finishedAt: day("2026-07-08", hour: 23)),
+            record(outcome: .won, finishedAt: day("2026-07-07", hour: 23, minute: 59)),
+        ], today: today)
+        #expect(result.gamesToday == 2)
+    }
+
+    @Test func weekRunsMondayToSundayInUTC() {
+        // Wednesday 2026-07-08: the week is Mon 07-06 00:00 ... Sun 07-12 24:00.
+        let today = day("2026-07-08")
+        let result = overview([
+            record(outcome: .won, finishedAt: day("2026-07-06", hour: 0)),
+            record(outcome: .abandoned, finishedAt: day("2026-07-12", hour: 23, minute: 59)),
+            record(outcome: .won, finishedAt: day("2026-07-05", hour: 23, minute: 59)),
+            record(outcome: .won, finishedAt: day("2026-07-13", hour: 0)),
+        ], today: today)
+        #expect(result.gamesThisWeek == 2)
+    }
+
+    /// Sunday 2026-07-12 closes a Monday-start week that began on 07-06, but
+    /// opens a Sunday-start one, so only the caller's first weekday decides
+    /// whether the 07-06 game still counts.
+    @Test(arguments: [
+        (firstWeekday: 2, expected: 2),
+        (firstWeekday: 1, expected: 1),
+    ])
+    func theWeekStartsOnTheCallersFirstWeekday(firstWeekday: Int, expected: Int) {
+        let records = [
+            record(outcome: .won, finishedAt: day("2026-07-06")),
+            record(outcome: .won, finishedAt: day("2026-07-12")),
+        ]
+        let sunday = day("2026-07-12")
+        let result = overview(records, today: sunday, firstWeekday: firstWeekday)
+        #expect(result.gamesThisWeek == expected)
+    }
+
+    @Test func perfectSolvesNeedAWinWithNoMistakesAndNoHints() {
+        let result = overview([
+            record(outcome: .won),
+            record(outcome: .won, mistakes: 1),
+            record(outcome: .won, hintsUsed: 1),
+            // A reveal is recorded as a hint by the session; the flag alone
+            // must disqualify too.
+            record(outcome: .won, hintsUsed: 1, usedReveal: true),
+            record(outcome: .won, usedReveal: true),
+            record(outcome: .lost, mode: .hardcore),
+            record(outcome: .abandoned),
+        ], today: day("2026-07-04"))
+        #expect(result.perfectSolves == 1)
+        #expect(result.perVariant.first { $0.variant == .classic && $0.difficulty == .medium }?
+            .perfectSolves == 1)
+    }
+
+    @Test func mistakeAndHintAveragesSpanEveryGame() {
+        let result = overview([
+            record(outcome: .won, mistakes: 2, hintsUsed: 1),
+            record(outcome: .abandoned, mistakes: 0, hintsUsed: 3),
+        ], today: day("2026-07-04"))
+        #expect(result.averageMistakes == 1)
+        #expect(result.averageHints == 2)
+        #expect(StatsOverview.empty.averageMistakes == 0)
+    }
+}
+
+@Suite
+struct SolveTimeTrendTests {
+    private let aggregator = StatsAggregator()
+    private let today = day("2026-07-04", hour: 8)
+
+    private func overview(_ records: [GameRecord]) -> StatsOverview {
+        aggregator.overview(
+            records: records,
+            dailyCompletionKeys: [],
+            today: today,
+            firstWeekday: 2,
+        )
+    }
+
+    @Test func noWinsMeansNoTrend() {
+        let result = overview([record(outcome: .abandoned), record(outcome: .lost, mode: .hardcore)])
+        #expect(result.classicSolveTimeTrendByDifficulty.isEmpty)
+        #expect(result.solveTimeTrendByVariant.isEmpty)
+    }
+
+    @Test func aSingleWinIsAOnePointSeries() {
+        let result = overview([record(outcome: .won, duration: 420, finishedAt: today)])
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last30Days.count == 1)
+        #expect(trend?.last90Days.count == 1)
+        #expect(trend?.last30Days.first?.averageTime == 420)
+        #expect(trend?.last30Days.first?.day == day("2026-07-04", hour: 0))
+        #expect(result.solveTimeTrendByVariant[.classic] == trend)
+    }
+
+    @Test func sparseWinsAverageByUTCDayAndSkipEmptyDays() {
+        let result = overview([
+            record(outcome: .won, duration: 100, finishedAt: day("2026-07-04", hour: 1)),
+            record(outcome: .won, duration: 300, finishedAt: day("2026-07-04", hour: 23)),
+            record(outcome: .won, duration: 500, finishedAt: day("2026-07-01")),
+            record(outcome: .won, variant: .killer, duration: 700, finishedAt: day("2026-06-20")),
+            record(outcome: .abandoned, duration: 5, finishedAt: day("2026-07-02")),
+        ])
+        let medium = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(medium?.last30Days.map(\.averageTime) == [500, 200])
+        #expect(medium?.last30Days.map(\.day) == [
+            day("2026-07-01", hour: 0), day("2026-07-04", hour: 0),
+        ])
+        // The killer win is a medium too, but a difficulty line only reads as
+        // progress if every point on it comes from the same variant.
+        #expect(medium?.last90Days.contains { $0.averageTime == 700 } == false)
+        #expect(result.solveTimeTrendByVariant[.classic]?.last30Days.map(\.averageTime) == [500, 200])
+        #expect(result.solveTimeTrendByVariant[.killer]?.last30Days.map(\.averageTime) == [700])
+    }
+
+    @Test func windowsSpanThirtyAndNinetyUTCDaysEndingToday() {
+        let result = overview([
+            record(outcome: .won, duration: 1, finishedAt: today),
+            // Day 30 of the 30-day window (29 days back) is in; day 31 is out.
+            record(outcome: .won, duration: 2, finishedAt: day("2026-06-05", hour: 0)),
+            record(outcome: .won, duration: 3, finishedAt: day("2026-06-04", hour: 23, minute: 59)),
+            // Same edge for the 90-day window.
+            record(outcome: .won, duration: 4, finishedAt: day("2026-04-06", hour: 0)),
+            record(outcome: .won, duration: 5, finishedAt: day("2026-04-05", hour: 23, minute: 59)),
+        ])
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last30Days.map(\.averageTime) == [2, 1])
+        #expect(trend?.last90Days.map(\.averageTime) == [4, 3, 2, 1])
     }
 }

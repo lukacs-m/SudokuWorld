@@ -31,7 +31,7 @@ struct StatsView: View {
                     }
 
                 case let .loaded(overview):
-                    totals(overview: overview, theme: theme)
+                    StatsTotalsGrid(overview: overview)
                     StreakBadgeView(streaks: overview.streaks)
                     StatsChartsView(overview: overview)
                     VariantBreakdownView(overview: overview)
@@ -51,21 +51,5 @@ struct StatsView: View {
         .background(theme.screenBackground)
         .navigationTitle(Text("stats.title", bundle: .module))
         .task { await viewModel.load() }
-    }
-
-    /// 2×2 grid: four short captions in one row truncate on small phones.
-    private func totals(overview: StatsOverview, theme _: Theme) -> some View {
-        LazyVGrid(
-            columns: [
-                GridItem(.flexible(), spacing: 10),
-                GridItem(.flexible(), spacing: 10),
-            ],
-            spacing: 10,
-        ) {
-            StatTile("stats.played", value: "\(overview.totalPlayed)")
-            StatTile("stats.winRate", value: "\(Int(overview.winRate * 100))%")
-            StatTile("stats.won", value: "\(overview.totalWon)")
-            StatTile("stats.lost", value: "\(overview.totalLost)")
-        }
     }
 }

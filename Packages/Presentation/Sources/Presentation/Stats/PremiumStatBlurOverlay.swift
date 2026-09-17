@@ -1,0 +1,135 @@
+import Model
+import SwiftUI
+
+/// Wraps premium-only stat card content for free players: the real content
+/// stays underneath, blurred and washed out, with a lock, the stat's name and a
+/// one-line tease on top. The whole card opens the paywall. Premium players get
+/// the content untouched. The card itself is supplied here, so the locked state
+/// keeps the standard card background, shadow and elevation.
+struct PremiumStatBlurOverlay<Content: View>: View {
+    private let titleKey: LocalizedStringKey
+    private let teaseKey: LocalizedStringKey
+    private let content: Content
+
+    @State private var showPaywall = false
+    @Environment(PremiumGate.self) private var premiumGate
+    @Environment(ThemeStore.self) private var themeStore
+    @Environment(\.colorScheme) private var colorScheme
+
+    init(
+        _ titleKey: LocalizedStringKey,
+        tease teaseKey: LocalizedStringKey,
+        @ViewBuilder content: () -> Content,
+    ) {
+        self.titleKey = titleKey
+        self.teaseKey = teaseKey
+        self.content = content()
+    }
+
+    var body: some View {
+        Group {
+            if premiumGate.isPremium {
+                CardView { content }
+            } else {
+                Button {
+                    showPaywall = true
+                } label: {
+                    locked(theme: themeStore.theme(for: colorScheme))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
+    }
+
+    /// The label is a `ZStack` sibling rather than an overlay so that it grows
+    /// the card at accessibility text sizes instead of spilling over the
+    /// neighbouring ones. The clip keeps the blur's bleed off the card's edge.
+    private func locked(theme: Theme) -> some View {
+        CardView {
+            ZStack {
+                content
+                    .blur(radius: 5)
+                    .overlay(theme.screenBackground.opacity(0.25))
+                    .accessibilityHidden(true)
+                LockedStatLabel(titleKey: titleKey, teaseKey: teaseKey, theme: theme)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+private struct LockedStatLabel: View {
+    let titleKey: LocalizedStringKey
+    let teaseKey: LocalizedStringKey
+    let theme: Theme
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "lock.fill")
+                .font(.title2)
+                .foregroundStyle(theme.accent)
+                .accessibilityHidden(true)
+            Text(titleKey, bundle: .module)
+                .font(.headline)
+                .foregroundStyle(theme.textPrimary)
+            Text(teaseKey, bundle: .module)
+                .font(.subheadline)
+                .foregroundStyle(theme.textSecondary)
+        }
+        .multilineTextAlignment(.center)
+        .padding(16)
+    }
+}
+
+#Preview("Free") {
+    PremiumStatBlurOverlay(
+        "stats.premium.allTimeTimes.title",
+        tease: "stats.premium.allTimeTimes.tease",
+    ) {
+        TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
+    }
+    .padding()
+    .environment(ThemeStore())
+    .environment(PremiumGate(isPremium: false))
+}
+
+/// The tightest case for the locked label: one row of content, largest text.
+#Preview("Free · one row · AX5") {
+    PremiumStatBlurOverlay(
+        "stats.premium.allTimeTimes.title",
+        tease: "stats.premium.allTimeTimes.tease",
+    ) {
+        TimesBreakdownContent(
+            title: "Classic best times",
+            entries: Array(PreviewData.times.prefix(1)),
+        )
+    }
+    .padding()
+    .environment(\.dynamicTypeSize, .accessibility5)
+    .environment(ThemeStore())
+    .environment(PremiumGate(isPremium: false))
+}
+
+#Preview("Premium") {
+    PremiumStatBlurOverlay(
+        "stats.premium.allTimeTimes.title",
+        tease: "stats.premium.allTimeTimes.tease",
+    ) {
+        TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
+    }
+    .padding()
+    .environment(ThemeStore())
+    .environment(PremiumGate(isPremium: true))
+}
+
+private enum PreviewData {
+    static let times: [StatsOverview.DifficultyTimes] = [
+        .init(difficulty: .easy, fastest: 245, average: 310),
+        .init(difficulty: .medium, fastest: 512, average: 640),
+        .init(difficulty: .hard, fastest: 901, average: 1180),
+    ]
+}

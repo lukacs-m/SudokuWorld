@@ -25,6 +25,7 @@ struct EventsHubView: View {
 
                 case let .loaded(content):
                     dailyCard(content.daily, theme: theme)
+                    DailyCompletionCalendarView(completedDayKeys: viewModel.completedDayKeys)
                     weeklyCard(content.weekly, theme: theme)
 
                 case .empty, .failed:
@@ -77,7 +78,7 @@ struct EventsHubView: View {
                 HStack(spacing: 6) {
                     Text("events.daily.today", bundle: .module)
                     Text("·")
-                    Text(Date.now.formatted(.dateTime.month(.wide).day()))
+                    Text(Date.now.formatted(DailyDayGrid.labelFormat.month(.wide).day()))
                 }
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(theme.textSecondary)
@@ -143,14 +144,14 @@ struct EventsHubView: View {
         .foregroundStyle(theme.textPrimary)
     }
 
-    /// The mock's week strip: this week's days, today accented, completed
-    /// days tinted. Completion keys are UTC (the daily clock authority).
+    /// The mock's week strip: this week's days, drawn with the same cell as
+    /// the month calendar below it. Days are UTC so both grids name the same
+    /// days as the streak.
     private func weekStrip(theme: Theme) -> some View {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let delta = (calendar.component(.weekday, from: today) - calendar.firstWeekday + 7) % 7
-        let start = calendar.date(byAdding: .day, value: -delta, to: today) ?? today
-        let days = (0 ..< 7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+        let calendar = DailyDayGrid.calendar
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let days = DailyDayGrid.weekDays(containing: now)
         return HStack(spacing: 6) {
             ForEach(days, id: \.self) { day in
                 let isToday = calendar.isDate(day, inSameDayAs: today)
@@ -158,27 +159,23 @@ struct EventsHubView: View {
                     .contains(EventSeeds.dailyDateKey(for: day))
                 let isFuture = day > today
                 VStack(spacing: 4) {
-                    Text(day.formatted(.dateTime.weekday(.narrow)))
+                    Text(day.formatted(DailyDayGrid.labelFormat.weekday(.narrow)))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(theme.textSecondary)
-                    Text("\(calendar.component(.day, from: day))")
-                        .font(.subheadline.weight(isToday ? .bold : .medium))
-                        .monospacedDigit()
-                        .foregroundStyle(
-                            isToday ? Color.white
-                                : isCompleted ? theme.accent : theme.textPrimary,
-                        )
-                        .frame(width: 32, height: 32)
-                        .background(
-                            isToday ? theme.accent
-                                : isCompleted ? theme.accent.opacity(0.15) : .clear,
-                            in: Circle(),
-                        )
+                    DailyDayCell(
+                        day: day,
+                        isCompleted: isCompleted,
+                        isToday: isToday,
+                        calendar: calendar,
+                        theme: theme,
+                    )
                 }
                 .frame(maxWidth: .infinity)
                 .opacity(isFuture ? 0.35 : 1)
             }
         }
+        // The cells grow with the digits, so cap them short of their slot.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityHidden(true)
     }
 

@@ -22,6 +22,8 @@ public struct StatTile: View {
                 .font(.title3.weight(.bold))
                 .fontDesign(.rounded)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
                 .foregroundStyle(valueColor ?? theme.textPrimary)
             Text(titleKey, bundle: .module)
                 .font(.caption)
