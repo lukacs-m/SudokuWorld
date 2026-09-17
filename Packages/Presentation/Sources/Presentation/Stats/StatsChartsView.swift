@@ -13,6 +13,7 @@ struct StatsChartsView: View {
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
+        let slices = variantSlices
         VStack(spacing: 16) {
             if hasRecentActivity {
                 ActivityChartView(days: overview.gamesPerDay)
@@ -48,7 +49,7 @@ struct StatsChartsView: View {
     /// The seven most played variants, then everything else pooled into one
     /// sector: past eight colours the legend can no longer be matched to the
     /// chart, and 25 slivers read as noise either way.
-    private var slices: [VariantSlice] {
+    private var variantSlices: [VariantSlice] {
         let ranked = overview.variantShares
             .sorted { $0.played > $1.played }
             .map { VariantSlice(name: localizedVariant($0.variant), played: $0.played) }

@@ -1,21 +1,22 @@
 import SwiftUI
 
-/// Chart colours in the theme's own roles, so multi-series charts never fall
-/// back to the system blue/green/orange that clashes with the sage palettes.
-/// Sector one is the accent, two the gold and three the success colour as the
-/// palette defines them; four and seven are the accent rotated 78 degrees
-/// either way around the colour wheel; six and eight are the gold rotated 35
-/// degrees either way; five is the success colour stepped 0.25 darker. A
-/// rotation and a step both carry the base's own saturation over untouched,
-/// so a muted palette keeps muted sectors. The success colour takes the
-/// brightness step rather than a rotation because two palettes make it the
-/// same hue as the accent (identical in forest, two degrees apart in warm
-/// paper), and where that is so, sector three is stepped the other way so
-/// the pair straddles the accent instead of repeating it.
+/// Chart colours from two of the theme's own roles, so multi-series charts
+/// never fall back to the system blue/green/orange that clashes with the sage
+/// palettes. The eight sectors are four brightness steps of the accent
+/// interleaved with four of the gold - accent, gold, accent one step on, gold
+/// one step on, and so on - with hue and saturation carried over untouched,
+/// so a muted palette keeps muted sectors and no sector lands on a hue the
+/// theme does not already use. The steps walk away from the card background,
+/// darker on a light palette and lighter on a dark one, starting far enough
+/// from it that the dimmest sector still reads; the gold ladder is offset
+/// half a step from the accent one, which is what keeps the two families
+/// apart in the amber palettes, whose accent and gold sit seven degrees of
+/// hue from each other.
 enum StatsPalette {
-    private static let accentRotation: Double = 78
-    private static let goldRotation: Double = 35
-    private static let brightnessStep = 0.25
+    private static let step = 0.19
+    private static let goldOffset = 0.08
+    private static let lightCardAnchor = 0.94
+    private static let darkCardAnchor = 0.34
 
     static func series(count: Int, theme: Theme) -> [Color] {
         let ramp = ramp(theme: theme)
@@ -25,19 +26,17 @@ enum StatsPalette {
     private static func ramp(theme: Theme) -> [Color] {
         let accent = HSB(theme.accent)
         let gold = HSB(theme.gold)
-        let success = HSB(theme.success)
-        return [
-            theme.accent,
-            theme.gold,
-            success.sharesHueFamily(with: accent)
-                ? success.color(brightnessStep: brightnessStep)
-                : theme.success,
-            accent.color(hueOffset: accentRotation),
-            success.color(brightnessStep: -brightnessStep),
-            gold.color(hueOffset: goldRotation),
-            accent.color(hueOffset: -accentRotation),
-            gold.color(hueOffset: -goldRotation),
-        ]
+        let onDarkCard = HSB(theme.cardBackground).brightness < 0.5
+        return (0 ..< 4).flatMap { index in
+            let accentStep = brightness(index, offset: 0, onDarkCard: onDarkCard)
+            let goldStep = brightness(index, offset: goldOffset, onDarkCard: onDarkCard)
+            return [accent.color(brightness: accentStep), gold.color(brightness: goldStep)]
+        }
+    }
+
+    private static func brightness(_ index: Int, offset: Double, onDarkCard: Bool) -> Double {
+        let walked = Double(index) * step + offset
+        return onDarkCard ? darkCardAnchor + walked : lightCardAnchor - walked
     }
 }
 
@@ -69,17 +68,11 @@ private struct HSB {
         hue = (sixth / 6 + 1).truncatingRemainder(dividingBy: 1)
     }
 
-    /// Close enough in hue that a donut legend reads the two as one colour.
-    func sharesHueFamily(with other: Self) -> Bool {
-        let gap = abs(hue - other.hue)
-        return min(gap, 1 - gap) < 25.0 / 360
-    }
-
-    func color(hueOffset: Double = 0, brightnessStep: Double = 0) -> Color {
+    func color(brightness: Double) -> Color {
         Color(
-            hue: (hue + hueOffset / 360 + 1).truncatingRemainder(dividingBy: 1),
+            hue: hue,
             saturation: saturation,
-            brightness: min(max(brightness + brightnessStep, 0.12), 0.95),
+            brightness: min(max(brightness, 0.05), 1),
         )
     }
 }
