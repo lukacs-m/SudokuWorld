@@ -42,6 +42,26 @@ struct TrendSeriesOption: Identifiable, Equatable {
     }
 }
 
+extension TrendSeriesOption {
+    /// One of a trend's windows, as the card draws it.
+    typealias Window = KeyPath<StatsOverview.SolveTimeTrend, [StatsOverview.TrendPoint]>
+
+    /// The series an unset picker names: the fullest one in the window on
+    /// screen, so the card never opens on an empty chart while another series
+    /// has wins to show. When no series has a point in that window it falls
+    /// back to the fullest 90-day series, so the picker still names a real
+    /// series above the chart's own empty state.
+    static func fullest(of options: [Self], in window: Window) -> Self? {
+        mostPoints(of: options, in: window) ?? mostPoints(of: options, in: \.last90Days)
+    }
+
+    private static func mostPoints(of options: [Self], in window: Window) -> Self? {
+        options
+            .filter { !$0.trend[keyPath: window].isEmpty }
+            .max { $0.trend[keyPath: window].count < $1.trend[keyPath: window].count }
+    }
+}
+
 enum TrendWindow: Int, CaseIterable, Identifiable {
     case days30 = 30
     case days90 = 90
@@ -64,11 +84,12 @@ struct SolveTimeTrendSection: View {
 
     var body: some View {
         let selected = options.first { $0.id == selectedID } ?? defaultOption
+        let drawn = selected?.trend[keyPath: displayedWindow] ?? []
         if premiumGate.isPremium {
             CardView {
                 TrendCardContent(
                     "stats.trend.title",
-                    points: points(of: selected, in: window),
+                    points: drawn,
                     days: window.rawValue,
                     endDay: selected?.trend.endDay,
                 ) {
@@ -79,7 +100,7 @@ struct SolveTimeTrendSection: View {
             CardView {
                 TrendCardContent(
                     "stats.trend.free.title",
-                    points: selected?.trend.last7Days ?? [],
+                    points: drawn,
                     days: 7,
                     endDay: selected?.trend.endDay,
                 ) {
@@ -104,10 +125,18 @@ struct SolveTimeTrendSection: View {
         }
     }
 
-    /// An unset picker reads as the series with the most days on it, rather
-    /// than whichever tier happens to sort first.
+    /// The window the live card draws, so the default series is picked from
+    /// the points that are actually on screen.
+    private var displayedWindow: TrendSeriesOption.Window {
+        guard premiumGate.isPremium else { return \.last7Days }
+        return switch window {
+        case .days30: \.last30Days
+        case .days90: \.last90Days
+        }
+    }
+
     private var defaultOption: TrendSeriesOption? {
-        options.max { $0.trend.last90Days.count < $1.trend.last90Days.count }
+        TrendSeriesOption.fullest(of: options, in: displayedWindow)
     }
 
     /// The picker needs a concrete selection to show its label, so an unset
@@ -117,17 +146,6 @@ struct SolveTimeTrendSection: View {
             get: { selectedID ?? defaultOption?.id },
             set: { selectedID = $0 },
         )
-    }
-
-    private func points(
-        of option: TrendSeriesOption?,
-        in window: TrendWindow,
-    ) -> [StatsOverview.TrendPoint] {
-        guard let option else { return [] }
-        return switch window {
-        case .days30: option.trend.last30Days
-        case .days90: option.trend.last90Days
-        }
     }
 }
 
