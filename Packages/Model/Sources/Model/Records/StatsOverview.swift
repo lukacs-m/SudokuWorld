@@ -72,11 +72,14 @@ public struct StatsOverview: Equatable, Sendable {
 
     /// Solve-time history for a line chart, wins only. Days without a win
     /// are left out rather than zero-filled, so sparse history plots as gaps.
+    /// The 7-day series is the free preview of the same line.
     public struct SolveTimeTrend: Equatable, Sendable {
+        public let last7Days: [TrendPoint]
         public let last30Days: [TrendPoint]
         public let last90Days: [TrendPoint]
 
-        public init(last30Days: [TrendPoint], last90Days: [TrendPoint]) {
+        public init(last7Days: [TrendPoint], last30Days: [TrendPoint], last90Days: [TrendPoint]) {
+            self.last7Days = last7Days
             self.last30Days = last30Days
             self.last90Days = last90Days
         }

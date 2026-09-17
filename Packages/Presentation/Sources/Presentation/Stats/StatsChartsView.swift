@@ -8,7 +8,11 @@ import SwiftUI
 struct StatsChartsView: View {
     let overview: StatsOverview
 
+    @Environment(ThemeStore.self) private var themeStore
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
+        let theme = themeStore.theme(for: colorScheme)
         VStack(spacing: 16) {
             if hasRecentActivity {
                 ActivityChartView(days: overview.gamesPerDay)
@@ -34,6 +38,13 @@ struct StatsChartsView: View {
                         ))
                         .cornerRadius(3)
                     }
+                    .chartForegroundStyleScale(
+                        domain: overview.variantShares.map { localizedVariant($0.variant) },
+                        range: StatsPalette.series(
+                            count: overview.variantShares.count,
+                            theme: theme,
+                        ),
+                    )
                     .frame(height: 200)
                 }
             }

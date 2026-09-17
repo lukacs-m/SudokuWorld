@@ -2,7 +2,8 @@ import Common
 import Model
 import SwiftUI
 
-/// The statistics screen: totals, streaks, charts, and the per-variant table.
+/// The statistics screen: totals, streaks, charts, the premium trend and
+/// accuracy cards, the mastery doorway, and the per-variant list.
 struct StatsView: View {
     @State private var viewModel = StatsViewModel()
 
@@ -34,6 +35,9 @@ struct StatsView: View {
                     StatsTotalsGrid(overview: overview)
                     StreakBadgeView(streaks: overview.streaks)
                     StatsChartsView(overview: overview)
+                    SolveTimeTrendSection(options: TrendSeriesOption.all(from: overview))
+                    AccuracyCard(overview: overview)
+                    MasteryLinkCard(overview: overview)
                     VariantBreakdownView(overview: overview)
 
                 case .failed:

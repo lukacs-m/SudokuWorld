@@ -381,6 +381,7 @@ struct SolveTimeTrendTests {
     @Test func aSingleWinIsAOnePointSeries() {
         let result = overview([record(outcome: .won, duration: 420, finishedAt: today)])
         let trend = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last7Days.count == 1)
         #expect(trend?.last30Days.count == 1)
         #expect(trend?.last90Days.count == 1)
         #expect(trend?.last30Days.first?.averageTime == 420)
@@ -421,5 +422,65 @@ struct SolveTimeTrendTests {
         let trend = result.classicSolveTimeTrendByDifficulty[.medium]
         #expect(trend?.last30Days.map(\.averageTime) == [2, 1])
         #expect(trend?.last90Days.map(\.averageTime) == [4, 3, 2, 1])
+    }
+
+    @Test func sevenDayWindowIsTheTailOfTheSameSeries() {
+        let result = overview([
+            record(outcome: .won, duration: 1, finishedAt: today),
+            // Day 7 of the free window (6 days back) is in; day 8 is out.
+            record(outcome: .won, duration: 2, finishedAt: day("2026-06-28", hour: 0)),
+            record(outcome: .won, duration: 3, finishedAt: day("2026-06-27", hour: 23, minute: 59)),
+        ])
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last7Days.map(\.averageTime) == [2, 1])
+        #expect(trend?.last30Days.map(\.averageTime) == [3, 2, 1])
+    }
+
+    @Test func aWinOlderThanAWeekLeavesTheFreeWindowEmptyButTheKeyPresent() {
+        let result = overview([record(outcome: .won, duration: 9, finishedAt: day("2026-06-20"))])
+        let trend = result.classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last7Days.isEmpty == true)
+        #expect(trend?.last30Days.map(\.averageTime) == [9])
+    }
+
+    /// Between one and four wins on distinct days give exactly that many
+    /// points, each on its own UTC day, in ascending order.
+    @Test(arguments: 1 ... 4)
+    func aFewWinsOnDistinctDaysGiveOnePointEach(count: Int) {
+        let records = (0 ..< count).map { offset in
+            record(
+                outcome: .won,
+                duration: TimeInterval(100 * (offset + 1)),
+                finishedAt: today.addingTimeInterval(TimeInterval(-86400 * offset)),
+            )
+        }
+        let trend = overview(records).classicSolveTimeTrendByDifficulty[.medium]
+        #expect(trend?.last7Days.count == count)
+        #expect(trend?.last7Days.map(\.averageTime) == (1 ... count).reversed().map { TimeInterval(100 * $0) })
+        let days = trend?.last7Days.map(\.day) ?? []
+        #expect(days == days.sorted())
+    }
+
+    @Test func aDailyChallengeRecordFeedsItsVariantTrendAndMasteryCell() {
+        let daily = GameRecord(
+            id: UUID(),
+            variant: .kropki,
+            difficulty: .easy,
+            mode: .normal,
+            outcome: .won,
+            context: .daily(dateKey: "2026-07-03", variant: .kropki),
+            duration: 250,
+            mistakes: 0,
+            hintsUsed: 0,
+            usedReveal: false,
+            points: 0,
+            startedAt: day("2026-07-03"),
+            finishedAt: day("2026-07-03", hour: 0, minute: 5),
+        )
+        let result = overview([daily])
+        #expect(result.solveTimeTrendByVariant[.kropki]?.last7Days.map(\.averageTime) == [250])
+        let cell = result.perVariant.first { $0.variant == .kropki && $0.difficulty == .easy }
+        #expect(cell?.won == 1)
+        #expect(cell?.perfectSolves == 1)
     }
 }

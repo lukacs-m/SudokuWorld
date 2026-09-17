@@ -9,6 +9,7 @@ import SwiftUI
 struct PremiumStatBlurOverlay<Content: View>: View {
     private let titleKey: LocalizedStringKey
     private let teaseKey: LocalizedStringKey
+    private let labelAlignment: Alignment
     private let content: Content
 
     @State private var showPaywall = false
@@ -16,13 +17,18 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
+    /// `labelAlignment` puts the lock label at the top of content taller than
+    /// a screen (the mastery matrix), where a centred label would only show
+    /// up mid-scroll.
     init(
         _ titleKey: LocalizedStringKey,
         tease teaseKey: LocalizedStringKey,
+        labelAlignment: Alignment = .center,
         @ViewBuilder content: () -> Content,
     ) {
         self.titleKey = titleKey
         self.teaseKey = teaseKey
+        self.labelAlignment = labelAlignment
         self.content = content()
     }
 
@@ -49,7 +55,7 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     /// neighbouring ones. The clip keeps the blur's bleed off the card's edge.
     private func locked(theme: Theme) -> some View {
         CardView {
-            ZStack {
+            ZStack(alignment: labelAlignment) {
                 content
                     .blur(radius: 5)
                     .overlay(theme.screenBackground.opacity(0.25))
