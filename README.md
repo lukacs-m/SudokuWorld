@@ -68,9 +68,10 @@ French localization.
   history; premium depth behind a `PremiumStatBlurOverlay` (real data, blurred,
   tap opens the paywall): 30/90-day solve-time trend lines per classic
   difficulty and per variant (free players see the last 7 days live), the
-  mistakes / hints / perfect-solves card, the mastery matrix (variant ×
-  difficulty; rows a free player has touched, dailies included, stay live) and
-  a per-variant deep dive; Swift Charts (30-day activity, variant distribution
+  mistakes / hints / perfect-solves card, and the mastery matrix (variant ×
+  difficulty; rows a free player has touched, dailies included, stay live);
+  a per-variant deep dive (outcomes and per-difficulty records free, its
+  trend line blurred); Swift Charts (30-day activity, variant distribution
   in theme colours). Every day bucket is a UTC day like the daily challenge.
 - **Game Center** — 84 matrix leaderboards (the 7 curated variants in
   `GameCenterIDs.leaderboardVariants` × 6 difficulties × time/wins; every
@@ -259,7 +260,7 @@ xcrun simctl launch booted com.mlukacs.sudokuWorld -AppleLanguages "(fr)"
 
 ## Testing
 
-Tests across four packages (`make test`, macOS host, 329 tests; the Domain
+Tests across four packages (`make test`, macOS host, 330 tests; the Domain
 suite alone runs ~3 min — around 180 s under `make test`'s parallel package
 load, most of it the fog-of-war logic-only proof that plays 75 generated
 Hard/Expert/Master boards to completion):
@@ -287,6 +288,8 @@ Hard/Expert/Master boards to completion):
   flows, premium theme gating, events hub; the daily day grids (week strip,
   month calendar and archive all naming the same UTC day, weekday symbols in
   the device's language), board zoom clamping, outside-clue overlay layout,
+  the premium stats cards (trend window and series seeding, mastery rows and
+  cell labels, chart sector separation in every theme and scheme),
   variant glyphs, cube geometry (bent lines straight over each fold, tap
   ray-cast, settle, zoom clamp), cube face texture rendering
   off the main actor (highlight blending over the cell background, given and

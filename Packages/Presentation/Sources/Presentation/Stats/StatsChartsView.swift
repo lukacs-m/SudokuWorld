@@ -55,10 +55,8 @@ struct StatsChartsView: View {
             .map { VariantSlice(name: localizedVariant($0.variant), played: $0.played) }
         guard ranked.count > VariantSlice.maximum else { return ranked }
         let pooled = ranked.dropFirst(VariantSlice.maximum - 1).reduce(0) { $0 + $1.played }
-        return ranked.prefix(VariantSlice.maximum - 1) + [VariantSlice(
-            name: moduleString("stats.chart.variants.other"),
-            played: pooled,
-        )]
+        let other = VariantSlice(name: moduleString("stats.chart.variants.other"), played: pooled)
+        return ranked.prefix(VariantSlice.maximum - 1) + [other]
     }
 
     /// `gamesPerDay` is zero-filled to exactly 30 entries, so it is never
