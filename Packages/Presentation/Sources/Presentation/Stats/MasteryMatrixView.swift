@@ -170,6 +170,8 @@ private struct MasteryCellView: View {
     let cell: VariantStats?
     let theme: Theme
 
+    @ScaledMetric(relativeTo: .subheadline) private var starSize: CGFloat = 8
+
     var body: some View {
         VStack(spacing: 2) {
             HStack(spacing: 2) {
@@ -179,7 +181,7 @@ private struct MasteryCellView: View {
                     .foregroundStyle(theme.textPrimary)
                 if cell?.hasPerfectSolve == true {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 8))
+                        .font(.system(size: starSize))
                         .foregroundStyle(theme.gold)
                 }
             }
