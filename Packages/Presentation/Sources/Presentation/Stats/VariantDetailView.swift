@@ -69,52 +69,54 @@ private struct VariantOutcomeGrid: View {
 struct VariantDifficultyCard: View {
     let cells: [VariantStats]
 
-    @State private var showPaywall = false
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        Group {
-            if premiumGate.isPremium {
-                CardView { VariantDifficultyRows(cells: cells) }
-            } else {
-                Button {
-                    showPaywall = true
-                } label: {
-                    LockedVariantDifficultyCard(
-                        cells: cells,
-                        theme: themeStore.theme(for: colorScheme),
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
+        if premiumGate.isPremium {
+            CardView { VariantDifficultyRows(cells: cells) }
+        } else {
+            LockedVariantDifficultyCard(cells: cells, theme: themeStore.theme(for: colorScheme))
         }
     }
 }
 
 /// The lock sits under the rows rather than over them, so the counts it
-/// leaves free stay readable.
+/// leaves free stay readable. The card opens the paywall wherever it is
+/// tapped, but only the lock label is a button: wrapping the whole card in
+/// one would merge the rows into a single VoiceOver element and take the
+/// per-difficulty counts away from the players this keeps them for.
 private struct LockedVariantDifficultyCard: View {
     let cells: [VariantStats]
     let theme: Theme
+
+    @State private var showPaywall = false
 
     var body: some View {
         CardView {
             VStack(alignment: .leading, spacing: 12) {
                 VariantDifficultyRows(cells: cells, timesBlurred: true)
-                LockedStatLabel(
-                    titleKey: "stats.premium.variantTimes.title",
-                    teaseKey: "stats.premium.variantTimes.tease",
-                    theme: theme,
-                )
-                .frame(maxWidth: .infinity)
+                Button {
+                    showPaywall = true
+                } label: {
+                    LockedStatLabel(
+                        titleKey: "stats.premium.variantTimes.title",
+                        teaseKey: "stats.premium.variantTimes.tease",
+                        theme: theme,
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
             }
         }
         .contentShape(RoundedRectangle(cornerRadius: 20))
+        .onTapGesture {
+            showPaywall = true
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
     }
 }
 
@@ -182,10 +184,10 @@ private struct VariantDifficultyTimes: View {
                 .monospacedDigit()
                 .foregroundStyle(theme.textSecondary)
         }
-        if blurred {
+        if blurred, stats.fastestTime != nil {
             times
-                .blur(radius: 5)
-                .accessibilityHidden(true)
+                .premiumStatBlur(theme: theme)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
         } else {
             times
         }

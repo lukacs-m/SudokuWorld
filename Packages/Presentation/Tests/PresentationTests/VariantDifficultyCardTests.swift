@@ -16,34 +16,35 @@ struct VariantDifficultyCardTests {
     private static let sameContent = 2
     private static let blurredContent = 64
 
-    private let cells: [VariantStats] = [
-        VariantStats(
-            variant: .killer,
-            difficulty: .easy,
-            played: 3,
-            won: 2,
-            lost: 1,
-            abandoned: 0,
-            currentWinStreak: 0,
-            bestWinStreak: 0,
-            fastestTime: 245,
-            averageTime: 310,
-            perfectSolves: 1,
-        ),
-        VariantStats(
-            variant: .killer,
-            difficulty: .medium,
-            played: 0,
-            won: 0,
-            lost: 0,
-            abandoned: 0,
-            currentWinStreak: 0,
-            bestWinStreak: 0,
-            fastestTime: nil,
-            averageTime: nil,
-            perfectSolves: 0,
-        ),
-    ]
+    private let touched = VariantStats(
+        variant: .killer,
+        difficulty: .easy,
+        played: 3,
+        won: 2,
+        lost: 1,
+        abandoned: 0,
+        currentWinStreak: 0,
+        bestWinStreak: 0,
+        fastestTime: 245,
+        averageTime: 310,
+        perfectSolves: 1,
+    )
+
+    private let untouched = VariantStats(
+        variant: .killer,
+        difficulty: .medium,
+        played: 0,
+        won: 0,
+        lost: 0,
+        abandoned: 0,
+        currentWinStreak: 0,
+        bestWinStreak: 0,
+        fastestTime: nil,
+        averageTime: nil,
+        perfectSolves: 0,
+    )
+
+    private var cells: [VariantStats] { [touched, untouched] }
 
     /// Both gates lay the rows out identically from the top of the card - the
     /// lock only adds its label below them - so one band covers the same rows
@@ -58,6 +59,16 @@ struct VariantDifficultyCardTests {
 
         #expect(try largestDifference(free, premium, in: counts) <= Self.sameContent)
         #expect(try largestDifference(free, premium, in: times) > Self.blurredContent)
+    }
+
+    /// A tier with no games has no premium value behind the blur, so its
+    /// dashes stay sharp rather than teasing data the player never recorded.
+    @Test func tiersWithoutATimeAreNotBlurred() throws {
+        let free = try #require(render(VariantDifficultyCard(cells: [untouched]), isPremium: false))
+        let premium = try #require(render(VariantDifficultyCard(cells: [untouched]), isPremium: true))
+        let rows = CGRect(x: 0, y: 0, width: CGFloat(premium.width), height: CGFloat(premium.height) * 2 / 3)
+
+        #expect(try largestDifference(free, premium, in: rows) <= Self.sameContent)
     }
 
     @Test func premiumPlayersGetTheRowsUntouched() throws {
