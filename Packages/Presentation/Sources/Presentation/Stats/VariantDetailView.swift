@@ -64,8 +64,22 @@ private struct VariantOutcomeGrid: View {
 
 /// One row per difficulty the variant offers (or once offered): won over
 /// played on the left, best and average time on the right, dashes where the
-/// tier has no games yet.
-private struct VariantDifficultyCard: View {
+/// tier has no games yet. Analysis rather than motivation, so free players
+/// see it blurred; the outcome tiles above stay theirs.
+struct VariantDifficultyCard: View {
+    let cells: [VariantStats]
+
+    var body: some View {
+        PremiumStatBlurOverlay(
+            "stats.premium.variantTimes.title",
+            tease: "stats.premium.variantTimes.tease",
+        ) {
+            VariantDifficultyRows(cells: cells)
+        }
+    }
+}
+
+struct VariantDifficultyRows: View {
     let cells: [VariantStats]
 
     @Environment(ThemeStore.self) private var themeStore
@@ -73,15 +87,13 @@ private struct VariantDifficultyCard: View {
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        CardView {
-            VStack(alignment: .leading, spacing: 12) {
-                SectionLabel("stats.variant.byDifficulty")
-                VStack(spacing: 0) {
-                    ForEach(cells, id: \.difficulty) { cell in
-                        VariantDifficultyRow(stats: cell, theme: theme)
-                        if cell.difficulty != cells.last?.difficulty {
-                            Divider()
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel("stats.variant.byDifficulty")
+            VStack(spacing: 0) {
+                ForEach(cells, id: \.difficulty) { cell in
+                    VariantDifficultyRow(stats: cell, theme: theme)
+                    if cell.difficulty != cells.last?.difficulty {
+                        Divider()
                     }
                 }
             }
