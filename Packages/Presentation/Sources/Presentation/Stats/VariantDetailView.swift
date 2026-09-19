@@ -105,6 +105,9 @@ private struct LockedVariantDifficultyCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        // The lock label's Button carries `isButton`; adding it to the card
+        // would propagate the trait to every count row, which is not one.
+        // swiftlint:disable:next accessibility_trait_for_button
         CardView {
             VStack(alignment: .leading, spacing: 12) {
                 VariantDifficultyRows(cells: cells, timesBlurred: true)
