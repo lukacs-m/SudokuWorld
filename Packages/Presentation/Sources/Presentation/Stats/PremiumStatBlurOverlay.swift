@@ -61,6 +61,7 @@ struct PremiumStatBlurOverlay<Content: View>: View {
                     .overlay(theme.screenBackground.opacity(0.25))
                     .accessibilityHidden(true)
                 LockedStatLabel(titleKey: titleKey, teaseKey: teaseKey, theme: theme)
+                    .padding(16)
             }
             .clipShape(RoundedRectangle(cornerRadius: 4))
         }
@@ -68,7 +69,9 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     }
 }
 
-private struct LockedStatLabel: View {
+/// Cards that blur only part of their content place this themselves, so the
+/// padding belongs to the caller.
+struct LockedStatLabel: View {
     let titleKey: LocalizedStringKey
     let teaseKey: LocalizedStringKey
     let theme: Theme
@@ -87,7 +90,6 @@ private struct LockedStatLabel: View {
                 .foregroundStyle(theme.textSecondary)
         }
         .multilineTextAlignment(.center)
-        .padding(16)
     }
 }
 

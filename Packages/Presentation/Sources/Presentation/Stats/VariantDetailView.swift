@@ -64,23 +64,63 @@ private struct VariantOutcomeGrid: View {
 
 /// One row per difficulty the variant offers (or once offered): won over
 /// played on the left, best and average time on the right, dashes where the
-/// tier has no games yet. Analysis rather than motivation, so free players
-/// see it blurred; the outcome tiles above stay theirs.
+/// tier has no games yet. The counts are motivation and stay free; the times
+/// are analysis, so free players get those blurred behind a paywall tap.
 struct VariantDifficultyCard: View {
     let cells: [VariantStats]
 
+    @State private var showPaywall = false
+    @Environment(PremiumGate.self) private var premiumGate
+    @Environment(ThemeStore.self) private var themeStore
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
-        PremiumStatBlurOverlay(
-            "stats.premium.variantTimes.title",
-            tease: "stats.premium.variantTimes.tease",
-        ) {
-            VariantDifficultyRows(cells: cells)
+        Group {
+            if premiumGate.isPremium {
+                CardView { VariantDifficultyRows(cells: cells) }
+            } else {
+                Button {
+                    showPaywall = true
+                } label: {
+                    LockedVariantDifficultyCard(
+                        cells: cells,
+                        theme: themeStore.theme(for: colorScheme),
+                    )
+                }
+                .buttonStyle(.plain)
+            }
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
+    }
+}
+
+/// The lock sits under the rows rather than over them, so the counts it
+/// leaves free stay readable.
+private struct LockedVariantDifficultyCard: View {
+    let cells: [VariantStats]
+    let theme: Theme
+
+    var body: some View {
+        CardView {
+            VStack(alignment: .leading, spacing: 12) {
+                VariantDifficultyRows(cells: cells, timesBlurred: true)
+                LockedStatLabel(
+                    titleKey: "stats.premium.variantTimes.title",
+                    teaseKey: "stats.premium.variantTimes.tease",
+                    theme: theme,
+                )
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 struct VariantDifficultyRows: View {
     let cells: [VariantStats]
+    var timesBlurred = false
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -91,7 +131,7 @@ struct VariantDifficultyRows: View {
             SectionLabel("stats.variant.byDifficulty")
             VStack(spacing: 0) {
                 ForEach(cells, id: \.difficulty) { cell in
-                    VariantDifficultyRow(stats: cell, theme: theme)
+                    VariantDifficultyRow(stats: cell, theme: theme, timesBlurred: timesBlurred)
                     if cell.difficulty != cells.last?.difficulty {
                         Divider()
                     }
@@ -104,6 +144,7 @@ struct VariantDifficultyRows: View {
 private struct VariantDifficultyRow: View {
     let stats: VariantStats
     let theme: Theme
+    let timesBlurred: Bool
 
     var body: some View {
         HStack {
@@ -118,19 +159,36 @@ private struct VariantDifficultyRow: View {
                     .foregroundStyle(theme.textSecondary)
             }
             Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(verbatim: stats.fastestTime.map(DurationFormatter.string(for:)) ?? "-")
-                    .font(.headline)
-                    .fontDesign(.rounded)
-                    .monospacedDigit()
-                    .foregroundStyle(theme.textPrimary)
-                Text(verbatim: stats.averageTime.map(averageTimeString) ?? "-")
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(theme.textSecondary)
-            }
+            VariantDifficultyTimes(stats: stats, theme: theme, blurred: timesBlurred)
         }
         .padding(.vertical, 8)
+    }
+}
+
+private struct VariantDifficultyTimes: View {
+    let stats: VariantStats
+    let theme: Theme
+    let blurred: Bool
+
+    var body: some View {
+        let times = VStack(alignment: .trailing, spacing: 2) {
+            Text(verbatim: stats.fastestTime.map(DurationFormatter.string(for:)) ?? "-")
+                .font(.headline)
+                .fontDesign(.rounded)
+                .monospacedDigit()
+                .foregroundStyle(theme.textPrimary)
+            Text(verbatim: stats.averageTime.map(averageTimeString) ?? "-")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(theme.textSecondary)
+        }
+        if blurred {
+            times
+                .blur(radius: 5)
+                .accessibilityHidden(true)
+        } else {
+            times
+        }
     }
 
     private func averageTimeString(_ time: TimeInterval) -> String {

@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import Model
 import SwiftUI
@@ -5,11 +6,16 @@ import Testing
 
 @testable import Presentation
 
-/// The deep dive's per-difficulty times are analysis, so the card is a
-/// premium preview: blurred with a lock for free players, the plain rows
-/// for premium ones. The gate is read from the environment, as everywhere.
+/// The deep dive's per-difficulty won / played counts are motivation and stay
+/// free; the best and average times beside them are analysis, so free players
+/// get those blurred under the lock. Premium players get the plain rows.
 @MainActor
 struct VariantDifficultyCardTests {
+    /// Two renders of the same content still land a level apart on
+    /// anti-aliased edges; a blurred column is nowhere near that close.
+    private static let sameContent = 2
+    private static let blurredContent = 64
+
     private let cells: [VariantStats] = [
         VariantStats(
             variant: .killer,
@@ -39,32 +45,65 @@ struct VariantDifficultyCardTests {
         ),
     ]
 
-    @Test func theCardIsThePremiumBlurWrapper() {
-        let body = VariantDifficultyCard(cells: cells).body
-
-        #expect(String(describing: type(of: body)).hasPrefix("PremiumStatBlurOverlay<"))
-    }
-
-    @Test func freePlayersGetTheLockedPreview() throws {
+    /// Both gates lay the rows out identically from the top of the card - the
+    /// lock only adds its label below them - so one band covers the same rows
+    /// in either render: counts on its left, times on its right.
+    @Test func freePlayersKeepTheirCountsAndLoseTheirTimes() throws {
         let free = try #require(render(VariantDifficultyCard(cells: cells), isPremium: false))
         let premium = try #require(render(VariantDifficultyCard(cells: cells), isPremium: true))
+        let rows = CGFloat(premium.height) * 2 / 3
+        let half = CGFloat(premium.width) / 2
+        let counts = CGRect(x: 0, y: 0, width: half, height: rows)
+        let times = CGRect(x: half, y: 0, width: half, height: rows)
 
-        #expect(free != premium)
+        #expect(try largestDifference(free, premium, in: counts) <= Self.sameContent)
+        #expect(try largestDifference(free, premium, in: times) > Self.blurredContent)
     }
 
     @Test func premiumPlayersGetTheRowsUntouched() throws {
         let card = try #require(render(VariantDifficultyCard(cells: cells), isPremium: true))
         let rows = try #require(render(CardView { VariantDifficultyRows(cells: cells) }, isPremium: true))
 
-        #expect(card == rows)
+        try #require(card.width == rows.width)
+        try #require(card.height == rows.height)
+        #expect(try largestDifference(card, rows, in: bounds(of: card)) <= Self.sameContent)
     }
 
-    private func render(_ view: some View, isPremium: Bool) -> Data? {
+    private func render(_ view: some View, isPremium: Bool) -> CGImage? {
         let renderer = ImageRenderer(content: view
             .frame(width: 390)
             .environment(ThemeStore())
             .environment(PremiumGate(isPremium: isPremium)))
         renderer.scale = 1
-        return renderer.cgImage?.dataProvider?.data as Data?
+        return renderer.cgImage
+    }
+
+    private func largestDifference(_ lhs: CGImage, _ rhs: CGImage, in rect: CGRect) throws -> Int {
+        let left = try pixels(lhs, in: rect)
+        let right = try pixels(rhs, in: rect)
+        try #require(left.count == right.count)
+        return zip(left, right).map { abs(Int($0) - Int($1)) }.max() ?? 0
+    }
+
+    /// `CGImage.cropping` may hand back the parent's whole buffer, so the
+    /// region is redrawn into its own context before its bytes are read.
+    private func pixels(_ image: CGImage, in rect: CGRect) throws -> Data {
+        let region = try #require(image.cropping(to: rect))
+        let context = try #require(CGContext(
+            data: nil,
+            width: region.width,
+            height: region.height,
+            bitsPerComponent: 8,
+            bytesPerRow: region.width * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue,
+        ))
+        context.draw(region, in: bounds(of: region))
+        let bytes = try #require(context.data)
+        return Data(bytes: bytes, count: context.bytesPerRow * region.height)
+    }
+
+    private func bounds(of image: CGImage) -> CGRect {
+        CGRect(x: 0, y: 0, width: image.width, height: image.height)
     }
 }
