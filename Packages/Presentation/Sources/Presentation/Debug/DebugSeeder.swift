@@ -18,8 +18,10 @@
 
             let variants: [SudokuVariant] = [.classic, .classic, .classic, .killer, .diagonal]
             let difficulties: [Difficulty] = [.easy, .easy, .medium, .medium, .hard, .expert]
-            for index in 0 ..< 42 {
-                let daysAgo = index % 28
+            for index in 0 ..< 54 {
+                // Four weeks of dense play, then a sparser tail so the 90-day
+                // trend differs from the 30-day one.
+                let daysAgo = index < 42 ? index % 28 : 30 + (index - 42) * 5
                 let started = calendar.date(byAdding: .day, value: -daysAgo, to: now) ?? now
                 let duration = TimeInterval(180 + (index * 37) % 900)
                 let record = GameRecord(
@@ -36,6 +38,29 @@
                     points: 0,
                     startedAt: started.addingTimeInterval(-duration),
                     finishedAt: started,
+                )
+                try? await records.insert(record)
+            }
+
+            // A variant played only through a daily slot, long enough ago to
+            // have rotated out of the free lineup: its mastery row stays live.
+            for offset in [16, 23] {
+                let finished = calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+                let dateKey = EventSeeds.dailyDateKey(for: finished)
+                let record = GameRecord(
+                    id: UUID(),
+                    variant: .kropki,
+                    difficulty: .easy,
+                    mode: .normal,
+                    outcome: .won,
+                    context: .daily(dateKey: dateKey, variant: .kropki),
+                    duration: 260,
+                    mistakes: 0,
+                    hintsUsed: 0,
+                    usedReveal: false,
+                    points: 0,
+                    startedAt: finished.addingTimeInterval(-260),
+                    finishedAt: finished,
                 )
                 try? await records.insert(record)
             }

@@ -27,6 +27,9 @@ public struct Theme: Equatable, Sendable {
     public let sameDigitHighlight: Color
     public let conflict: Color
     public let hintHighlight: Color
+    /// The solid gold `hintHighlight` is tinted from, for badges and chart
+    /// series that need a warm hue the palette's greens cannot supply.
+    public let gold: Color
 
     public let success: Color
     public let textPrimary: Color
@@ -50,6 +53,7 @@ public struct Theme: Equatable, Sendable {
         sameDigitHighlight: Color,
         conflict: Color,
         hintHighlight: Color,
+        gold: Color,
         success: Color,
         textPrimary: Color,
         textSecondary: Color,
@@ -71,6 +75,7 @@ public struct Theme: Equatable, Sendable {
         self.sameDigitHighlight = sameDigitHighlight
         self.conflict = conflict
         self.hintHighlight = hintHighlight
+        self.gold = gold
         self.success = success
         self.textPrimary = textPrimary
         self.textSecondary = textSecondary

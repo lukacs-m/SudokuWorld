@@ -173,7 +173,7 @@ public struct StatsAggregator: Sendable {
     }
 
     /// One trend per key (difficulty or variant) with a win in the last 90
-    /// UTC days; the 30-day series is the tail of the same points.
+    /// UTC days; the 30- and 7-day series are tails of the same points.
     private func trends<Key: Hashable>(
         records: [GameRecord],
         today: Date,
@@ -181,11 +181,15 @@ public struct StatsAggregator: Sendable {
     ) -> [Key: StatsOverview.SolveTimeTrend] {
         let start90 = startOfWindow(days: 90, today: today)
         let start30 = startOfWindow(days: 30, today: today)
+        let start7 = startOfWindow(days: 7, today: today)
+        let endDay = calendar.startOfDay(for: today)
         let wins = records.filter { $0.outcome == .won && $0.finishedAt >= start90 }
         var trends: [Key: StatsOverview.SolveTimeTrend] = [:]
         for (value, subset) in Dictionary(grouping: wins, by: { $0[keyPath: key] }) {
             let points = trendPoints(wins: subset)
             trends[value] = StatsOverview.SolveTimeTrend(
+                endDay: endDay,
+                last7Days: points.filter { $0.day >= start7 },
                 last30Days: points.filter { $0.day >= start30 },
                 last90Days: points,
             )

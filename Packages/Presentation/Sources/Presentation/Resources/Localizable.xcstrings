@@ -4093,6 +4093,22 @@
         }
       }
     },
+    "paywall.benefit.stats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full statistics: trends, mastery matrix and all-time history"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistiques complètes : tendances, matrice de maîtrise et historique complet"
+          }
+        }
+      }
+    },
     "paywall.benefit.themes" : {
       "localizations" : {
         "en" : {
@@ -7008,6 +7024,70 @@
         }
       }
     },
+    "stats.accuracy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accuracy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Précision"
+          }
+        }
+      }
+    },
+    "stats.accuracy.hints" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avg hints"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indices moy."
+          }
+        }
+      }
+    },
+    "stats.accuracy.mistakes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avg mistakes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreurs moy."
+          }
+        }
+      }
+    },
+    "stats.accuracy.perfect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfect solves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grilles parfaites"
+          }
+        }
+      }
+    },
     "stats.byVariant" : {
       "localizations" : {
         "en" : {
@@ -7105,6 +7185,22 @@
         }
       }
     },
+    "stats.chart.variants.other" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other variants"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres variantes"
+          }
+        }
+      }
+    },
     "stats.chart.winRate" : {
       "localizations" : {
         "en" : {
@@ -7185,6 +7281,142 @@
         }
       }
     },
+    "stats.mastery" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mastery"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maîtrise"
+          }
+        }
+      }
+    },
+    "stats.mastery.cell.none" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No games"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune partie"
+          }
+        }
+      }
+    },
+    "stats.mastery.cell.notOffered" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not offered"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non proposé"
+          }
+        }
+      }
+    },
+    "stats.mastery.cell.solved %lld" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld solved"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld solved"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld résolue"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld résolues"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stats.mastery.legend.perfect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfect solve"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grille parfaite"
+          }
+        }
+      }
+    },
+    "stats.mastery.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solved, best time and perfect solves for every variant and difficulty"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réussites, record et grilles parfaites par variante et difficulté"
+          }
+        }
+      }
+    },
+    "stats.mastery.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mastery matrix"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matrice de maîtrise"
+          }
+        }
+      }
+    },
     "stats.played" : {
       "localizations" : {
         "en" : {
@@ -7229,6 +7461,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vos meilleurs temps de tous les temps"
+          }
+        }
+      }
+    },
+    "stats.premium.mastery.tease" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every variant, every difficulty, at a glance"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les variantes et difficultés en un coup d'œil"
+          }
+        }
+      }
+    },
+    "stats.premium.mastery.title %lld" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mastery matrix - %lld variant locked"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Mastery matrix - %lld variants locked"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Matrice de maîtrise - %lld variante verrouillée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Matrice de maîtrise - %lld variantes verrouillées"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stats.premium.perfect.tease" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mistakes and hints per game, and your flawless wins"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreurs et indices par partie, et vos victoires sans faute"
+          }
+        }
+      }
+    },
+    "stats.premium.perfect.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfect solves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grilles parfaites"
+          }
+        }
+      }
+    },
+    "stats.premium.trend.tease" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every win charted, per difficulty and per variant"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque victoire tracée, par difficulté et par variante"
+          }
+        }
+      }
+    },
+    "stats.premium.trend.title %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your progress over %lld days"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre progression sur %lld jours"
           }
         }
       }
@@ -7395,6 +7747,118 @@
         }
       }
     },
+    "stats.trend.empty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No wins in this window yet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune victoire sur cette période"
+          }
+        }
+      }
+    },
+    "stats.trend.free.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your progress · last 7 days"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre progression · 7 derniers jours"
+          }
+        }
+      }
+    },
+    "stats.trend.series" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Series"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Série"
+          }
+        }
+      }
+    },
+    "stats.trend.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your progress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre progression"
+          }
+        }
+      }
+    },
+    "stats.trend.window %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld jours"
+          }
+        }
+      }
+    },
+    "stats.trend.window.label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Période"
+          }
+        }
+      }
+    },
+    "stats.variant.abandoned" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandoned"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonnées"
+          }
+        }
+      }
+    },
     "stats.variant.best" : {
       "localizations" : {
         "en" : {
@@ -7407,6 +7871,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Record %@"
+          }
+        }
+      }
+    },
+    "stats.variant.byDifficulty" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By difficulty"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par difficulté"
           }
         }
       }
