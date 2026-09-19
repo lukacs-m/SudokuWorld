@@ -44,6 +44,20 @@ struct VariantDifficultyCardTests {
         perfectSolves: 0,
     )
 
+    private let neverWon = VariantStats(
+        variant: .killer,
+        difficulty: .easy,
+        played: 2,
+        won: 0,
+        lost: 2,
+        abandoned: 0,
+        currentWinStreak: 0,
+        bestWinStreak: 0,
+        fastestTime: nil,
+        averageTime: nil,
+        perfectSolves: 0,
+    )
+
     private var cells: [VariantStats] { [touched, untouched] }
 
     /// Both gates lay the rows out identically from the top of the card - the
@@ -61,14 +75,29 @@ struct VariantDifficultyCardTests {
         #expect(try largestDifference(free, premium, in: times) > Self.blurredContent)
     }
 
-    /// A tier with no games has no premium value behind the blur, so its
-    /// dashes stay sharp rather than teasing data the player never recorded.
-    @Test func tiersWithoutATimeAreNotBlurred() throws {
-        let free = try #require(render(VariantDifficultyCard(cells: [untouched]), isPremium: false))
-        let premium = try #require(render(VariantDifficultyCard(cells: [untouched]), isPremium: true))
-        let rows = CGRect(x: 0, y: 0, width: CGFloat(premium.width), height: CGFloat(premium.height) * 2 / 3)
+    /// A variant the player has played but never finished has no time to
+    /// hide, so the lock would sell nothing: free players get the very card
+    /// premium players get, with no lock label and nothing to tap.
+    @Test func aVariantWithNoTimeGetsNoLock() throws {
+        let free = try #require(render(VariantDifficultyCard(cells: [neverWon]), isPremium: false))
+        let premium = try #require(render(VariantDifficultyCard(cells: [neverWon]), isPremium: true))
 
-        #expect(try largestDifference(free, premium, in: rows) <= Self.sameContent)
+        try #require(free.width == premium.width)
+        try #require(free.height == premium.height)
+        #expect(try largestDifference(free, premium, in: bounds(of: free)) <= Self.sameContent)
+    }
+
+    /// Inside a locked card, a tier with no game finished has no premium
+    /// value behind the blur, so its dashes stay sharp.
+    @Test func tiersWithoutATimeAreNotBlurred() throws {
+        let locked = try #require(render(
+            CardView { VariantDifficultyRows(cells: [untouched], timesBlurred: true) },
+            isPremium: false,
+        ))
+        let plain = try #require(render(CardView { VariantDifficultyRows(cells: [untouched]) }, isPremium: false))
+
+        try #require(locked.height == plain.height)
+        #expect(try largestDifference(locked, plain, in: bounds(of: plain)) <= Self.sameContent)
     }
 
     @Test func premiumPlayersGetTheRowsUntouched() throws {

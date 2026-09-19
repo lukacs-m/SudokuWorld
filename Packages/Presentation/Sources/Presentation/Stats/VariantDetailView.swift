@@ -65,19 +65,29 @@ private struct VariantOutcomeGrid: View {
 /// One row per difficulty the variant offers (or once offered): won over
 /// played on the left, best and average time on the right, dashes where the
 /// tier has no games yet. The counts are motivation and stay free; the times
-/// are analysis, so free players get those blurred behind a paywall tap.
+/// are analysis, so free players get those blurred behind a paywall tap. A
+/// variant the player has never finished has no time to hide, so everyone
+/// gets the plain card rather than a lock over a column of dashes.
+///
+/// The sheet hangs above the gate: a purchase made in it flips the branch
+/// underneath, and a sheet owned by the locked branch would go with it
+/// before the paywall could confirm the purchase.
 struct VariantDifficultyCard: View {
     let cells: [VariantStats]
 
+    @State private var showPaywall = false
     @Environment(PremiumGate.self) private var premiumGate
-    @Environment(ThemeStore.self) private var themeStore
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        if premiumGate.isPremium {
-            CardView { VariantDifficultyRows(cells: cells) }
-        } else {
-            LockedVariantDifficultyCard(cells: cells, theme: themeStore.theme(for: colorScheme))
+        Group {
+            if !premiumGate.isPremium, cells.contains(where: { $0.fastestTime != nil }) {
+                LockedVariantDifficultyCard(cells: cells, showPaywall: $showPaywall)
+            } else {
+                CardView { VariantDifficultyRows(cells: cells) }
+            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
         }
     }
 }
@@ -89,9 +99,10 @@ struct VariantDifficultyCard: View {
 /// per-difficulty counts away from the players this keeps them for.
 private struct LockedVariantDifficultyCard: View {
     let cells: [VariantStats]
-    let theme: Theme
+    @Binding var showPaywall: Bool
 
-    @State private var showPaywall = false
+    @Environment(ThemeStore.self) private var themeStore
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         CardView {
@@ -103,7 +114,7 @@ private struct LockedVariantDifficultyCard: View {
                     LockedStatLabel(
                         titleKey: "stats.premium.variantTimes.title",
                         teaseKey: "stats.premium.variantTimes.tease",
-                        theme: theme,
+                        theme: themeStore.theme(for: colorScheme),
                     )
                     .frame(maxWidth: .infinity)
                 }
@@ -113,9 +124,6 @@ private struct LockedVariantDifficultyCard: View {
         .contentShape(RoundedRectangle(cornerRadius: 20))
         .onTapGesture {
             showPaywall = true
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
         }
     }
 }
