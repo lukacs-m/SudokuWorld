@@ -56,11 +56,9 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     private func locked(theme: Theme) -> some View {
         CardView {
             ZStack(alignment: labelAlignment) {
-                content
-                    .blur(radius: 5)
-                    .overlay(theme.screenBackground.opacity(0.25))
-                    .accessibilityHidden(true)
+                content.premiumStatBlur(theme: theme)
                 LockedStatLabel(titleKey: titleKey, teaseKey: teaseKey, theme: theme)
+                    .padding(16)
             }
             .clipShape(RoundedRectangle(cornerRadius: 4))
         }
@@ -68,7 +66,33 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     }
 }
 
-private struct LockedStatLabel: View {
+/// How a locked preview hides the player's real numbers, wherever it covers
+/// them: the radius scales with the text it sits on, so raising Dynamic Type
+/// cannot bring the values back, and the wash keeps the lock label legible.
+/// Hidden from VoiceOver, which the lock label speaks for. Callers clip the
+/// region the bleed may not leave.
+private struct PremiumStatBlur: ViewModifier {
+    let theme: Theme
+
+    @ScaledMetric(relativeTo: .body) private var radius: CGFloat = 5
+
+    func body(content: Content) -> some View {
+        content
+            .blur(radius: radius)
+            .overlay(theme.screenBackground.opacity(0.25))
+            .accessibilityHidden(true)
+    }
+}
+
+extension View {
+    func premiumStatBlur(theme: Theme) -> some View {
+        modifier(PremiumStatBlur(theme: theme))
+    }
+}
+
+/// Cards that blur only part of their content place this themselves, so the
+/// padding belongs to the caller.
+struct LockedStatLabel: View {
     let titleKey: LocalizedStringKey
     let teaseKey: LocalizedStringKey
     let theme: Theme
@@ -87,7 +111,6 @@ private struct LockedStatLabel: View {
                 .foregroundStyle(theme.textSecondary)
         }
         .multilineTextAlignment(.center)
-        .padding(16)
     }
 }
 

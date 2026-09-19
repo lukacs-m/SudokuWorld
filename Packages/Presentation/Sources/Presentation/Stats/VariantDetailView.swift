@@ -64,24 +64,89 @@ private struct VariantOutcomeGrid: View {
 
 /// One row per difficulty the variant offers (or once offered): won over
 /// played on the left, best and average time on the right, dashes where the
-/// tier has no games yet.
-private struct VariantDifficultyCard: View {
+/// tier has no games yet. The counts are motivation and stay free; the times
+/// are analysis, so free players get those blurred behind a paywall tap. A
+/// variant the player has never finished has no time to hide, so everyone
+/// gets the plain card rather than a lock over a column of dashes.
+///
+/// The sheet hangs above the gate: a purchase made in it flips the branch
+/// underneath, and a sheet owned by the locked branch would go with it
+/// before the paywall could confirm the purchase.
+struct VariantDifficultyCard: View {
     let cells: [VariantStats]
+
+    @State private var showPaywall = false
+    @Environment(PremiumGate.self) private var premiumGate
+
+    var body: some View {
+        Group {
+            if !premiumGate.isPremium, cells.contains(where: { $0.fastestTime != nil }) {
+                LockedVariantDifficultyCard(cells: cells, showPaywall: $showPaywall)
+            } else {
+                CardView { VariantDifficultyRows(cells: cells) }
+            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
+    }
+}
+
+/// The lock sits under the rows rather than over them, so the counts it
+/// leaves free stay readable. The card opens the paywall wherever it is
+/// tapped, but only the lock label is a button: wrapping the whole card in
+/// one would merge the rows into a single VoiceOver element and take the
+/// per-difficulty counts away from the players this keeps them for.
+private struct LockedVariantDifficultyCard: View {
+    let cells: [VariantStats]
+    @Binding var showPaywall: Bool
+
+    @Environment(ThemeStore.self) private var themeStore
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        // The lock label's Button carries `isButton`; adding it to the card
+        // would propagate the trait to every count row, which is not one.
+        // swiftlint:disable:next accessibility_trait_for_button
+        CardView {
+            VStack(alignment: .leading, spacing: 12) {
+                VariantDifficultyRows(cells: cells, timesBlurred: true)
+                Button {
+                    showPaywall = true
+                } label: {
+                    LockedStatLabel(
+                        titleKey: "stats.premium.variantTimes.title",
+                        teaseKey: "stats.premium.variantTimes.tease",
+                        theme: themeStore.theme(for: colorScheme),
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 20))
+        .onTapGesture {
+            showPaywall = true
+        }
+    }
+}
+
+struct VariantDifficultyRows: View {
+    let cells: [VariantStats]
+    var timesBlurred = false
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        CardView {
-            VStack(alignment: .leading, spacing: 12) {
-                SectionLabel("stats.variant.byDifficulty")
-                VStack(spacing: 0) {
-                    ForEach(cells, id: \.difficulty) { cell in
-                        VariantDifficultyRow(stats: cell, theme: theme)
-                        if cell.difficulty != cells.last?.difficulty {
-                            Divider()
-                        }
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel("stats.variant.byDifficulty")
+            VStack(spacing: 0) {
+                ForEach(cells, id: \.difficulty) { cell in
+                    VariantDifficultyRow(stats: cell, theme: theme, timesBlurred: timesBlurred)
+                    if cell.difficulty != cells.last?.difficulty {
+                        Divider()
                     }
                 }
             }
@@ -92,6 +157,7 @@ private struct VariantDifficultyCard: View {
 private struct VariantDifficultyRow: View {
     let stats: VariantStats
     let theme: Theme
+    let timesBlurred: Bool
 
     var body: some View {
         HStack {
@@ -106,19 +172,36 @@ private struct VariantDifficultyRow: View {
                     .foregroundStyle(theme.textSecondary)
             }
             Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(verbatim: stats.fastestTime.map(DurationFormatter.string(for:)) ?? "-")
-                    .font(.headline)
-                    .fontDesign(.rounded)
-                    .monospacedDigit()
-                    .foregroundStyle(theme.textPrimary)
-                Text(verbatim: stats.averageTime.map(averageTimeString) ?? "-")
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(theme.textSecondary)
-            }
+            VariantDifficultyTimes(stats: stats, theme: theme, blurred: timesBlurred)
         }
         .padding(.vertical, 8)
+    }
+}
+
+private struct VariantDifficultyTimes: View {
+    let stats: VariantStats
+    let theme: Theme
+    let blurred: Bool
+
+    var body: some View {
+        let times = VStack(alignment: .trailing, spacing: 2) {
+            Text(verbatim: stats.fastestTime.map(DurationFormatter.string(for:)) ?? "-")
+                .font(.headline)
+                .fontDesign(.rounded)
+                .monospacedDigit()
+                .foregroundStyle(theme.textPrimary)
+            Text(verbatim: stats.averageTime.map(averageTimeString) ?? "-")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(theme.textSecondary)
+        }
+        if blurred, stats.fastestTime != nil {
+            times
+                .premiumStatBlur(theme: theme)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+        } else {
+            times
+        }
     }
 
     private func averageTimeString(_ time: TimeInterval) -> String {

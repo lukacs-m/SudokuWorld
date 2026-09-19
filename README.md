@@ -70,9 +70,10 @@ French localization.
   difficulty and per variant (free players see the last 7 days live), the
   mistakes / hints / perfect-solves card, and the mastery matrix (variant ×
   difficulty; rows a free player has touched, dailies included, stay live);
-  a per-variant deep dive (outcomes and per-difficulty records free, its
-  trend line blurred); Swift Charts (30-day activity, variant distribution
-  in theme colours). Every day bucket is a UTC day like the daily challenge.
+  a per-variant deep dive (outcomes and per-difficulty counts free, its
+  per-difficulty best/average times and its trend line blurred); Swift
+  Charts (30-day activity, variant distribution in theme colours). Every
+  day bucket is a UTC day like the daily challenge.
 - **Game Center** — 84 matrix leaderboards (the 7 curated variants in
   `GameCenterIDs.leaderboardVariants` × 6 difficulties × time/wins; every
   other variant counts toward the aggregates only) + 4 aggregates, 16

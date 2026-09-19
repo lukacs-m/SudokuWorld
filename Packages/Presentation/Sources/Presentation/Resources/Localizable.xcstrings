@@ -7585,6 +7585,38 @@
         }
       }
     },
+    "stats.premium.variantTimes.tease" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your fastest and typical solve at every level"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre temps record et habituel à chaque niveau"
+          }
+        }
+      }
+    },
+    "stats.premium.variantTimes.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best and average times by difficulty"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleurs temps et moyennes par difficulté"
+          }
+        }
+      }
+    },
     "stats.streak.bestCount" : {
       "localizations" : {
         "en" : {
