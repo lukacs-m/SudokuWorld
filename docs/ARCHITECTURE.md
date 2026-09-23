@@ -87,7 +87,9 @@ or `navigationDestination(item:)` anywhere. Modals follow the same shape: the
 `sheetDestinations(_:)` / `fullScreenDestination(_:)` switches
 (`Destinations.swift`), bound to `AppRouter.presentedSheet` /
 `presentedFullScreen` at the root, or to a modal's own `presentedSheet` state
-for a sheet presented from inside another modal.
+for a sheet presented from inside another modal. The one exception is the
+in-game hint sheet, bound to `GameViewModel.presentedHint`, because its actions
+mutate the live hint session rather than carry a value payload.
 
 ## Why a separate DI package?
 

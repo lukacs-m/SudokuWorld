@@ -18,9 +18,9 @@ public final class NewGameViewModel {
     public init() {}
 
     public func load(now: Date = Date()) async {
+        lineup = await getDailyLineup(dateKey: EventSeeds.dailyDateKey(for: now))
         stats = await computeStats(today: now, firstWeekday: DailyDayGrid.firstWeekday)
             .perVariant
-        lineup = await getDailyLineup(dateKey: EventSeeds.dailyDateKey(for: now))
     }
 
     public func bestTime(variant: SudokuVariant, difficulty: Difficulty) -> TimeInterval? {

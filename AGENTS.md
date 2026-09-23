@@ -150,6 +150,9 @@ Match the existing `Article` slice's structure and naming. If it has been remove
   built only in `Root/Destinations.swift`; present them through
   `AppRouter.presentedSheet` / `presentedFullScreen`, or a modal's own
   `presentedSheet` when the sheet is presented from inside another modal.
+  The one exception is the in-game hint sheet, bound to
+  `GameViewModel.presentedHint`, because its actions mutate the live hint
+  session rather than carry a value payload.
 - Adding a screen means: a route case, a switch arm, and a `push` at the call
   site. See `docs/ARCHITECTURE.md` → "Presentation".
 
