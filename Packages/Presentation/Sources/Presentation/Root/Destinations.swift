@@ -24,7 +24,8 @@ public enum FullScreenDestination: Hashable, Identifiable {
 }
 
 extension View {
-    /// The one place sheets are built. The root binds `AppRouter.presentedSheet`;
+    /// The one place sheets are built (except the hint sheet, see
+    /// `docs/ARCHITECTURE.md`). The root binds `AppRouter.presentedSheet`;
     /// a modal that presents a sheet of its own binds a local `presentedSheet`
     /// instead, because a modal can only present from its own hierarchy.
     func sheetDestinations(_ destination: Binding<SheetDestination?>) -> some View {
