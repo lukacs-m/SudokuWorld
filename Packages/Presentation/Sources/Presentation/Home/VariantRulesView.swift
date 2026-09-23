@@ -6,13 +6,14 @@ import SwiftUI
 struct VariantRulesView: View {
     let variant: SudokuVariant
 
+    @State private var router = RulesRouter()
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     header(theme: theme)

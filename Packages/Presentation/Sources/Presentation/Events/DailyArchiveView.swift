@@ -53,9 +53,8 @@ final class DailyArchiveViewModel {
 
 struct DailyArchiveView: View {
     @State private var viewModel = DailyArchiveViewModel()
-    @State private var softWall: SoftWallContext?
 
-    @Environment(Router.self) private var router
+    @Environment(AppRouter.self) private var router
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -91,7 +90,7 @@ struct DailyArchiveView: View {
                                     difficulty: slot.difficulty,
                                 )))
                             } else {
-                                softWall = SoftWallContext(variant: slot.variant)
+                                router.presentedSheet = .softWall(slot.variant)
                             }
                         }
                     }
@@ -104,14 +103,11 @@ struct DailyArchiveView: View {
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("archive.title", bundle: .module))
-        .onChange(of: router.game) { _, game in
+        .onChange(of: router.presentedFullScreen) { _, presented in
             // The game cover doesn't refire row tasks underneath on its own.
-            if game == nil {
+            if presented == nil {
                 viewModel.invalidate()
             }
-        }
-        .sheet(item: $softWall) { context in
-            SoftWallView(variant: context.variant)
         }
     }
 }

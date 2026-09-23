@@ -11,11 +11,11 @@ import SwiftUI
 struct GameView: View {
     @State private var viewModel: GameViewModel
     @State private var showExitDialog = false
-    @State private var softWall: SoftWallContext?
+    @State private var presentedSheet: SheetDestination?
     @State private var showsFogLiftCue = false
     @State private var fogLiftCueTask: Task<Void, Never>?
 
-    @Environment(Router.self) private var router
+    @Environment(AppRouter.self) private var router
     @Environment(ThemeStore.self) private var themeStore
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
@@ -98,9 +98,7 @@ struct GameView: View {
                 )
             }
         }
-        .sheet(item: $softWall) { context in
-            SoftWallView(variant: context.variant)
-        }
+        .sheetDestinations($presentedSheet)
         .confirmationDialog(
             Text("game.exit.title", bundle: .module),
             isPresented: $showExitDialog,
@@ -263,7 +261,7 @@ struct GameView: View {
                        let dailyVariant = viewModel.session?.context.dailyVariant,
                        dailyVariant != .classic
                     {
-                        softWall = SoftWallContext(variant: dailyVariant)
+                        presentedSheet = .softWall(dailyVariant)
                     } else {
                         // Fresh presentation token, so the cover rebuilds
                         // even for an identical configuration.

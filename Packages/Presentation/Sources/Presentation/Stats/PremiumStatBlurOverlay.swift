@@ -12,7 +12,7 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     private let labelAlignment: Alignment
     private let content: Content
 
-    @State private var showPaywall = false
+    @Environment(AppRouter.self) private var router
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -33,20 +33,15 @@ struct PremiumStatBlurOverlay<Content: View>: View {
     }
 
     var body: some View {
-        Group {
-            if premiumGate.isPremium {
-                CardView { content }
-            } else {
-                Button {
-                    showPaywall = true
-                } label: {
-                    locked(theme: themeStore.theme(for: colorScheme))
-                }
-                .buttonStyle(.plain)
+        if premiumGate.isPremium {
+            CardView { content }
+        } else {
+            Button {
+                router.presentedSheet = .paywall
+            } label: {
+                locked(theme: themeStore.theme(for: colorScheme))
             }
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
+            .buttonStyle(.plain)
         }
     }
 
@@ -122,6 +117,7 @@ struct LockedStatLabel: View {
         TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
     }
     .padding()
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
@@ -139,6 +135,7 @@ struct LockedStatLabel: View {
     }
     .padding()
     .environment(\.dynamicTypeSize, .accessibility5)
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
@@ -151,6 +148,7 @@ struct LockedStatLabel: View {
         TimesBreakdownContent(title: "Classic best times", entries: PreviewData.times)
     }
     .padding()
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: true))
 }

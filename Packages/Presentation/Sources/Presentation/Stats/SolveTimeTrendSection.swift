@@ -379,6 +379,7 @@ struct SolveTimeTrendChart: View {
         }
         .padding()
     }
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
@@ -390,6 +391,7 @@ struct SolveTimeTrendChart: View {
         }
         .padding()
     }
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: true))
 }
@@ -397,6 +399,7 @@ struct SolveTimeTrendChart: View {
 #Preview("Premium · no wins") {
     SolveTimeTrendSection(options: [])
         .padding()
+        .environment(AppRouter())
         .environment(ThemeStore())
         .environment(PremiumGate(isPremium: true))
 }

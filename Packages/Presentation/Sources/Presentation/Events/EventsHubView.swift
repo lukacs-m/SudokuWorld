@@ -9,7 +9,8 @@ import SwiftUI
 struct EventsHubView: View {
     @State private var viewModel = EventsHubViewModel()
 
-    @Environment(Router.self) private var router
+    @Environment(AppRouter.self) private var router
+    @Environment(EventsRouter.self) private var eventsRouter
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
@@ -44,9 +45,9 @@ struct EventsHubView: View {
         .navigationTitle(Text("events.title", bundle: .module))
         .task { await viewModel.load() }
         .task { await viewModel.observeAuthState() }
-        .onChange(of: router.game) { _, game in
+        .onChange(of: router.presentedFullScreen) { _, presented in
             // The game cover doesn't refire onAppear underneath on dismissal.
-            if game == nil {
+            if presented == nil {
                 Task { await viewModel.load() }
             }
         }
@@ -122,8 +123,8 @@ struct EventsHubView: View {
     }
 
     private func archiveLink(theme: Theme) -> some View {
-        NavigationLink {
-            DailyArchiveView()
+        Button {
+            eventsRouter.push(.dailyArchive)
         } label: {
             HStack {
                 Label {
@@ -137,6 +138,7 @@ struct EventsHubView: View {
                 Image(systemName: "chevron.right")
                     .font(.footnote)
                     .foregroundStyle(theme.textSecondary)
+                    .accessibilityHidden(true)
             }
             .contentShape(Rectangle())
         }

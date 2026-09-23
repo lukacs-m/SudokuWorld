@@ -41,13 +41,14 @@ private struct VariantBreakdownRow: View {
     let cells: [VariantStats]
     let overview: StatsOverview
 
+    @Environment(StatsRouter.self) private var router
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        NavigationLink {
-            VariantDetailView(variant: variant, overview: overview)
+        Button {
+            router.push(.variantDetail(variant, overview))
         } label: {
             HStack(spacing: 10) {
                 Text(verbatim: moduleString("variant.\(variant.slug)"))

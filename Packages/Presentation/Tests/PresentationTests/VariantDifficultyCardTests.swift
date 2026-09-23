@@ -112,6 +112,7 @@ struct VariantDifficultyCardTests {
     private func render(_ view: some View, isPremium: Bool) -> CGImage? {
         let renderer = ImageRenderer(content: view
             .frame(width: 390)
+            .environment(AppRouter())
             .environment(ThemeStore())
             .environment(PremiumGate(isPremium: isPremium)))
         renderer.scale = 1

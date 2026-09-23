@@ -13,8 +13,9 @@ struct SettingsView: View {
         URL(string: "https://apps.apple.com/app/id0000000000?action=write-review")!
 
     @State private var viewModel = SettingsViewModel()
-    @State private var showPaywall = false
 
+    @Environment(AppRouter.self) private var router
+    @Environment(SettingsRouter.self) private var settingsRouter
     @Environment(ThemeStore.self) private var themeStore
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
@@ -30,7 +31,7 @@ struct SettingsView: View {
                 themeSection(theme: theme)
                 gameCenterSection(theme: theme)
                 #if DEBUG
-                    debugSection
+                    debugSection(theme: theme)
                 #endif
                 aboutSection(theme: theme)
             } else {
@@ -43,9 +44,6 @@ struct SettingsView: View {
         .navigationTitle(Text("settings.title", bundle: .module))
         .task { await viewModel.load() }
         .task { await viewModel.observeAuthState() }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
-        }
     }
 
     // MARK: - Sections
@@ -71,19 +69,20 @@ struct SettingsView: View {
         }
     }
 
-    private func assistanceSection(theme _: Theme) -> some View {
+    private func assistanceSection(theme: Theme) -> some View {
         Section {
             toggle("settings.autoCleanNotes", value: \.autoCleanNotes)
             toggle("settings.mistakeHighlighting", value: \.mistakeHighlighting)
             toggle("settings.autoCheck", value: \.autoCheck)
             toggle("settings.hardcoreDefault", value: \.hardcoreByDefault)
-            NavigationLink {
-                LearnView()
+            DisclosureRow {
+                settingsRouter.push(.learn)
             } label: {
                 Label {
                     Text("settings.learn", bundle: .module)
                 } icon: {
                     Image(systemName: "graduationcap")
+                        .foregroundStyle(theme.accent)
                 }
             }
         } header: {
@@ -169,7 +168,7 @@ struct SettingsView: View {
                         themeStore.select(id)
                     }
                 },
-                onLocked: { showPaywall = true },
+                onLocked: { router.presentedSheet = .paywall },
             )
             .padding(.vertical, 6)
         } header: {
@@ -222,7 +221,7 @@ struct SettingsView: View {
                 }
             } else {
                 Button {
-                    showPaywall = true
+                    router.presentedSheet = .paywall
                 } label: {
                     Label {
                         Text("settings.premium.upgrade", bundle: .module)
@@ -271,15 +270,16 @@ struct SettingsView: View {
     }
 
     #if DEBUG
-        private var debugSection: some View {
+        private func debugSection(theme: Theme) -> some View {
             Section {
-                NavigationLink {
-                    DebugMenuView()
+                DisclosureRow {
+                    settingsRouter.push(.debug)
                 } label: {
                     Label {
                         Text("home.debug", bundle: .module)
                     } icon: {
                         Image(systemName: "hammer")
+                            .foregroundStyle(theme.accent)
                     }
                 }
             }

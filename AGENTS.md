@@ -136,6 +136,23 @@ Match the existing `Article` slice's structure and naming. If it has been remove
   and only update when new data arrives. See `ArticleListViewModel.load(showLoading:)`.
 - Guard re-entrant `.task` triggers (`guard case .idle = state else { return }`).
 
+## Navigation conventions
+
+- One `Router<Route>` per `NavigationStack`, bound with `NavigationStack(path:)`;
+  the route enum and typealias live in `Presentation/Root/Routes.swift` and the
+  stack's single `navigationDestination(for:)` switch in `Root/TabStacks.swift`
+  (or the modal that owns the stack). Never declare a destination switch inside
+  a pushed screen.
+- Navigate by pushing onto the right router from the environment. Never use
+  `NavigationLink`, `navigationDestination(isPresented:)` or
+  `navigationDestination(item:)`.
+- Sheets and covers are `SheetDestination` / `FullScreenDestination` cases,
+  built only in `Root/Destinations.swift`; present them through
+  `AppRouter.presentedSheet` / `presentedFullScreen`, or a modal's own
+  `presentedSheet` when the sheet is presented from inside another modal.
+- Adding a screen means: a route case, a switch arm, and a `push` at the call
+  site. See `docs/ARCHITECTURE.md` → "Presentation".
+
 ## Factory (FactoryKit) conventions
 
 - Register as computed `Factory` properties on `Container` using `self { Impl() }`;

@@ -14,13 +14,14 @@ struct PaywallView: View {
 
     @State private var viewModel = PaywallViewModel()
     @State private var selectedID: String?
+    @State private var router = PaywallRouter()
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(spacing: 20) {
                     header(theme: theme)

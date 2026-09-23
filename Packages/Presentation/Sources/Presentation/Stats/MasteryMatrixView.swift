@@ -61,6 +61,7 @@ private struct MasteryGrid: View {
     let overview: StatsOverview
     let opensDetail: Bool
 
+    @Environment(StatsRouter.self) private var router
     @ScaledMetric(relativeTo: .subheadline) private var nameWidth: CGFloat = 92
     @ScaledMetric(relativeTo: .caption2) private var cellWidth: CGFloat = 36
     private let spacing: CGFloat = 1
@@ -72,8 +73,8 @@ private struct MasteryGrid: View {
                 ForEach(rows) { row in
                     Divider()
                     if opensDetail {
-                        NavigationLink {
-                            VariantDetailView(variant: row.variant, overview: overview)
+                        Button {
+                            router.push(.variantDetail(row.variant, overview))
                         } label: {
                             MasteryRowView(
                                 row: row,
@@ -230,17 +231,21 @@ func masteryCellLabel(difficulty: Difficulty, cell: VariantStats?) -> String {
 }
 
 #Preview("Free") {
-    NavigationStack {
+    @Previewable @State var router = StatsRouter()
+    NavigationStack(path: $router.path) {
         MasteryMatrixView(overview: .masteryPreview)
     }
+    .environment(router)
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
 
 #Preview("Premium · AX3") {
-    NavigationStack {
+    @Previewable @State var router = StatsRouter()
+    NavigationStack(path: $router.path) {
         MasteryMatrixView(overview: .masteryPreview)
     }
+    .environment(router)
     .environment(\.dynamicTypeSize, .accessibility3)
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: true))

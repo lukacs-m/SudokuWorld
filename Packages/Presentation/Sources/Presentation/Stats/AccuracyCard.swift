@@ -35,6 +35,7 @@ struct AccuracyCard: View {
 #Preview("Free") {
     AccuracyCard(overview: .accuracyPreview)
         .padding()
+        .environment(AppRouter())
         .environment(ThemeStore())
         .environment(PremiumGate(isPremium: false))
 }
@@ -42,6 +43,7 @@ struct AccuracyCard: View {
 #Preview("Premium") {
     AccuracyCard(overview: .accuracyPreview)
         .padding()
+        .environment(AppRouter())
         .environment(ThemeStore())
         .environment(PremiumGate(isPremium: true))
 }

@@ -9,7 +9,7 @@
     struct DebugMenuView: View {
         @State private var resetResult: String?
 
-        @Environment(Router.self) private var router
+        @Environment(AppRouter.self) private var router
 
         var body: some View {
             List {
