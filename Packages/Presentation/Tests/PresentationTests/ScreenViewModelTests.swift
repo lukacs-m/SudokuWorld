@@ -333,3 +333,23 @@ struct SettingsViewModelTests {
         #expect(viewModel.restorePhase == .failed)
     }
 }
+
+@Suite(.container)
+@MainActor
+struct NewGameViewModelTests {
+    @Test(arguments: [false, true])
+    func hardcoreDefaultFollowsStoredSetting(hardcoreByDefault: Bool) async {
+        Container.shared.computeStatsUseCase.register { MockComputeStats() }
+        Container.shared.getDailyLineupUseCase.register { MockGetDailyLineup() }
+        Container.shared.settingsRepository.register {
+            var settings = GameSettings.standard
+            settings.hardcoreByDefault = hardcoreByDefault
+            return MockSettingsRepository(settings: settings)
+        }
+
+        let viewModel = NewGameViewModel()
+        await viewModel.load()
+
+        #expect(viewModel.hardcoreByDefault == hardcoreByDefault)
+    }
+}
