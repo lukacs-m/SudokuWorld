@@ -60,8 +60,10 @@ struct NewGameSheet: View {
         .sheetDestinations($presentedSheet)
         .task {
             await viewModel.load()
-            hardcore = viewModel.hardcoreByDefault
             computeChips()
+        }
+        .onChange(of: viewModel.hardcoreByDefault) { _, stored in
+            hardcore = stored
         }
         .onAppear {
             #if DEBUG

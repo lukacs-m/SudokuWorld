@@ -20,10 +20,10 @@ public final class NewGameViewModel {
     public init() {}
 
     public func load(now: Date = Date()) async {
+        hardcoreByDefault = await settingsRepository.gameSettings().hardcoreByDefault
         lineup = await getDailyLineup(dateKey: EventSeeds.dailyDateKey(for: now))
         stats = await computeStats(today: now, firstWeekday: DailyDayGrid.firstWeekday)
             .perVariant
-        hardcoreByDefault = await settingsRepository.gameSettings().hardcoreByDefault
     }
 
     public func bestTime(variant: SudokuVariant, difficulty: Difficulty) -> TimeInterval? {
