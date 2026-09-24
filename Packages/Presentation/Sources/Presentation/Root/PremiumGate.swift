@@ -6,7 +6,7 @@ public import Observation
 /// The single source of truth for premium: seeded from RevenueCat's cached
 /// customer info (so it works offline), then kept live by the entitlement
 /// stream (purchase, restore, renewal, expiry) and a foreground refresh.
-/// Injected through the environment like `Router` and `ThemeStore`.
+/// Injected through the environment like `AppRouter` and `ThemeStore`.
 @MainActor
 @Observable
 public final class PremiumGate {

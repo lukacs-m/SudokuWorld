@@ -12,84 +12,69 @@ import SwiftUI
 /// daily slot when the rotation offers them, and to the soft wall otherwise.
 /// The full catalog stays browsable (cards, rules) for everyone.
 struct NewGameSheet: View {
-    let hardcoreDefault: Bool
-    let isPremium: Bool
-    let lineup: DailyLineup?
-    let onStart: (SudokuVariant, Difficulty, GameMode) -> Void
-    let onPlayDaily: (DailyLineup.Slot) -> Void
-    let onSoftWall: (SudokuVariant) -> Void
-
     @State private var viewModel = NewGameViewModel()
+    @State private var router = NewGameRouter()
+    @State private var presentedSheet: SheetDestination?
     @State private var variant: SudokuVariant = .classic
     @State private var difficulty: Difficulty = .easy
-    @State private var hardcore: Bool
-    @State private var showDifficulty = false
-    @State private var showRules = false
+    @State private var hardcore = false
     /// Free-tier scheduling chips ("Play today" / "Daily Fri") per variant.
     @State private var chips: [SudokuVariant: String] = [:]
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var appRouter
+    @Environment(PremiumGate.self) private var premiumGate
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
-    init(
-        hardcoreDefault: Bool,
-        isPremium: Bool,
-        lineup: DailyLineup?,
-        onStart: @escaping (SudokuVariant, Difficulty, GameMode) -> Void,
-        onPlayDaily: @escaping (DailyLineup.Slot) -> Void,
-        onSoftWall: @escaping (SudokuVariant) -> Void,
-    ) {
-        self.hardcoreDefault = hardcoreDefault
-        self.isPremium = isPremium
-        self.lineup = lineup
-        self.onStart = onStart
-        self.onPlayDaily = onPlayDaily
-        self.onSoftWall = onSoftWall
-        _hardcore = State(initialValue: hardcoreDefault)
-    }
-
     private enum Access {
         case full
-        case playToday(DailyLineup.Slot)
+        case playToday(dateKey: String, DailyLineup.Slot)
         case softWall
     }
 
     private var access: Access {
-        if isPremium || variant == .classic {
+        if premiumGate.isPremium || variant == .classic {
             return .full
         }
-        if let slot = lineup?.slots.first(where: { $0.variant == variant }),
+        if let lineup = viewModel.lineup,
+           let slot = lineup.slots.first(where: { $0.variant == variant }),
            !slot.isCompleted
         {
-            return .playToday(slot)
+            return .playToday(dateKey: lineup.dateKey, slot)
         }
         return .softWall
     }
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             variantStep(theme: theme)
-                .navigationDestination(isPresented: $showDifficulty) {
-                    difficultyStep(theme: theme)
+                .navigationDestination(for: NewGameRoute.self) { route in
+                    switch route {
+                    case .difficulty:
+                        difficultyStep(theme: theme)
+                    }
                 }
         }
-        .task { await viewModel.load() }
-        .onAppear { computeChips() }
+        .sheetDestinations($presentedSheet)
+        .task {
+            await viewModel.load()
+            computeChips()
+        }
         .onAppear {
             #if DEBUG
                 if let slug = LaunchHooks.rulesVariant,
                    let hooked = SudokuVariant(rawValue: slug)
                 {
                     variant = hooked
-                    showRules = true
+                    presentedSheet = .rules(hooked)
                 }
                 if let slug = LaunchHooks.difficultyStepVariant,
                    let hooked = SudokuVariant(rawValue: slug)
                 {
                     variant = hooked
-                    showDifficulty = true
+                    router.push(.difficulty)
                 }
             #endif
         }
@@ -138,15 +123,12 @@ struct NewGameSheet: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        showRules = true
+                        presentedSheet = .rules(variant)
                     } label: {
                         Image(systemName: "info.circle")
                     }
                     .accessibilityLabel(Text("rules.title", bundle: .module))
                 }
-            }
-            .sheet(isPresented: $showRules) {
-                VariantRulesView(variant: variant)
             }
     }
 
@@ -161,10 +143,10 @@ struct NewGameSheet: View {
                     moduleString("variant.\(variant.slug)"),
                 ),
             ) {
-                showDifficulty = true
+                router.push(.difficulty)
             }
 
-        case let .playToday(slot):
+        case let .playToday(dateKey, slot):
             PrimaryButton(
                 verbatim: String(
                     format: String(localized: "newGame.playToday", bundle: .module),
@@ -173,7 +155,11 @@ struct NewGameSheet: View {
                 systemImage: "play.fill",
             ) {
                 dismiss()
-                onPlayDaily(slot)
+                appRouter.play(GameLaunch(kind: .daily(
+                    dateKey: dateKey,
+                    variant: slot.variant,
+                    difficulty: slot.difficulty,
+                )))
             }
 
         case .softWall:
@@ -183,8 +169,8 @@ struct NewGameSheet: View {
                     moduleString("variant.\(variant.slug)"),
                 ),
             ) {
-                dismiss()
-                onSoftWall(variant)
+                // Replaces this sheet with the soft wall.
+                appRouter.presentedSheet = .softWall(variant)
             }
         }
     }
@@ -234,7 +220,11 @@ struct NewGameSheet: View {
                     systemImage: "play.fill",
                 ) {
                     dismiss()
-                    onStart(variant, effectiveDifficulty, hardcore ? .hardcore : .normal)
+                    appRouter.play(GameLaunch(kind: .new(
+                        variant: variant,
+                        difficulty: effectiveDifficulty,
+                        mode: hardcore ? .hardcore : .normal,
+                    )))
                 }
             }
         }
@@ -289,7 +279,8 @@ struct NewGameSheet: View {
     /// One pass over the catalog when the sheet opens; `nextAppearance`
     /// scans forward per variant, cheap but not free — not body work.
     private func computeChips() {
-        guard !isPremium, chips.isEmpty else { return }
+        guard !premiumGate.isPremium, chips.isEmpty else { return }
+        let lineup = viewModel.lineup
         let todayKey = lineup?.dateKey ?? EventSeeds.dailyDateKey(for: Date())
         var result: [SudokuVariant: String] = [:]
         for candidate in VariantCatalog.available where candidate != .classic {

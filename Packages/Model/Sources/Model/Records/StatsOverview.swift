@@ -3,9 +3,9 @@ public import Foundation
 /// Everything the Statistics screen renders, precomputed into chart-friendly
 /// series so the view stays dumb. Every day bucket is a UTC day — the clock
 /// the daily challenge and the streak already run on.
-public struct StatsOverview: Equatable, Sendable {
+public struct StatsOverview: Hashable, Sendable {
     /// Finished games per UTC day (for the activity chart).
-    public struct DailyCount: Identifiable, Equatable, Sendable {
+    public struct DailyCount: Identifiable, Hashable, Sendable {
         public let day: Date
         public let count: Int
 
@@ -19,7 +19,7 @@ public struct StatsOverview: Equatable, Sendable {
         }
     }
 
-    public struct DifficultyWinRate: Identifiable, Equatable, Sendable {
+    public struct DifficultyWinRate: Identifiable, Hashable, Sendable {
         public let difficulty: Difficulty
         public let played: Int
         public let won: Int
@@ -39,7 +39,7 @@ public struct StatsOverview: Equatable, Sendable {
         }
     }
 
-    public struct DifficultyTimes: Identifiable, Equatable, Sendable {
+    public struct DifficultyTimes: Identifiable, Hashable, Sendable {
         public let difficulty: Difficulty
         public let fastest: TimeInterval?
         public let average: TimeInterval?
@@ -56,7 +56,7 @@ public struct StatsOverview: Equatable, Sendable {
     }
 
     /// Average solve time of one UTC day's wins.
-    public struct TrendPoint: Identifiable, Equatable, Sendable {
+    public struct TrendPoint: Identifiable, Hashable, Sendable {
         public let day: Date
         public let averageTime: TimeInterval
 
@@ -73,7 +73,7 @@ public struct StatsOverview: Equatable, Sendable {
     /// Solve-time history for a line chart, wins only. Days without a win
     /// are left out rather than zero-filled, so sparse history plots as gaps.
     /// The 7-day series is the free preview of the same line.
-    public struct SolveTimeTrend: Equatable, Sendable {
+    public struct SolveTimeTrend: Hashable, Sendable {
         /// The UTC day every window was measured back from, so a chart draws
         /// the axis the points were bucketed against even if midnight passes
         /// while the screen stays open.
@@ -95,7 +95,7 @@ public struct StatsOverview: Equatable, Sendable {
         }
     }
 
-    public struct VariantShare: Identifiable, Equatable, Sendable {
+    public struct VariantShare: Identifiable, Hashable, Sendable {
         public let variant: SudokuVariant
         public let played: Int
 

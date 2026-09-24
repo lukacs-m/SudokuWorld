@@ -7,18 +7,10 @@ import SwiftUI
 /// section, and entries into events, stats, and settings.
 struct HomeView: View {
     @State private var viewModel = HomeViewModel()
-    @State private var showNewGame = false
-    @State private var showPaywall = false
-    @State private var softWall: SoftWallContext?
-    @State private var hardcoreDefault = false
     @State private var launchHooksHandled = false
-    @State private var showLearn = false
 
-    #if DEBUG
-        @State private var hookLesson: Technique?
-    #endif
-
-    @Environment(Router.self) private var router
+    @Environment(AppRouter.self) private var router
+    @Environment(HomeRouter.self) private var homeRouter
     @Environment(ThemeStore.self) private var themeStore
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(\.colorScheme) private var colorScheme
@@ -39,7 +31,7 @@ struct HomeView: View {
                         newGameRow(theme: theme)
                     } else {
                         PrimaryButton("home.newGame", systemImage: "plus") {
-                            showNewGame = true
+                            router.presentedSheet = .newGame
                         }
                     }
                     DailyChallengeCard(
@@ -53,7 +45,7 @@ struct HomeView: View {
                             difficulty: slot.difficulty,
                         )))
                     }
-                    LearnCard { showLearn = true }
+                    LearnCard { homeRouter.push(.learn) }
                 } else {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -63,56 +55,18 @@ struct HomeView: View {
             .padding(20)
         }
         .background(theme.screenBackground)
-        .navigationDestination(isPresented: $showLearn) {
-            LearnView()
-        }
-        #if DEBUG
-        .navigationDestination(item: $hookLesson) { technique in
-            LessonView(technique: technique)
-        }
-        #endif
         .navigationTitle(Text("app.title", bundle: .module))
         .toolbarTitleDisplayMode(.inline)
-        .task { await viewModel.refresh() }
+        // Keyed on the cover being down: the game cover doesn't refire
+        // onAppear underneath on dismissal, and presenting it needs no reload.
+        .task(id: router.presentedFullScreen == nil) {
+            guard router.presentedFullScreen == nil else { return }
+            await viewModel.refresh()
+        }
         .onAppear {
             // Refresh when the tab is re-selected (task only fires once).
             Task { await viewModel.refresh() }
             handleLaunchHooks()
-        }
-        .onChange(of: router.game) { _, game in
-            // The game cover doesn't refire onAppear underneath on dismissal.
-            if game == nil {
-                Task { await viewModel.refresh() }
-            }
-        }
-        .sheet(isPresented: $showNewGame) {
-            NewGameSheet(
-                hardcoreDefault: hardcoreDefault,
-                isPremium: premiumGate.isPremium,
-                lineup: viewModel.dailyState.value,
-                onStart: { variant, difficulty, mode in
-                    router.play(GameLaunch(
-                        kind: .new(variant: variant, difficulty: difficulty, mode: mode),
-                    ))
-                },
-                onPlayDaily: { slot in
-                    guard let lineup = viewModel.dailyState.value else { return }
-                    router.play(GameLaunch(kind: .daily(
-                        dateKey: lineup.dateKey,
-                        variant: slot.variant,
-                        difficulty: slot.difficulty,
-                    )))
-                },
-                onSoftWall: { variant in
-                    softWall = SoftWallContext(variant: variant)
-                },
-            )
-        }
-        .sheet(item: $softWall) { context in
-            SoftWallView(variant: context.variant)
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
         }
     }
 
@@ -124,16 +78,18 @@ struct HomeView: View {
             }
             launchHooksHandled = true
             if LaunchHooks.openNewGameSheet {
-                showNewGame = true
+                router.presentedSheet = .newGame
             }
             if LaunchHooks.openPaywall {
-                showPaywall = true
+                router.presentedSheet = .paywall
             }
             if LaunchHooks.openLearn {
-                showLearn = true
+                homeRouter.push(.learn)
             }
-            if let slug = LaunchHooks.lessonTechnique {
-                hookLesson = Technique(rawValue: slug)
+            if let slug = LaunchHooks.lessonTechnique,
+               let technique = Technique(rawValue: slug)
+            {
+                homeRouter.push(.lesson(technique))
             }
             if let start = LaunchHooks.autostart,
                let variant = SudokuVariant(rawValue: start.variantSlug),
@@ -150,7 +106,7 @@ struct HomeView: View {
     /// owns the primary button.
     private func newGameRow(theme: Theme) -> some View {
         Button {
-            showNewGame = true
+            router.presentedSheet = .newGame
         } label: {
             CardView {
                 HStack(spacing: 14) {
@@ -212,7 +168,7 @@ struct HomeView: View {
             Spacer()
             if !premiumGate.isPremium {
                 Button {
-                    showPaywall = true
+                    router.presentedSheet = .paywall
                 } label: {
                     Label {
                         Text("home.premium", bundle: .module)

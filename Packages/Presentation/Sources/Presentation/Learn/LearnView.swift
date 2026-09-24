@@ -2,8 +2,10 @@ import Model
 import SwiftUI
 
 /// The learning section's technique list, grouped by difficulty band. Each
-/// row pushes the technique's lesson.
+/// row hands the technique to the owning stack, which pushes its lesson.
 struct LearnView: View {
+    let onSelect: (Technique) -> Void
+
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
@@ -13,7 +15,9 @@ struct LearnView: View {
             ForEach(LessonGroup.allCases, id: \.self) { group in
                 Section {
                     ForEach(group.techniques, id: \.self) { technique in
-                        NavigationLink(value: technique) {
+                        DisclosureRow {
+                            onSelect(technique)
+                        } label: {
                             Text(verbatim: technique.lessonName)
                                 .foregroundStyle(theme.textPrimary)
                         }
@@ -26,8 +30,5 @@ struct LearnView: View {
         .scrollContentBackground(.hidden)
         .background(theme.screenBackground)
         .navigationTitle(Text("learn.title", bundle: .module))
-        .navigationDestination(for: Technique.self) { technique in
-            LessonView(technique: technique)
-        }
     }
 }

@@ -1,5 +1,5 @@
 /// Streak counters surfaced on the home and stats screens.
-public struct StreakInfo: Equatable, Sendable, Codable {
+public struct StreakInfo: Hashable, Sendable, Codable {
     /// Consecutive calendar days with a completed daily challenge.
     public let currentDailyStreak: Int
     public let bestDailyStreak: Int

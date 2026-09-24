@@ -76,6 +76,21 @@ you write straightforward main-thread code and only step off it deliberately.
 Presentation depends on Domain (for the protocols it injects) and DI (for the
 keyPaths), but **never on Data**. It cannot reference a concrete repository.
 
+**Navigation** is centralized in `Sources/Presentation/Root/`. Every
+`NavigationStack` binds its path to its own `Router<Route>` (`Router.swift`,
+route enums and typealiases in `Routes.swift`), and the stack's root view holds
+the one `navigationDestination(for:)` switch that resolves its routes
+(`TabStacks.swift`). Screens navigate by pushing onto a router from the
+environment; there is no `NavigationLink`, `navigationDestination(isPresented:)`
+or `navigationDestination(item:)` anywhere. Modals follow the same shape: the
+`SheetDestination` and `FullScreenDestination` enums are built in the single
+`sheetDestinations(_:)` / `fullScreenDestination(_:)` switches
+(`Destinations.swift`), bound to `AppRouter.presentedSheet` /
+`presentedFullScreen` at the root, or to a modal's own `presentedSheet` state
+for a sheet presented from inside another modal. The one exception is the
+in-game hint sheet, bound to `GameViewModel.presentedHint`, because its actions
+mutate the live hint session rather than carry a value payload.
+
 ## Why a separate DI package?
 
 An earlier design kept registrations inside Data. That forced Presentation to link

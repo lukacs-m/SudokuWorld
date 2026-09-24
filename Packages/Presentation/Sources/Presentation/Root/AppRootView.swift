@@ -5,11 +5,16 @@ import Foundation
 import Model
 public import SwiftUI
 
-/// The app's root: owns the navigation stack, the theme store, and the
-/// launch-time side effects (purchases configuration, Game Center sign-in,
-/// reminder rescheduling). The app target's `@main` hands off here.
+/// The app's root: owns the routers (one per navigation stack plus the
+/// app-level one), the theme store, and the launch-time side effects
+/// (purchases configuration, Game Center sign-in, reminder rescheduling).
+/// The app target's `@main` hands off here.
 public struct AppRootView: View {
-    @State private var router = Router()
+    @State private var router = AppRouter()
+    @State private var homeRouter = HomeRouter()
+    @State private var eventsRouter = EventsRouter()
+    @State private var statsRouter = StatsRouter()
+    @State private var settingsRouter = SettingsRouter()
     @State private var themeStore = ThemeStore()
     @State private var premiumGate = PremiumGate()
     @State private var launched = false
@@ -21,7 +26,7 @@ public struct AppRootView: View {
     public var body: some View {
         TabView(selection: $router.selectedTab) {
             Tab(value: AppTab.home) {
-                NavigationStack { HomeView() }
+                HomeStack()
             } label: {
                 Label {
                     Text("tab.home", bundle: .module)
@@ -30,7 +35,7 @@ public struct AppRootView: View {
                 }
             }
             Tab(value: AppTab.events) {
-                NavigationStack { EventsHubView() }
+                EventsStack()
             } label: {
                 Label {
                     Text("home.events", bundle: .module)
@@ -39,7 +44,7 @@ public struct AppRootView: View {
                 }
             }
             Tab(value: AppTab.stats) {
-                NavigationStack { StatsView() }
+                StatsStack()
             } label: {
                 Label {
                     Text("home.stats", bundle: .module)
@@ -48,7 +53,7 @@ public struct AppRootView: View {
                 }
             }
             Tab(value: AppTab.settings) {
-                NavigationStack { SettingsView() }
+                SettingsStack()
             } label: {
                 Label {
                     Text("home.settings", bundle: .module)
@@ -59,16 +64,14 @@ public struct AppRootView: View {
         }
         #if os(iOS)
         .tabBarMinimizeBehavior(.onScrollDown)
-        .fullScreenCover(item: $router.game) { presentation in
-            NavigationStack { GameView(launch: presentation.launch) }
-        }
-        #else
-        // fullScreenCover doesn't exist on macOS (test builds only).
-        .sheet(item: $router.game) { presentation in
-            NavigationStack { GameView(launch: presentation.launch) }
-        }
         #endif
+        .sheetDestinations($router.presentedSheet)
+        .fullScreenDestination($router.presentedFullScreen)
         .environment(router)
+        .environment(homeRouter)
+        .environment(eventsRouter)
+        .environment(statsRouter)
+        .environment(settingsRouter)
         .environment(themeStore)
         .environment(premiumGate)
         .tint(themeStore.theme(for: colorScheme).accent)

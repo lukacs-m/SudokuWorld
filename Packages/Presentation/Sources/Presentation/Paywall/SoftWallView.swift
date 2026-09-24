@@ -10,7 +10,7 @@ struct SoftWallView: View {
     let variant: SudokuVariant
     let now: Date
 
-    @State private var showPaywall = false
+    @State private var presentedSheet: SheetDestination?
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -65,7 +65,7 @@ struct SoftWallView: View {
                     systemImage: "infinity",
                     theme: theme,
                 ) {
-                    showPaywall = true
+                    presentedSheet = .paywall
                 }
             }
         }
@@ -73,9 +73,7 @@ struct SoftWallView: View {
         .frame(maxWidth: .infinity)
         .background(theme.screenBackground)
         .presentationDetents([.medium])
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
-        }
+        .sheetDestinations($presentedSheet)
     }
 
     /// Both choices carry the same visual weight — deliberately.
@@ -118,14 +116,5 @@ struct SoftWallView: View {
     private var tomorrowVariants: [SudokuVariant] {
         let tomorrowKey = EventSeeds.dailyDateKey(for: EventSeeds.nextDailyReset(after: now))
         return EventSeeds.dailySlots(dateKey: tomorrowKey).dropFirst().map(\.variant)
-    }
-}
-
-/// Identifiable wrapper so call sites can drive `.sheet(item:)` with just a
-/// variant.
-struct SoftWallContext: Identifiable {
-    let variant: SudokuVariant
-    var id: String {
-        variant.slug
     }
 }

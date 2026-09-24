@@ -87,10 +87,11 @@ struct LessonView: View {
 struct LessonSheet: View {
     let technique: Technique
 
+    @State private var router = LessonSheetRouter()
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             LessonView(technique: technique)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {

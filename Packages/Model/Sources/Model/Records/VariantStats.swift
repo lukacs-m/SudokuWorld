@@ -1,7 +1,7 @@
 public import Foundation
 
 /// Aggregated results for one variant × difficulty cell of the stats matrix.
-public struct VariantStats: Equatable, Sendable, Codable {
+public struct VariantStats: Hashable, Sendable, Codable {
     public let variant: SudokuVariant
     public let difficulty: Difficulty
     public let played: Int

@@ -69,25 +69,19 @@ private struct VariantOutcomeGrid: View {
 /// variant the player has never finished has no time to hide, so everyone
 /// gets the plain card rather than a lock over a column of dashes.
 ///
-/// The sheet hangs above the gate: a purchase made in it flips the branch
-/// underneath, and a sheet owned by the locked branch would go with it
-/// before the paywall could confirm the purchase.
+/// The paywall is the app router's sheet, above the gate: a purchase made
+/// in it flips the branch underneath, and a sheet owned by the locked branch
+/// would go with it before the paywall could confirm the purchase.
 struct VariantDifficultyCard: View {
     let cells: [VariantStats]
 
-    @State private var showPaywall = false
     @Environment(PremiumGate.self) private var premiumGate
 
     var body: some View {
-        Group {
-            if !premiumGate.isPremium, cells.contains(where: { $0.fastestTime != nil }) {
-                LockedVariantDifficultyCard(cells: cells, showPaywall: $showPaywall)
-            } else {
-                CardView { VariantDifficultyRows(cells: cells) }
-            }
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView()
+        if !premiumGate.isPremium, cells.contains(where: { $0.fastestTime != nil }) {
+            LockedVariantDifficultyCard(cells: cells)
+        } else {
+            CardView { VariantDifficultyRows(cells: cells) }
         }
     }
 }
@@ -99,8 +93,8 @@ struct VariantDifficultyCard: View {
 /// per-difficulty counts away from the players this keeps them for.
 private struct LockedVariantDifficultyCard: View {
     let cells: [VariantStats]
-    @Binding var showPaywall: Bool
 
+    @Environment(AppRouter.self) private var router
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
@@ -112,7 +106,7 @@ private struct LockedVariantDifficultyCard: View {
             VStack(alignment: .leading, spacing: 12) {
                 VariantDifficultyRows(cells: cells, timesBlurred: true)
                 Button {
-                    showPaywall = true
+                    router.presentedSheet = .paywall
                 } label: {
                     LockedStatLabel(
                         titleKey: "stats.premium.variantTimes.title",
@@ -126,7 +120,7 @@ private struct LockedVariantDifficultyCard: View {
         }
         .contentShape(RoundedRectangle(cornerRadius: 20))
         .onTapGesture {
-            showPaywall = true
+            router.presentedSheet = .paywall
         }
     }
 }
@@ -213,17 +207,23 @@ private struct VariantDifficultyTimes: View {
 }
 
 #Preview("Free") {
-    NavigationStack {
+    @Previewable @State var router = StatsRouter()
+    NavigationStack(path: $router.path) {
         VariantDetailView(variant: .killer, overview: .masteryPreview)
     }
+    .environment(router)
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: false))
 }
 
 #Preview("Premium") {
-    NavigationStack {
+    @Previewable @State var router = StatsRouter()
+    NavigationStack(path: $router.path) {
         VariantDetailView(variant: .classic, overview: .masteryPreview)
     }
+    .environment(router)
+    .environment(AppRouter())
     .environment(ThemeStore())
     .environment(PremiumGate(isPremium: true))
 }

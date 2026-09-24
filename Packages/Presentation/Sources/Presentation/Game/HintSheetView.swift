@@ -12,7 +12,7 @@ struct HintSheetView: View {
     let onReveal: () -> Void
     let onDismiss: () -> Void
 
-    @State private var showLesson = false
+    @State private var presentedSheet: SheetDestination?
 
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -61,7 +61,7 @@ struct HintSheetView: View {
                     .foregroundStyle(theme.textSecondary)
 
                     Button {
-                        showLesson = true
+                        presentedSheet = .lesson(technique)
                     } label: {
                         Label {
                             Text("hint.learnMore", bundle: .module)
@@ -75,15 +75,13 @@ struct HintSheetView: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(theme.accent)
-                    .sheet(isPresented: $showLesson) {
-                        LessonSheet(technique: technique)
-                    }
+                    .sheetDestinations($presentedSheet)
                     #if DEBUG
-                    .onAppear {
-                        if LaunchHooks.openHintLesson {
-                            showLesson = true
+                        .onAppear {
+                            if LaunchHooks.openHintLesson {
+                                presentedSheet = .lesson(technique)
+                            }
                         }
-                    }
                     #endif
                 }
             }

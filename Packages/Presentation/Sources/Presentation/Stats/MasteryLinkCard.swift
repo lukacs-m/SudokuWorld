@@ -5,13 +5,14 @@ import SwiftUI
 struct MasteryLinkCard: View {
     let overview: StatsOverview
 
+    @Environment(StatsRouter.self) private var router
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         let theme = themeStore.theme(for: colorScheme)
-        NavigationLink {
-            MasteryMatrixView(overview: overview)
+        Button {
+            router.push(.mastery(overview))
         } label: {
             CardView {
                 HStack(spacing: 12) {

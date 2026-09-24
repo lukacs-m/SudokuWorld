@@ -14,8 +14,6 @@ final class DailyArchiveViewModel {
     /// Yesterday back to the 2026-01-01 rotation epoch, newest first.
     let dateKeys: [String]
     private(set) var lineups: [String: DailyLineup] = [:]
-    /// Bumped after a game ends so visible rows re-fetch completion state.
-    private(set) var generation = 0
 
     @ObservationIgnored @Injected(\.getDailyLineupUseCase) private var getDailyLineup
     @ObservationIgnored @Injected(\.resumeGameUseCase) private var resumeGame
@@ -44,18 +42,12 @@ final class DailyArchiveViewModel {
     func hasSavedGame(dateKey: String, variant: SudokuVariant) async -> Bool {
         await resumeGame(context: .daily(dateKey: dateKey, variant: variant)) != nil
     }
-
-    func invalidate() {
-        lineups = [:]
-        generation += 1
-    }
 }
 
 struct DailyArchiveView: View {
     @State private var viewModel = DailyArchiveViewModel()
-    @State private var softWall: SoftWallContext?
 
-    @Environment(Router.self) private var router
+    @Environment(AppRouter.self) private var router
     @Environment(PremiumGate.self) private var premiumGate
     @Environment(ThemeStore.self) private var themeStore
     @Environment(\.colorScheme) private var colorScheme
@@ -91,11 +83,12 @@ struct DailyArchiveView: View {
                                     difficulty: slot.difficulty,
                                 )))
                             } else {
-                                softWall = SoftWallContext(variant: slot.variant)
+                                router.presentedSheet = .softWall(slot.variant)
                             }
                         }
                     }
-                    .task(id: viewModel.generation) {
+                    .task(id: router.presentedFullScreen == nil) {
+                        guard router.presentedFullScreen == nil else { return }
                         await viewModel.load(dateKey: dateKey)
                     }
                 }
@@ -104,15 +97,6 @@ struct DailyArchiveView: View {
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("archive.title", bundle: .module))
-        .onChange(of: router.game) { _, game in
-            // The game cover doesn't refire row tasks underneath on its own.
-            if game == nil {
-                viewModel.invalidate()
-            }
-        }
-        .sheet(item: $softWall) { context in
-            SoftWallView(variant: context.variant)
-        }
     }
 }
 
