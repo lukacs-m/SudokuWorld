@@ -103,11 +103,12 @@ struct DailyArchiveView: View {
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("archive.title", bundle: .module))
-        .onChange(of: router.presentedFullScreen) { _, presented in
-            // The game cover doesn't refire row tasks underneath on its own.
-            if presented == nil {
-                viewModel.invalidate()
-            }
+        // Keyed on the cover being down: the game cover doesn't refire row
+        // tasks underneath on its own. On first appearance the rows have
+        // fetched nothing yet, so there is nothing to invalidate.
+        .task(id: router.presentedFullScreen == nil) {
+            guard router.presentedFullScreen == nil, !viewModel.lineups.isEmpty else { return }
+            viewModel.invalidate()
         }
     }
 }

@@ -57,17 +57,16 @@ struct HomeView: View {
         .background(theme.screenBackground)
         .navigationTitle(Text("app.title", bundle: .module))
         .toolbarTitleDisplayMode(.inline)
-        .task { await viewModel.refresh() }
+        // Keyed on the cover being down: the game cover doesn't refire
+        // onAppear underneath on dismissal, and presenting it needs no reload.
+        .task(id: router.presentedFullScreen == nil) {
+            guard router.presentedFullScreen == nil else { return }
+            await viewModel.refresh()
+        }
         .onAppear {
             // Refresh when the tab is re-selected (task only fires once).
             Task { await viewModel.refresh() }
             handleLaunchHooks()
-        }
-        .onChange(of: router.presentedFullScreen) { _, presented in
-            // The game cover doesn't refire onAppear underneath on dismissal.
-            if presented == nil {
-                Task { await viewModel.refresh() }
-            }
         }
     }
 

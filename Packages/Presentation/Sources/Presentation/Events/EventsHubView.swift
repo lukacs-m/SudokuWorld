@@ -43,14 +43,13 @@ struct EventsHubView: View {
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("events.title", bundle: .module))
-        .task { await viewModel.load() }
-        .task { await viewModel.observeAuthState() }
-        .onChange(of: router.presentedFullScreen) { _, presented in
-            // The game cover doesn't refire onAppear underneath on dismissal.
-            if presented == nil {
-                Task { await viewModel.load() }
-            }
+        // Keyed on the cover being down: the game cover doesn't refire
+        // onAppear underneath on dismissal, and presenting it needs no reload.
+        .task(id: router.presentedFullScreen == nil) {
+            guard router.presentedFullScreen == nil else { return }
+            await viewModel.load()
         }
+        .task { await viewModel.observeAuthState() }
     }
 
     private func dailyCard(_ daily: DailyLineup, theme: Theme) -> some View {
