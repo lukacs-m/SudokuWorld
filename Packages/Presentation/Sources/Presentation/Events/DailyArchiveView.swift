@@ -14,8 +14,6 @@ final class DailyArchiveViewModel {
     /// Yesterday back to the 2026-01-01 rotation epoch, newest first.
     let dateKeys: [String]
     private(set) var lineups: [String: DailyLineup] = [:]
-    /// Bumped after a game ends so visible rows re-fetch completion state.
-    private(set) var generation = 0
 
     @ObservationIgnored @Injected(\.getDailyLineupUseCase) private var getDailyLineup
     @ObservationIgnored @Injected(\.resumeGameUseCase) private var resumeGame
@@ -43,11 +41,6 @@ final class DailyArchiveViewModel {
     /// players — a saved game bypasses the soft wall.
     func hasSavedGame(dateKey: String, variant: SudokuVariant) async -> Bool {
         await resumeGame(context: .daily(dateKey: dateKey, variant: variant)) != nil
-    }
-
-    func invalidate() {
-        lineups = [:]
-        generation += 1
     }
 }
 
@@ -94,7 +87,8 @@ struct DailyArchiveView: View {
                             }
                         }
                     }
-                    .task(id: viewModel.generation) {
+                    .task(id: router.presentedFullScreen == nil) {
+                        guard router.presentedFullScreen == nil else { return }
                         await viewModel.load(dateKey: dateKey)
                     }
                 }
@@ -103,13 +97,6 @@ struct DailyArchiveView: View {
         }
         .background(theme.screenBackground)
         .navigationTitle(Text("archive.title", bundle: .module))
-        // Keyed on the cover being down: the game cover doesn't refire row
-        // tasks underneath on its own. On first appearance the rows have
-        // fetched nothing yet, so there is nothing to invalidate.
-        .task(id: router.presentedFullScreen == nil) {
-            guard router.presentedFullScreen == nil, !viewModel.lineups.isEmpty else { return }
-            viewModel.invalidate()
-        }
     }
 }
 
