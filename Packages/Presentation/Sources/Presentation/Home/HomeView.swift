@@ -80,9 +80,6 @@ struct HomeView: View {
             if LaunchHooks.openNewGameSheet {
                 router.presentedSheet = .newGame
             }
-            if LaunchHooks.openPaywall {
-                router.presentedSheet = .paywall
-            }
             if LaunchHooks.openLearn {
                 homeRouter.push(.learn)
             }
