@@ -45,7 +45,7 @@ public enum LaunchHooks {
             UserDefaults.standard.string(forKey: "uiHookDifficultyStep")
         }
 
-        /// Present the paywall immediately on the home screen:
+        /// Present the paywall once purchases are configured at launch:
         /// `-uiHookPaywall YES`.
         public static var openPaywall: Bool {
             UserDefaults.standard.bool(forKey: "uiHookPaywall")

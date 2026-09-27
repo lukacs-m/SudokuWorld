@@ -97,6 +97,13 @@ public struct AppRootView: View {
             #endif
             await themeStore.load()
             await LaunchTasks.run()
+            #if DEBUG
+                // Only once purchases are configured, or the paywall loads
+                // into the "unavailable" state.
+                if LaunchHooks.openPaywall {
+                    router.presentedSheet = .paywall
+                }
+            #endif
             // Never returns: follows entitlement changes for the
             // app's lifetime, after purchases are configured.
             await premiumGate.start()
