@@ -62,6 +62,9 @@ struct NewGameSheet: View {
             await viewModel.load()
             computeChips()
         }
+        .onChange(of: viewModel.hardcoreByDefault) { _, stored in
+            hardcore = stored
+        }
         .onAppear {
             #if DEBUG
                 if let slug = LaunchHooks.rulesVariant,
